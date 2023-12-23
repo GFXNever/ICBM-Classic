@@ -7,14 +7,13 @@ import net.minecraft.util.ResourceLocation;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class SaveNodeResourceLocation<E> extends NbtSaveNode<E, NBTTagString>
-{
-    public SaveNodeResourceLocation(final String name, Function<E, ResourceLocation> save, BiConsumer<E, ResourceLocation> load)
-    {
+public class SaveNodeResourceLocation<E> extends NbtSaveNode<E, NBTTagString> {
+
+    public SaveNodeResourceLocation(final String name, Function<E, ResourceLocation> save, BiConsumer<E, ResourceLocation> load) {
         super(name,
             (obj) -> {
                 final ResourceLocation key = save.apply(obj);
-                if(key == null) {
+                if (key == null) {
                     return null;
                 }
                 return new NBTTagString(key.toString());
@@ -24,4 +23,5 @@ public class SaveNodeResourceLocation<E> extends NbtSaveNode<E, NBTTagString>
             }
         );
     }
+
 }

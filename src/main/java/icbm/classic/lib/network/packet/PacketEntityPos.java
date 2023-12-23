@@ -11,24 +11,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * Packet to handle updating entity position, motion, and rotation.
  * Usually after teleporting server side.
- *
  */
 @Deprecated
-public class PacketEntityPos extends PacketBase<PacketEntityPos>
-{
+public class PacketEntityPos extends PacketBase<PacketEntityPos> {
+
     public int entityId;
     public int world;
     public double x, y, z;
     public double mx, my, mz;
     public float yaw, pitch;
 
-    public PacketEntityPos()
-    {
+    public PacketEntityPos() {
         //Needed for forge to construct the packet
     }
 
-    public PacketEntityPos(Entity entity)
-    {
+    public PacketEntityPos(Entity entity) {
         this.entityId = entity.getEntityId();
         this.world = entity.world.provider.getDimension();
         this.x = entity.posX;
@@ -42,8 +39,7 @@ public class PacketEntityPos extends PacketBase<PacketEntityPos>
     }
 
     @Override
-    public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
-    {
+    public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer) {
         buffer.writeInt(entityId);
         buffer.writeInt(world);
         buffer.writeDouble(x);
@@ -58,8 +54,7 @@ public class PacketEntityPos extends PacketBase<PacketEntityPos>
     }
 
     @Override
-    public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
-    {
+    public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer) {
         entityId = buffer.readInt();
         world = buffer.readInt();
         x = buffer.readDouble();
@@ -75,12 +70,10 @@ public class PacketEntityPos extends PacketBase<PacketEntityPos>
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void handleClientSide(Minecraft minecraft, EntityPlayer player)
-    {
-        if (player != null && player.world.provider.getDimension() == world)
-        {
+    public void handleClientSide(Minecraft minecraft, EntityPlayer player) {
+        if (player != null && player.world.provider.getDimension() == world) {
             final Entity entity = player.world.getEntityByID(entityId);
-            if(entity != null) {
+            if (entity != null) {
                 entity.setPosition(x, y, z);
                 entity.motionX = mx;
                 entity.motionY = my;
@@ -92,7 +85,7 @@ public class PacketEntityPos extends PacketBase<PacketEntityPos>
     }
 
     @Override
-    public void handleServerSide(EntityPlayer player)
-    {
+    public void handleServerSide(EntityPlayer player) {
     }
+
 }

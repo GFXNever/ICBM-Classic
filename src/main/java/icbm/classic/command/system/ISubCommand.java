@@ -13,8 +13,7 @@ import java.util.List;
 /**
  * Created by Robert Seifert on 1/6/20.
  */
-public interface ISubCommand
-{
+public interface ISubCommand {
 
     /**
      * Called to run the command
@@ -31,8 +30,7 @@ public interface ISubCommand
      *
      * @param sender
      */
-    default void displayHelp(ICommandSender sender)
-    {
+    default void displayHelp(ICommandSender sender) {
         sender.sendMessage(new TextComponentString(getUsage(sender)));
     }
 
@@ -45,7 +43,8 @@ public interface ISubCommand
      * @param targetPos - block position for the command
      * @return empty list or list containing suggestions
      */
-    List<String> getTabSuggestions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args, @Nullable BlockPos targetPos);
+    List<String> getTabSuggestions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args,
+                                   @Nullable BlockPos targetPos);
 
 
     /**
@@ -69,4 +68,5 @@ public interface ISubCommand
      * @param parent - command's parent
      */
     void setParent(ICommandGroup parent);
+
 }

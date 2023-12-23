@@ -10,8 +10,8 @@ import net.minecraftforge.common.config.Config;
  */
 @Config(modid = ICBMConstants.DOMAIN, name = "icbmclassic/launcher")
 @Config.LangKey("config.icbmclassic:launcher.title")
-public class ConfigLauncher
-{
+public class ConfigLauncher {
+
     @Config.Name("max_range")
     @Config.Comment("Range of silo launcher in blocks (meters)")
     public static int RANGE = 10000;
@@ -35,4 +35,5 @@ public class ConfigLauncher
     @Config.Name("power_per_launch")
     @Config.Comment("Energy consumed per launcher")
     public static int POWER_COST = 1200;
+
 }

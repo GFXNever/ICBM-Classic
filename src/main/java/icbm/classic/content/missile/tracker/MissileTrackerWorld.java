@@ -20,11 +20,11 @@ import java.util.LinkedList;
 
 /**
  * Per world handler for tracking and simulating missiles
- *
+ * <p>
  * Created by GHXX on 7/31/2018.
  */
-public class MissileTrackerWorld extends WorldSavedData
-{
+public class MissileTrackerWorld extends WorldSavedData {
+
     //Constants
     private final int speedPerSecond = 10; //10 blocks per second
     private final int unloadChunkCooldown = 60; //1 minute
@@ -36,14 +36,14 @@ public class MissileTrackerWorld extends WorldSavedData
 
     //Chunk stuff
     private ForgeChunkManager.Ticket chunkLoadTicket;   //The chunkloading ticket used for loading chunks
-    private LinkedList<LoadedChunkPair> currentLoadedChunks;    //Stores the currently loaded chunks along with a timer how long they will be loaded for
+    private LinkedList<LoadedChunkPair> currentLoadedChunks;
+        //Stores the currently loaded chunks along with a timer how long they will be loaded for
 
     //Tick counter for reducing the simulation speed
     private int ticks = 0;
 
     //Constructor has to be (String) or it will break
-    public MissileTrackerWorld(String identifier)
-    {
+    public MissileTrackerWorld(String identifier) {
         super(identifier);
         missileList = new LinkedList<>();
         currentLoadedChunks = new LinkedList<>();
@@ -53,11 +53,11 @@ public class MissileTrackerWorld extends WorldSavedData
 
     /**
      * Called to simulate the missile
+     *
      * @param missile
      */
-    void simulateMissile(EntityExplosiveMissile missile)
-    {
-        if(ConfigDebug.DEBUG_MISSILE_TRACKER) {
+    void simulateMissile(EntityExplosiveMissile missile) {
+        if (ConfigDebug.DEBUG_MISSILE_TRACKER) {
             final String formatted = String.format("MissileTracker[%s]: Simulating missile: %s",
                 missile.world.provider.getDimension(),
                 missile
@@ -66,8 +66,7 @@ public class MissileTrackerWorld extends WorldSavedData
         }
 
         //Only run on server
-        if (!missile.world.isRemote && missile.getMissileCapability().getTargetData()  != null)
-        {
+        if (!missile.world.isRemote && missile.getMissileCapability().getTargetData() != null) {
             //Clear flight logic, once we are out of simulation the computer is dead
             missile.getMissileCapability().setFlightLogic(null); //TODO create custom sim-logic flight logic to better handle re-entry
 
@@ -93,29 +92,25 @@ public class MissileTrackerWorld extends WorldSavedData
     /**
      * Called each time the world ticks
      */
-    public void onWorldTick(final World world)
-    {
+    public void onWorldTick(final World world) {
         if (ticks++ >= 20)  //Run every 20 ticks = 1 second
         {
             ticks = 0;
             int mIndex = 0;
             //Loop through all simulated missiles
             final Iterator<MissileTrackerData> missileIterator = missileList.iterator();
-            while(missileIterator.hasNext())
-            {
+            while (missileIterator.hasNext()) {
                 //Get current missile
                 MissileTrackerData missile = missileIterator.next();
                 if (missile.ticksLeftToTarget <= 0) //If missile is at the target location
                 {
                     //If we haven't got a chunkload ticket then create one
-                    if (chunkLoadTicket == null)
-                    {
+                    if (chunkLoadTicket == null) {
                         chunkLoadTicket = ForgeChunkManager.requestTicket(ICBMClassic.INSTANCE, world, ForgeChunkManager.Type.NORMAL);
 
-                        if(chunkLoadTicket != null) //If we just created a ticket then we queue up all chunks which may have been kept forced to unforce them later
+                        if (chunkLoadTicket != null) //If we just created a ticket then we queue up all chunks which may have been kept forced to unforce them later
                         {
-                            for(ChunkPos cp : chunkLoadTicket.getChunkList())
-                            {
+                            for (ChunkPos cp : chunkLoadTicket.getChunkList()) {
                                 this.currentLoadedChunks.add(new LoadedChunkPair(cp, unloadChunkCooldown));
                             }
                         }
@@ -138,21 +133,20 @@ public class MissileTrackerWorld extends WorldSavedData
                         currentLoadedChunk = new ChunkPos((int) missile.targetPos.x() >> 4, -1 + ((int) missile.targetPos.z() >> 4));
                         forceChunk(currentLoadedChunk, chunkLoadTicket);
 
-                    }
-                    else
-                    {
-                        ICBMClassic.logger().warn("Unable to receive chunkloading ticket. You could try to increase the maximum loaded chunks for ICBM.");
+                    } else {
+                        ICBMClassic.logger()
+                            .warn("Unable to receive chunkloading ticket. You could try to increase the maximum loaded chunks for ICBM.");
                     }
 
                     missile.preLoadChunkTimer = preLoadChunkTimer;
                     missileSpawnList.add(missile);
                     missileIterator.remove();
-                }
-                else //If we aren't at the target location then simulate it for another tick
+                } else //If we aren't at the target location then simulate it for another tick
                 {
                     missile.ticksLeftToTarget--;
-                    if(ConfigDebug.DEBUG_MISSILE_TRACKER)
-                        ICBMClassic.logger().log(Level.INFO,"MissileTracker Missile ["+mIndex+"]: Simulation ticks left: "+missile.ticksLeftToTarget);
+                    if (ConfigDebug.DEBUG_MISSILE_TRACKER)
+                        ICBMClassic.logger()
+                            .log(Level.INFO, "MissileTracker Missile [" + mIndex + "]: Simulation ticks left: " + missile.ticksLeftToTarget);
                 }
                 mIndex++;
             }
@@ -162,23 +156,19 @@ public class MissileTrackerWorld extends WorldSavedData
             {
                 ChunkPos chunkPos = currentLoadedChunks.get(i).chunkPos;
                 int waitTime = currentLoadedChunks.get(i).timeLeft - 1;
-                if (waitTime <= 0)
-                {
-                    if(!MinecraftForge.EVENT_BUS.post(new MissileChunkEvent.Unload(new LoadedChunkPair(chunkPos, waitTime), chunkLoadTicket)))
-                    {
+                if (waitTime <= 0) {
+                    if (!MinecraftForge.EVENT_BUS.post(new MissileChunkEvent.Unload(new LoadedChunkPair(chunkPos, waitTime), chunkLoadTicket))) {
                         ForgeChunkManager.unforceChunk(chunkLoadTicket, chunkPos);
                         currentLoadedChunks.remove(i);
                     }
-                }
-                else
-                {
+                } else {
                     currentLoadedChunks.set(i, new LoadedChunkPair(chunkPos, waitTime));
                 }
             }
 
             //Check missile spawn-queue
             final Iterator<MissileTrackerData> spawnIterator = missileSpawnList.iterator();
-            while(spawnIterator.hasNext()) // TODO wait for callback maybe instead of waiting a set amount of time
+            while (spawnIterator.hasNext()) // TODO wait for callback maybe instead of waiting a set amount of time
             {
                 final MissileTrackerData mtd = spawnIterator.next();
 
@@ -186,8 +176,7 @@ public class MissileTrackerWorld extends WorldSavedData
                 mtd.preLoadChunkTimer--;
 
                 //Check if ready to launch
-                if (mtd.preLoadChunkTimer <= 0)
-                {
+                if (mtd.preLoadChunkTimer <= 0) {
                     //Load missile into world
                     spawnMissileOnDestination(world, mtd);
 
@@ -201,8 +190,7 @@ public class MissileTrackerWorld extends WorldSavedData
         }
     }
 
-    private void spawnMissileOnDestination(final World world, MissileTrackerData mtd)
-    {
+    private void spawnMissileOnDestination(final World world, MissileTrackerData mtd) {
         //Create entity
         EntityExplosiveMissile missile = new EntityExplosiveMissile(world);
 
@@ -217,7 +205,7 @@ public class MissileTrackerWorld extends WorldSavedData
         missile.rotateTowardsMotion(1);
 
         // Change over to dead aim if we have no custom flight system
-        if(missile.getMissileCapability().getFlightLogic() == null) {
+        if (missile.getMissileCapability().getFlightLogic() == null) {
             missile.getMissileCapability().setFlightLogic(new DeadFlightLogic(100));
         }
 
@@ -227,17 +215,17 @@ public class MissileTrackerWorld extends WorldSavedData
         //Spawn entity
         missile.world().spawnEntity(missile);
 
-        if(ConfigDebug.DEBUG_MISSILE_TRACKER)
-            ICBMClassic.logger().info("MissileTracker[" + missile.world.provider.getDimension() + "]: Missile spawned by missile tracker: " + missile);
+        if (ConfigDebug.DEBUG_MISSILE_TRACKER)
+            ICBMClassic.logger()
+                .info("MissileTracker[" + missile.world.provider.getDimension() + "]: Missile spawned by missile tracker: " + missile);
     }
 
     //Helper method for forcing a chunk (chunkloading)
-    private void forceChunk(ChunkPos chunkPos, ForgeChunkManager.Ticket ticket)
-    {
-        for (int i = 0; i < currentLoadedChunks.size(); i++) // check if the chunk that should be loaded is loaded already. If so then just reset the remaining time.
+    private void forceChunk(ChunkPos chunkPos, ForgeChunkManager.Ticket ticket) {
+        for (int i =
+             0; i < currentLoadedChunks.size(); i++) // check if the chunk that should be loaded is loaded already. If so then just reset the remaining time.
         {
-            if (currentLoadedChunks.get(i).chunkPos == chunkPos)
-            {
+            if (currentLoadedChunks.get(i).chunkPos == chunkPos) {
                 currentLoadedChunks.set(i, new LoadedChunkPair(chunkPos, unloadChunkCooldown));
                 return;
             }
@@ -245,20 +233,17 @@ public class MissileTrackerWorld extends WorldSavedData
 
         LoadedChunkPair pair = new LoadedChunkPair(chunkPos, unloadChunkCooldown);
 
-        if(!MinecraftForge.EVENT_BUS.post(new MissileChunkEvent.Load(pair, ticket)))
-        {
+        if (!MinecraftForge.EVENT_BUS.post(new MissileChunkEvent.Load(pair, ticket))) {
             currentLoadedChunks.add(pair);
             ForgeChunkManager.forceChunk(ticket, chunkPos);
         }
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    public void readFromNBT(NBTTagCompound nbt) {
         //Load missiles
         NBTTagList list = nbt.getTagList(NBTConstants.MISSILES, 10);
-        for (int i = 0; i < list.tagCount(); i++)
-        {
+        for (int i = 0; i < list.tagCount(); i++) {
             NBTTagCompound missileSave = list.getCompoundTagAt(i);
             MissileTrackerData mtd = new MissileTrackerData(missileSave);
             missileList.add(mtd);
@@ -266,8 +251,7 @@ public class MissileTrackerWorld extends WorldSavedData
 
         //Load missiles that will spawn
         list = nbt.getTagList(NBTConstants.SPAWNS, 10);
-        for (int i = 0; i < list.tagCount(); i++)
-        {
+        for (int i = 0; i < list.tagCount(); i++) {
             NBTTagCompound missileSave = list.getCompoundTagAt(i);
             MissileTrackerData mtd = new MissileTrackerData(missileSave);
             missileSpawnList.add(mtd);
@@ -275,12 +259,10 @@ public class MissileTrackerWorld extends WorldSavedData
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
+    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         //Save missiles
         NBTTagList list = new NBTTagList();
-        for (MissileTrackerData mtd : missileList)
-        {
+        for (MissileTrackerData mtd : missileList) {
             NBTTagCompound compound = new NBTTagCompound();
             mtd.writeToNBT(compound);
             list.appendTag(compound);
@@ -289,8 +271,7 @@ public class MissileTrackerWorld extends WorldSavedData
 
         //Save missiles that will spawn
         list = new NBTTagList();
-        for (MissileTrackerData mtd : missileSpawnList)
-        {
+        for (MissileTrackerData mtd : missileSpawnList) {
             NBTTagCompound compound = new NBTTagCompound();
             mtd.writeToNBT(compound);
             list.appendTag(compound);
@@ -301,12 +282,12 @@ public class MissileTrackerWorld extends WorldSavedData
     }
 
     // clear buffers
-    public void destroy()
-    {
+    public void destroy() {
         this.missileList.clear();
         this.missileSpawnList.clear();
 
         chunkLoadTicket = null;
         currentLoadedChunks.clear();
     }
+
 }

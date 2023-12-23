@@ -22,30 +22,30 @@ import javax.annotation.Nullable;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 4/19/2020.
  */
-public class EntityRedmatter extends Entity
-{
+public class EntityRedmatter extends Entity {
+
     public static final String NBT_BLAST_SIZE = "blast_size";
     public static final String NBT_BLAST_SIZE_MAX = "blast_size_max";
 
 
     public static final float MAX_SPEED = 0.5f;
     public static final float SPEED_REDUCTION = 0.98f;
-
+    /**
+     * Actual size of the redmatter
+     */
+    private static final DataParameter<Float> SIZE_DATA = EntityDataManager.createKey(EntityRedmatter.class, DataSerializers.FLOAT);
+    /**
+     * Largest possible size of the redmatter
+     */
+    private static final DataParameter<Float> MAX_SIZE_DATA = EntityDataManager.createKey(EntityRedmatter.class, DataSerializers.FLOAT);
     //Acts as an API wrapper for the entity
     public final BlastRedmatterWrapper blastData = new BlastRedmatterWrapper(this);
     public final CapRedmatterPull capRedmatterPull = new CapRedmatterPull(this);
-
     //Handlers
     public final RedmatterClientLogic clientLogic = new RedmatterClientLogic(this);
     public final RedmatterLogic redmatterLogic = new RedmatterLogic(this);
 
-    /** Actual size of the redmatter */
-    private static final DataParameter<Float> SIZE_DATA = EntityDataManager.createKey(EntityRedmatter.class, DataSerializers.FLOAT);
-    /** Largest possible size of the redmatter */
-    private static final DataParameter<Float> MAX_SIZE_DATA = EntityDataManager.createKey(EntityRedmatter.class, DataSerializers.FLOAT);
-
-    public EntityRedmatter(World world)
-    {
+    public EntityRedmatter(World world) {
         super(world);
         this.setSize(0.98F, 0.98F);
         this.preventEntitySpawning = true;
@@ -55,15 +55,13 @@ public class EntityRedmatter extends Entity
     }
 
     @Override
-    protected void entityInit()
-    {
+    protected void entityInit() {
         this.dataManager.register(SIZE_DATA, ConfigBlast.redmatter.DEFAULT_SIZE);
         this.dataManager.register(MAX_SIZE_DATA, ConfigBlast.redmatter.MAX_SIZE);
     }
 
     @Override
-    public void onUpdate()
-    {
+    public void onUpdate() {
         super.onUpdate();
 
         //Update motion until we hit zero
@@ -75,22 +73,19 @@ public class EntityRedmatter extends Entity
         }
 
         //Run only if server
-        if(!world.isRemote)
-        {
+        if (!world.isRemote) {
             redmatterLogic.tick();
         }
     }
 
     //<editor-fold desc="motion handling">
-    private void reduceMotion()
-    {
+    private void reduceMotion() {
         this.motionX *= SPEED_REDUCTION;
         this.motionY *= SPEED_REDUCTION;
         this.motionZ *= SPEED_REDUCTION;
     }
 
-    private void correctMotion()
-    {
+    private void correctMotion() {
         //TODO see if we can remove the sqrt and if the limit should be in an if-statement
 
         //Normalize motion as a speed value
@@ -109,21 +104,17 @@ public class EntityRedmatter extends Entity
 
     //<editor-fold desc="saving">
     @Override
-    protected void readEntityFromNBT(NBTTagCompound nbt)
-    {
-        if(nbt.hasKey(NBT_BLAST_SIZE))
-        {
+    protected void readEntityFromNBT(NBTTagCompound nbt) {
+        if (nbt.hasKey(NBT_BLAST_SIZE)) {
             setBlastSize(nbt.getFloat(NBT_BLAST_SIZE));
         }
-        if(nbt.hasKey(NBT_BLAST_SIZE_MAX))
-        {
+        if (nbt.hasKey(NBT_BLAST_SIZE_MAX)) {
             setBlastSize(nbt.getFloat(NBT_BLAST_SIZE_MAX));
         }
     }
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound nbt)
-    {
+    protected void writeEntityToNBT(NBTTagCompound nbt) {
         nbt.setFloat(NBT_BLAST_SIZE, getBlastSize());
         nbt.setFloat(NBT_BLAST_SIZE_MAX, getBlastMaxSize());
     }
@@ -131,61 +122,51 @@ public class EntityRedmatter extends Entity
 
     //<editor-fold desc="disabled-props">
     @Override
-    protected boolean canTriggerWalking()
-    {
+    protected boolean canTriggerWalking() {
         return false;
     }
 
     @Override
-    public boolean canBeCollidedWith()
-    {
+    public boolean canBeCollidedWith() {
         return false;
     }
     //</editor-fold>
 
     //<editor-fold desc="cap-system">
     @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
-    {
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
         return capability == ICBMClassicAPI.BLAST_CAPABILITY
-                || capability == ICBMClassicAPI.BLAST_VELOCITY_CAPABILITY
-                || super.hasCapability(capability, facing);
+            || capability == ICBMClassicAPI.BLAST_VELOCITY_CAPABILITY
+            || super.hasCapability(capability, facing);
     }
 
     @Override
     @Nullable
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
-    {
-        if (capability == ICBMClassicAPI.BLAST_CAPABILITY)
-        {
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == ICBMClassicAPI.BLAST_CAPABILITY) {
             return ICBMClassicAPI.BLAST_CAPABILITY.cast(blastData);
-        }
-        else if (capability == ICBMClassicAPI.BLAST_VELOCITY_CAPABILITY)
-        {
+        } else if (capability == ICBMClassicAPI.BLAST_VELOCITY_CAPABILITY) {
             return ICBMClassicAPI.BLAST_VELOCITY_CAPABILITY.cast(capRedmatterPull);
         }
         return super.getCapability(capability, facing);
     }
     //</editor-fold>
 
-    public float getBlastSize()
-    {
+    public float getBlastSize() {
         return this.dataManager.get(SIZE_DATA);
     }
 
-    public float getBlastMaxSize()
-    {
-        return this.dataManager.get(MAX_SIZE_DATA);
-    }
-
-    public void setBlastSize(float size)
-    {
+    public void setBlastSize(float size) {
         final float limitedSize = Math.max(ConfigBlast.redmatter.MIN_SIZE, size);
         this.dataManager.set(SIZE_DATA, limitedSize);
     }
 
-    public void setBlastMaxSize(float size)
-    {
+    public float getBlastMaxSize() {
+        return this.dataManager.get(MAX_SIZE_DATA);
+    }
+
+    public void setBlastMaxSize(float size) {
         this.dataManager.set(MAX_SIZE_DATA, size);
     }
+
 }

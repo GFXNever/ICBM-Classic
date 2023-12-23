@@ -28,11 +28,10 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import javax.annotation.Nullable;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robin) on 1/16/2018.
  */
-public class BlockLaunchConnector extends BlockContainer
-{
+public class BlockLaunchConnector extends BlockContainer {
+
     public static final PropertyBool UP = PropertyBool.create("up");
     public static final PropertyBool DOWN = PropertyBool.create("down");
     public static final PropertyBool NORTH = PropertyBool.create("north");
@@ -40,8 +39,7 @@ public class BlockLaunchConnector extends BlockContainer
     public static final PropertyBool SOUTH = PropertyBool.create("south");
     public static final PropertyBool WEST = PropertyBool.create("west");
 
-    public BlockLaunchConnector()
-    {
+    public BlockLaunchConnector() {
         super(Material.IRON);
         blockHardness = 10f;
         blockResistance = 10f;
@@ -51,8 +49,7 @@ public class BlockLaunchConnector extends BlockContainer
     }
 
     @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
         final boolean upConnection = isConnection(worldIn, pos, EnumFacing.UP);
         final boolean downConnection = isConnection(worldIn, pos, EnumFacing.DOWN);
         final boolean northConnection = isConnection(worldIn, pos, EnumFacing.NORTH);
@@ -72,7 +69,7 @@ public class BlockLaunchConnector extends BlockContainer
     private boolean isConnection(IBlockAccess worldIn, BlockPos selfPos, EnumFacing side) {
         final BlockPos pos = selfPos.offset(side);
         final TileEntity tile = worldIn.getTileEntity(pos);
-        if(tile != null) {
+        if (tile != null) {
             return tile.hasCapability(CapabilityEnergy.ENERGY, side.getOpposite())
                 || tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.getOpposite());
         }
@@ -81,26 +78,24 @@ public class BlockLaunchConnector extends BlockContainer
 
 
     @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
+    public IBlockState getStateFromMeta(int meta) {
         return getDefaultState();
     }
 
     @Override
-    public int getMetaFromState(IBlockState state)
-    {
+    public int getMetaFromState(IBlockState state) {
         return 0;
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing,
+                                    float hitX, float hitY, float hitZ) {
         final TileEntity tile = worldIn.getTileEntity(pos);
-        if (tile instanceof icbm.classic.content.blocks.launcher.frame.TileLauncherFrame)
-        {
-            if(playerIn.getHeldItem(hand).getItem() == Items.STONE_AXE) {
-                if(!worldIn.isRemote) {
-                    final LauncherNetwork network = ((icbm.classic.content.blocks.launcher.frame.TileLauncherFrame) tile).getNetworkNode().getNetwork();
+        if (tile instanceof icbm.classic.content.blocks.launcher.frame.TileLauncherFrame) {
+            if (playerIn.getHeldItem(hand).getItem() == Items.STONE_AXE) {
+                if (!worldIn.isRemote) {
+                    final LauncherNetwork network =
+                        ((icbm.classic.content.blocks.launcher.frame.TileLauncherFrame) tile).getNetworkNode().getNetwork();
                     playerIn.sendMessage(new TextComponentString("Network: " + network));
                     playerIn.sendMessage(new TextComponentString("L: " + network.getLaunchers().size()));
                 }
@@ -111,45 +106,39 @@ public class BlockLaunchConnector extends BlockContainer
     }
 
     @Deprecated
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @Override
-    protected BlockStateContainer createBlockState()
-    {
+    protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, UP, DOWN, NORTH, EAST, WEST, SOUTH);
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
+    public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer()
-    {
+    public BlockRenderLayer getBlockLayer() {
         return BlockRenderLayer.CUTOUT;
     }
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta)
-    {
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileLauncherConnector();
     }
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state)
-    {
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
         TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof ILauncherComponent)
-        {
+        if (tile instanceof ILauncherComponent) {
             ((ILauncherComponent) tile).getNetworkNode().onTileRemoved();
         }
         super.breakBlock(world, pos, state);
     }
+
 }

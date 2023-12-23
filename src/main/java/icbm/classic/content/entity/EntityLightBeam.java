@@ -15,30 +15,25 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 
-public class EntityLightBeam extends Entity implements IEntityAdditionalSpawnData
-{
+public class EntityLightBeam extends Entity implements IEntityAdditionalSpawnData {
+
+    //Data
+    private static final DataParameter<Float> BEAM_PROGRESS = EntityDataManager.createKey(EntityLightBeam.class, DataSerializers.FLOAT);
     //Render color
     public float red = 1;
     public float green = 0;
     public float blue = 0;
-
     //Render Size
     public float beamSize = 0.5f;
     public float beamGlowSize = 1f;
-
     //Client state
     public float clientBeamProgress = 0;
-
     //State
     public boolean deathCycle = false;
     public float targetBeamProgress = 1;
     public float beamGrowthRate = 0.05f;
 
-    //Data
-    private static final DataParameter<Float> BEAM_PROGRESS = EntityDataManager.createKey(EntityLightBeam.class, DataSerializers.FLOAT);
-
-    public EntityLightBeam(World world)
-    {
+    public EntityLightBeam(World world) {
         super(world);
         this.setSize(1F, 1F);
         this.preventEntitySpawning = true;
@@ -48,56 +43,47 @@ public class EntityLightBeam extends Entity implements IEntityAdditionalSpawnDat
     }
 
     @Override
-    protected void entityInit()
-    {
+    protected void entityInit() {
         this.getDataManager().register(BEAM_PROGRESS, -1f);
     }
 
-    public EntityLightBeam setPosition(IPos3D position)
-    {
+    public EntityLightBeam setPosition(IPos3D position) {
         this.setPosition(position.x(), position.y(), position.z());
         return this;
     }
 
-    public EntityLightBeam setColor(float red, float green, float blue)
-    {
+    public EntityLightBeam setColor(float red, float green, float blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
         return this;
     }
 
-    public void startDeathCycle()
-    {
+    public void startDeathCycle() {
         deathCycle = true;
     }
 
-    public void setTargetBeamProgress(float value)
-    {
+    public void setTargetBeamProgress(float value) {
         targetBeamProgress = value;
     }
 
-    public void setActualBeamProgress(float value)
-    {
+    public void setActualBeamProgress(float value) {
         this.getDataManager().set(BEAM_PROGRESS, Math.min(1, Math.max(0, value)));
     }
 
-    public float getBeamProgress()
-    {
+    public float getBeamProgress() {
         return this.getDataManager().get(BEAM_PROGRESS);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     @Nonnull
-    public AxisAlignedBB getRenderBoundingBox()
-    {
+    public AxisAlignedBB getRenderBoundingBox() {
         return new AxisAlignedBB(posX - 5, -10, posZ - 5, posX + 5, Double.POSITIVE_INFINITY, posZ + 5);
     }
 
     @Override
-    public void writeSpawnData(ByteBuf data)
-    {
+    public void writeSpawnData(ByteBuf data) {
         data.writeFloat(this.red);
         data.writeFloat(this.green);
         data.writeFloat(this.blue);
@@ -106,8 +92,7 @@ public class EntityLightBeam extends Entity implements IEntityAdditionalSpawnDat
     }
 
     @Override
-    public void readSpawnData(ByteBuf data)
-    {
+    public void readSpawnData(ByteBuf data) {
         this.red = data.readFloat();
         this.green = data.readFloat();
         this.blue = data.readFloat();
@@ -116,22 +101,18 @@ public class EntityLightBeam extends Entity implements IEntityAdditionalSpawnDat
     }
 
     @Override
-    public void onUpdate()
-    {
+    public void onUpdate() {
         //Grow beam slowly
-        if (getBeamProgress() < targetBeamProgress)
-        {
+        if (getBeamProgress() < targetBeamProgress) {
             setActualBeamProgress(Math.min(targetBeamProgress, getBeamProgress() + beamGrowthRate));
         }
         //Decrease size slowly
-        else if(getBeamProgress() > targetBeamProgress)
-        {
+        else if (getBeamProgress() > targetBeamProgress) {
             setActualBeamProgress(Math.max(targetBeamProgress, getBeamProgress() - beamGrowthRate));
         }
 
         //Kill off beam when animation finishes
-        if (deathCycle && Math.abs(getBeamProgress() - targetBeamProgress) <= 0.01)
-        {
+        if (deathCycle && Math.abs(getBeamProgress() - targetBeamProgress) <= 0.01) {
             setDead();
         }
         //Safety in case the beam is never killed
@@ -142,32 +123,28 @@ public class EntityLightBeam extends Entity implements IEntityAdditionalSpawnDat
     }
 
     @Override
-    public boolean canBePushed()
-    {
+    public boolean canBePushed() {
         return false;
     }
 
     @Override
-    protected boolean canTriggerWalking()
-    {
+    protected boolean canTriggerWalking() {
         return false;
     }
 
     @Override
-    public boolean canBeCollidedWith()
-    {
+    public boolean canBeCollidedWith() {
         return false;
     }
 
     @Override
-    protected void readEntityFromNBT(NBTTagCompound var1)
-    {
+    protected void readEntityFromNBT(NBTTagCompound var1) {
 
     }
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound var1)
-    {
+    protected void writeEntityToNBT(NBTTagCompound var1) {
 
     }
+
 }

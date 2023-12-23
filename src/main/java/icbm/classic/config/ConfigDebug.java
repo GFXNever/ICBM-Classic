@@ -4,13 +4,12 @@ import icbm.classic.ICBMConstants;
 import net.minecraftforge.common.config.Config;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 4/10/2018.
  */
 @Config(modid = ICBMConstants.DOMAIN, name = "icbmclassic/debug")
 @Config.LangKey("config.icbmclassic:debug.title")
-public class ConfigDebug
-{
+public class ConfigDebug {
+
     @Config.Name("debug_threads")
     @Config.Comment("Enables extra console output to check the state of the explosive threads.")
     public static boolean DEBUG_THREADS = false;
@@ -30,4 +29,5 @@ public class ConfigDebug
     @Config.Name("debug_missile_tracker")
     @Config.Comment("When enabled, additional debug output is written to the console regarding the missile tracker.")
     public static boolean DEBUG_MISSILE_TRACKER = false;
+
 }

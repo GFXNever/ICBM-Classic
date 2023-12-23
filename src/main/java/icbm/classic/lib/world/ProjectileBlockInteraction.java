@@ -30,21 +30,21 @@ public final class ProjectileBlockInteraction {
     // TODO once on 1.19 use TAG system to easily ID blocks "CollisionBasedPortal"
 
     public static void addBlockStateInteraction(IBlockState state, IProjectileBlockInteraction function) {
-        if(stateToInteraction.containsKey(state)) {
+        if (stateToInteraction.containsKey(state)) {
             ICBMClassic.logger().warn("interaction already exists for " + state + " replacing", new RuntimeException());
         }
         stateToInteraction.put(state, function);
     }
 
     public static void addBlockInteraction(Block block, IProjectileBlockInteraction function) {
-        if(blockToInteraction.containsKey(block)) {
+        if (blockToInteraction.containsKey(block)) {
             ICBMClassic.logger().warn("interaction already exists for " + block + " replacing", new RuntimeException());
         }
         blockToInteraction.put(block, function);
     }
 
     public static void addMaterialInteraction(Material material, IProjectileBlockInteraction function) {
-        if(materialToInteraction.containsKey(material)) {
+        if (materialToInteraction.containsKey(material)) {
             ICBMClassic.logger().warn("interaction already exists for " + material + " replacing", new RuntimeException());
         }
         materialToInteraction.put(material, function);
@@ -56,7 +56,7 @@ public final class ProjectileBlockInteraction {
 
     public static void breakBlockInteraction(Block block) {
         addBlockInteraction(block, (world, pos, hit, side, state, entity) -> {
-            if(breakBlock(world, pos, state, entity)) {
+            if (breakBlock(world, pos, state, entity)) {
                 return IProjectileBlockInteraction.EnumHitReactions.CONTINUE_NO_IMPACT;
             }
             return IProjectileBlockInteraction.EnumHitReactions.CONTINUE;
@@ -65,7 +65,7 @@ public final class ProjectileBlockInteraction {
 
     public static void breakMaterialInteraction(Material material) {
         addMaterialInteraction(material, (world, pos, hit, side, state, entity) -> {
-            if(breakBlock(world, pos, state, entity)) {
+            if (breakBlock(world, pos, state, entity)) {
                 return IProjectileBlockInteraction.EnumHitReactions.CONTINUE_NO_IMPACT;
             }
             return IProjectileBlockInteraction.EnumHitReactions.CONTINUE;
@@ -74,8 +74,7 @@ public final class ProjectileBlockInteraction {
 
     private static boolean breakBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
         final Block block = state.getBlock();
-        if (block.canEntityDestroy(state, world, pos, entity))
-        {
+        if (block.canEntityDestroy(state, world, pos, entity)) {
             block.dropBlockAsItem(world, pos, state, 0);
             world.setBlockToAir(pos);
             return true;
@@ -83,26 +82,27 @@ public final class ProjectileBlockInteraction {
         return false;
     }
 
-    public static IProjectileBlockInteraction.EnumHitReactions handleSpecialInteraction(World world, BlockPos pos, Vec3d hit, EnumFacing side, IBlockState state, Entity entity) {
+    public static IProjectileBlockInteraction.EnumHitReactions handleSpecialInteraction(World world, BlockPos pos, Vec3d hit, EnumFacing side,
+                                                                                        IBlockState state, Entity entity) {
 
         IProjectileBlockInteraction func = stateToInteraction.get(state);
-        if(func != null) {
+        if (func != null) {
             final IProjectileBlockInteraction.EnumHitReactions result = func.apply(world, pos, hit, side, state, entity);
-            if(result != null && result != IProjectileBlockInteraction.EnumHitReactions.PASS) {
+            if (result != null && result != IProjectileBlockInteraction.EnumHitReactions.PASS) {
                 return result;
             }
         }
         func = blockToInteraction.get(state.getBlock());
-        if(func != null) {
+        if (func != null) {
             final IProjectileBlockInteraction.EnumHitReactions result = func.apply(world, pos, hit, side, state, entity);
-            if(result != null && result != IProjectileBlockInteraction.EnumHitReactions.PASS) {
+            if (result != null && result != IProjectileBlockInteraction.EnumHitReactions.PASS) {
                 return result;
             }
         }
         func = materialToInteraction.get(state.getMaterial());
-        if(func != null) {
+        if (func != null) {
             final IProjectileBlockInteraction.EnumHitReactions result = func.apply(world, pos, hit, side, state, entity);
-            if(result != null && result != IProjectileBlockInteraction.EnumHitReactions.PASS) {
+            if (result != null && result != IProjectileBlockInteraction.EnumHitReactions.PASS) {
                 return result;
             }
         }
@@ -116,7 +116,7 @@ public final class ProjectileBlockInteraction {
         addCollisionInteraction(Blocks.END_PORTAL);
         addBlockInteraction(Blocks.END_GATEWAY, (world, pos, hit, side, state, entity) -> {
             final TileEntity tile = world.getTileEntity(pos);
-            if(tile instanceof TileEntityEndGateway) {
+            if (tile instanceof TileEntityEndGateway) {
                 ((TileEntityEndGateway) tile).teleportEntity(entity);
                 return IProjectileBlockInteraction.EnumHitReactions.TELEPORTED;
             }
@@ -128,4 +128,5 @@ public final class ProjectileBlockInteraction {
         breakMaterialInteraction(Material.SNOW);
         breakMaterialInteraction(Material.GLASS);
     }
+
 }

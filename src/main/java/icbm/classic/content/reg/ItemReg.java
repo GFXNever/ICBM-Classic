@@ -25,8 +25,8 @@ import net.minecraftforge.oredict.OreDictionary;
  * Created by Dark(DarkGuardsman, Robert) on 1/7/19.
  */
 @Mod.EventBusSubscriber(modid = ICBMConstants.DOMAIN)
-public class ItemReg
-{
+public class ItemReg {
+
     @ObjectHolder(ICBMConstants.PREFIX + "antidote")
     public static Item itemAntidote;
     @ObjectHolder(ICBMConstants.PREFIX + "signalDisrupter")
@@ -85,7 +85,7 @@ public class ItemReg
 
         // Name was changed in v4.2.0
         final ResourceLocation oldMissileName = new ResourceLocation(ICBMConstants.DOMAIN, "missile");
-        for(RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getMappings()) {
+        for (RegistryEvent.MissingMappings.Mapping<Item> mapping : event.getMappings()) {
             if (oldMissileName.equals(mapping.key)) {
                 mapping.remap(itemExplosiveMissile);
             }
@@ -93,8 +93,7 @@ public class ItemReg
     }
 
     @SubscribeEvent
-    public static void registerItems(RegistryEvent.Register<Item> event)
-    {
+    public static void registerItems(RegistryEvent.Register<Item> event) {
         //Items
         event.getRegistry().register(new ItemGrenade().setName("grenade").setCreativeTab(ICBMClassic.CREATIVE_TAB));
         event.getRegistry().register(new ItemBombCart().setName("bombcart").setCreativeTab(ICBMClassic.CREATIVE_TAB));
@@ -137,34 +136,29 @@ public class ItemReg
         event.getRegistry().register(new ItemBlock(BlockReg.blockCruiseLauncher).setRegistryName(BlockReg.blockCruiseLauncher.getRegistryName()));
 
         //Crafting resources
-        if (ConfigItems.ENABLE_CRAFTING_ITEMS)
-        {
-            if (ConfigItems.ENABLE_INGOTS_ITEMS)
-            {
+        if (ConfigItems.ENABLE_CRAFTING_ITEMS) {
+            if (ConfigItems.ENABLE_INGOTS_ITEMS) {
                 event.getRegistry().register(new ItemCrafting("ingot", "steel", "copper"));
                 event.getRegistry().register(new ItemCrafting("clump", "steel"));
             }
-            if (ConfigItems.ENABLE_PLATES_ITEMS)
-            {
+            if (ConfigItems.ENABLE_PLATES_ITEMS) {
                 event.getRegistry().register(new ItemCrafting("plate", "steel", "iron"));
             }
-            if (ConfigItems.ENABLE_CIRCUIT_ITEMS)
-            {
+            if (ConfigItems.ENABLE_CIRCUIT_ITEMS) {
                 event.getRegistry().register(new ItemCrafting("circuit", "basic", "advanced", "elite"));
             }
-            if (ConfigItems.ENABLE_WIRES_ITEMS)
-            {
+            if (ConfigItems.ENABLE_WIRES_ITEMS) {
                 event.getRegistry().register(new ItemCrafting("wire", "copper", "gold"));
             }
         }
 
         //Optional items
-        if (ConfigItems.ENABLE_BATTERY)
-        {
+        if (ConfigItems.ENABLE_BATTERY) {
             event.getRegistry().register(new ItemBattery());
         }
 
         OreDictionary.registerOre("dustSulfur", new ItemStack(ItemReg.itemSulfurDust));
         OreDictionary.registerOre("dustSaltpeter", new ItemStack(ItemReg.itemSaltpeterDust));
     }
+
 }

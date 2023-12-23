@@ -9,13 +9,12 @@ import java.util.function.Function;
 
 public class SaveNodeFacing<E> extends NbtSaveNode<E, NBTTagByte> //TODO convert to enum save/load (small enums can do short, large can do ints)
 {
-    public SaveNodeFacing(String name, Function<E, EnumFacing> save, BiConsumer<E, EnumFacing> load)
-    {
+
+    public SaveNodeFacing(String name, Function<E, EnumFacing> save, BiConsumer<E, EnumFacing> load) {
         super(name,
             (obj) -> {
                 final EnumFacing facing = save.apply(obj);
-                if (facing != null)
-                {
+                if (facing != null) {
                     final byte b = (byte) facing.getIndex();
                     return new NBTTagByte(b);
                 }
@@ -28,4 +27,5 @@ public class SaveNodeFacing<E> extends NbtSaveNode<E, NBTTagByte> //TODO convert
             }
         );
     }
+
 }

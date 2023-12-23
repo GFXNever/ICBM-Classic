@@ -6,6 +6,8 @@ import net.minecraft.util.math.Vec3d;
 
 @Data
 public class TargetMessage implements ITargetMessage {
+
     private final String channel;
     private final Vec3d target;
+
 }

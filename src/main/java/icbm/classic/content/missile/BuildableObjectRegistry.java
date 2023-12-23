@@ -14,13 +14,12 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 @RequiredArgsConstructor
-public class BuildableObjectRegistry<Part extends IBuildableObject> implements IBuilderRegistry<Part>
-{
+public class BuildableObjectRegistry<Part extends IBuildableObject> implements IBuilderRegistry<Part> {
+
     private final Map<ResourceLocation, Supplier<Part>> builders = new HashMap();
+    private final String name;
     @Getter
     private boolean isLocked = false;
-
-    private final String name;
 
     @Override
     public void register(ResourceLocation key, Supplier<Part> builder) {
@@ -29,7 +28,7 @@ public class BuildableObjectRegistry<Part extends IBuildableObject> implements I
         }
         if (builders.containsKey(key)) {
             throw new RuntimeException(this.name + ": mod '" + FMLCommonHandler.instance().getModName() + "' attempted to override '" + key + "'. " +
-                    "This method does not allow replacing existing registries. See implementing class for override call.");
+                "This method does not allow replacing existing registries. See implementing class for override call.");
         }
         builders.put(key, builder);
     }
@@ -38,7 +37,7 @@ public class BuildableObjectRegistry<Part extends IBuildableObject> implements I
      * Use this to safely override another mod's content. Make sure to do a dependency on the mod to ensure
      * your mod loads after. Do not wait for the events to complete as the registry locks and will throw errors.
      *
-     * @param key of the content to override
+     * @param key     of the content to override
      * @param builder to use for save/load
      */
     public void overrideRegistry(ResourceLocation key, Supplier<Part> builder) {
@@ -57,4 +56,5 @@ public class BuildableObjectRegistry<Part extends IBuildableObject> implements I
     public void lock() {
         this.isLocked = true;
     }
+
 }

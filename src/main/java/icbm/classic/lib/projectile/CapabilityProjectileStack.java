@@ -17,23 +17,16 @@ import javax.annotation.Nullable;
 /**
  * Applied to {@link ItemStack} that are projectiles
  */
-public class CapabilityProjectileStack implements IProjectileStack<Entity>
-{
+public class CapabilityProjectileStack implements IProjectileStack<Entity> {
+
     private final ResourceLocation projectileDataKey;
 
     public CapabilityProjectileStack(ResourceLocation projectileDataKey) {
         this.projectileDataKey = projectileDataKey;
     }
 
-    @Override
-    public IProjectileData<Entity> getProjectileData() {
-        return ICBMClassicAPI.PROJECTILE_DATA_REGISTRY.build(projectileDataKey);
-    }
-
-    public static void register()
-    {
-        CapabilityManager.INSTANCE.register(IProjectileStack.class, new Capability.IStorage<IProjectileStack>()
-            {
+    public static void register() {
+        CapabilityManager.INSTANCE.register(IProjectileStack.class, new Capability.IStorage<IProjectileStack>() {
                 @Nullable
                 @Override
                 public NBTBase writeNBT(Capability<IProjectileStack> capability, IProjectileStack instance, EnumFacing side) {
@@ -47,4 +40,10 @@ public class CapabilityProjectileStack implements IProjectileStack<Entity>
             },
             () -> new CapabilityProjectileStack(ArrowProjectileData.NAME));
     }
+
+    @Override
+    public IProjectileData<Entity> getProjectileData() {
+        return ICBMClassicAPI.PROJECTILE_DATA_REGISTRY.build(projectileDataKey);
+    }
+
 }

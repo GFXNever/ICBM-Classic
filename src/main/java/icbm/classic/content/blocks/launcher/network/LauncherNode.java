@@ -8,23 +8,20 @@ import net.minecraft.util.math.BlockPos;
 @Data
 public class LauncherNode {
 
-    private LauncherNetwork network;
-
     private final TileEntity self;
-
     /**
      * True to allow external tiles to insert items into this tile using the network.
      * Do not allow insertion into the network and accepting of items in the same tile.
      * Other wise it will infinite loop
-     * */
+     */
     private final boolean acceptsItems;
-
+    private LauncherNetwork network;
     private boolean isInvalid = false;
 
     /**
      * Creates a new node in the network
      *
-     * @param self hosting the node
+     * @param self         hosting the node
      * @param acceptsItems to enable network to feed this tile items. If enabled this tile shouldn't dump back to the network.
      */
     public LauncherNode(TileEntity self, boolean acceptsItems) {
@@ -61,7 +58,7 @@ public class LauncherNode {
                     final LauncherNode node = ((ILauncherComponent) tile).getNetworkNode();
 
                     // Ignore dead nodes
-                    if(node.isInvalid()) {
+                    if (node.isInvalid()) {
                         continue;
                     }
 
@@ -93,4 +90,5 @@ public class LauncherNode {
     public int hashCode() {
         return self.getPos().hashCode();
     }
+
 }

@@ -12,13 +12,12 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  * that can be defused. Use specific events for
  * more control.
  */
-public class ExplosiveDefuseEvent extends Event
-{
+public class ExplosiveDefuseEvent extends Event {
+
     public final EntityPlayer player;
     public final Entity entityToDefuse;
 
-    public ExplosiveDefuseEvent(EntityPlayer player, Entity entityToDefuse)
-    {
+    public ExplosiveDefuseEvent(EntityPlayer player, Entity entityToDefuse) {
         this.player = player;
         this.entityToDefuse = entityToDefuse;
     }
@@ -28,16 +27,16 @@ public class ExplosiveDefuseEvent extends Event
      * Cancel to not defuse the explosive.
      */
     @Cancelable
-    public static class ICBMExplosive extends ExplosiveDefuseEvent
-    {
+    public static class ICBMExplosive extends ExplosiveDefuseEvent {
+
         public final IExplosive explosive;
 
-        public ICBMExplosive(EntityPlayer player, Entity entityToDefuse, IExplosive explosive)
-        {
+        public ICBMExplosive(EntityPlayer player, Entity entityToDefuse, IExplosive explosive) {
             super(player, entityToDefuse);
 
             this.explosive = explosive;
         }
+
     }
 
     /**
@@ -46,12 +45,12 @@ public class ExplosiveDefuseEvent extends Event
      * defuse the tnt.
      */
     @Cancelable
-    public static class TNTExplosive extends ExplosiveDefuseEvent
-    {
-        public TNTExplosive(EntityPlayer player, Entity entityToDefuse)
-        {
+    public static class TNTExplosive extends ExplosiveDefuseEvent {
+
+        public TNTExplosive(EntityPlayer player, Entity entityToDefuse) {
             super(player, entityToDefuse);
         }
+
     }
 
     /**
@@ -59,11 +58,12 @@ public class ExplosiveDefuseEvent extends Event
      * Cancel to not defuse the bomb cart.
      */
     @Cancelable
-    public static class ICBMBombCart extends ExplosiveDefuseEvent
-    {
-        public ICBMBombCart(EntityPlayer player, Entity entityToDefuse)
-        {
+    public static class ICBMBombCart extends ExplosiveDefuseEvent {
+
+        public ICBMBombCart(EntityPlayer player, Entity entityToDefuse) {
             super(player, entityToDefuse);
         }
+
     }
+
 }

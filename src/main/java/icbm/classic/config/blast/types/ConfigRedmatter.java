@@ -5,8 +5,8 @@ import net.minecraftforge.common.config.Config;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 2/9/2020.
  */
-public class ConfigRedmatter
-{
+public class ConfigRedmatter {
+
     @Config.Name("redmatter_max_size")
     @Config.Comment("Largest size the redmatter can grow into before stopping.")
     public float MAX_SIZE = 70;
@@ -64,4 +64,5 @@ public class ConfigRedmatter
     @Config.Name("redmatter_colored_beams")
     @Config.Comment("Set to true to render redmatter with colored beams")
     public boolean RENDER_COLORED_BEAMS = true;
+
 }

@@ -36,7 +36,7 @@ public interface IMissileHolder //TODO refactor to be a list
 
     /**
      * Called to insert the missile into the holder
-     *
+     * <p>
      * Insert will run {@link #canSupportMissile(ItemStack)} so no need
      * to call it before.
      *
@@ -60,4 +60,5 @@ public interface IMissileHolder //TODO refactor to be a list
      * @return true if supported
      */
     boolean canSupportMissile(ItemStack stack);
+
 }

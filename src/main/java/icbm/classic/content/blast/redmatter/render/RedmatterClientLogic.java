@@ -4,11 +4,11 @@ import icbm.classic.content.blast.redmatter.EntityRedmatter;
 
 /**
  * Handles client size logic for the redmatter
- *
+ * <p>
  * Created by Dark(DarkGuardsman, Robert) on 5/23/2020.
  */
-public class RedmatterClientLogic
-{
+public class RedmatterClientLogic {
+
     private final EntityRedmatter host;
 
     private float visualSize = 0.0F;
@@ -22,13 +22,12 @@ public class RedmatterClientLogic
      *
      * @param deltaTick percentage of time passed (0.0 - 1.0f)
      */
-    public void lerpSize(float deltaTick)
-    {
+    public void lerpSize(float deltaTick) {
         visualSize = visualSize + deltaTick * (host.getBlastSize() - visualSize);
     }
 
-    public float getVisualSize()
-    {
+    public float getVisualSize() {
         return visualSize;
     }
+
 }

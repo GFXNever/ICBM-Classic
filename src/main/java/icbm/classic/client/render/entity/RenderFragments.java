@@ -23,24 +23,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 @SideOnly(Side.CLIENT)
-public class RenderFragments extends Render<EntityFragments>
-{
+public class RenderFragments extends Render<EntityFragments> {
+
     public static final ResourceLocation TEXTURE = new ResourceLocation(ICBMConstants.DOMAIN, "textures/entity/fragments/fragment.png");
 
-    public RenderFragments(RenderManager renderManager)
-    {
+    public RenderFragments(RenderManager renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void doRender(EntityFragments entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
+    public void doRender(EntityFragments entity, double x, double y, double z, float entityYaw, float partialTicks) {
         this.bindEntityTexture(entity);
-        if (entity.isAnvil)
-        {
+        if (entity.isAnvil) {
             final IBlockState blockState = Blocks.ANVIL.getDefaultState()
-                    .withProperty(BlockAnvil.DAMAGE, entity.world.rand.nextInt(2))
-                    .withProperty(BlockAnvil.FACING, EnumFacing.Plane.HORIZONTAL.facings()[entity.world.rand.nextInt(3)]);
+                .withProperty(BlockAnvil.DAMAGE, entity.world.rand.nextInt(2))
+                .withProperty(BlockAnvil.FACING, EnumFacing.Plane.HORIZONTAL.facings()[entity.world.rand.nextInt(3)]);
             //TODO store rotation and damage in entity to reduce random nature
 
 
@@ -58,9 +55,7 @@ public class RenderFragments extends Render<EntityFragments>
             GlStateManager.translate(0.0F, 0.0F, 1.0F);
 
             GlStateManager.popMatrix();
-        }
-        else
-        {
+        } else {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             GlStateManager.pushMatrix();
             GlStateManager.disableLighting();
@@ -73,8 +68,7 @@ public class RenderFragments extends Render<EntityFragments>
             GlStateManager.enableRescaleNormal();
             float f9 = (float) entity.arrowShake - partialTicks;
 
-            if (f9 > 0.0F)
-            {
+            if (f9 > 0.0F) {
                 float f10 = -MathHelper.sin(f9 * 3.0F) * f9;
                 GlStateManager.rotate(f10, 0.0F, 0.0F, 1.0F);
             }
@@ -99,8 +93,7 @@ public class RenderFragments extends Render<EntityFragments>
             bufferbuilder.pos(-7.0D, -2.0D, -2.0D).tex(0.0D, 0.3125D).endVertex();
             tessellator.draw();
 
-            for (int j = 0; j < 4; ++j)
-            {
+            for (int j = 0; j < 4; ++j) {
                 GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
                 GlStateManager.glNormal3f(0.0F, 0.0F, 0.05625F);
                 bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
@@ -122,8 +115,8 @@ public class RenderFragments extends Render<EntityFragments>
 
     @Nullable
     @Override
-    protected ResourceLocation getEntityTexture(EntityFragments entity)
-    {
+    protected ResourceLocation getEntityTexture(EntityFragments entity) {
         return TEXTURE;
     }
+
 }

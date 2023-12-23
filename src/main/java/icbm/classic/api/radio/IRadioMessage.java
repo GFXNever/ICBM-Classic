@@ -11,4 +11,5 @@ public interface IRadioMessage {
      * @return id
      */
     String getChannel();
+
 }

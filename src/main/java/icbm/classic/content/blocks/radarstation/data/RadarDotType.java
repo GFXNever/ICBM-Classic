@@ -7,7 +7,7 @@ public enum RadarDotType {
     INCOMING;
 
     public static RadarDotType get(int index) {
-        if(index >= 0 && index < values().length) {
+        if (index >= 0 && index < values().length) {
             return values()[index];
         }
         return DETECTED;

@@ -12,8 +12,8 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class PacketSpawnBlockExplosion implements IPacket<PacketSpawnBlockExplosion>
-{
+public class PacketSpawnBlockExplosion implements IPacket<PacketSpawnBlockExplosion> {
+
     /*
     Id of the dimension that this particle should be placed in.
      */
@@ -28,13 +28,11 @@ public class PacketSpawnBlockExplosion implements IPacket<PacketSpawnBlockExplos
 
     private BlockPos blockPos;
 
-    public PacketSpawnBlockExplosion()
-    {
+    public PacketSpawnBlockExplosion() {
         //Needed for forge to construct the packet
     }
 
-    public PacketSpawnBlockExplosion(int dimId, double sourceX, double sourceY, double sourceZ, double blastScale, BlockPos pos)
-    {
+    public PacketSpawnBlockExplosion(int dimId, double sourceX, double sourceY, double sourceZ, double blastScale, BlockPos pos) {
         this.dimId = dimId;
         this.sourceX = sourceX;
         this.sourceY = sourceY;
@@ -43,9 +41,15 @@ public class PacketSpawnBlockExplosion implements IPacket<PacketSpawnBlockExplos
         this.blastScale = blastScale;
     }
 
+    public static void sendToAllClients(World world, double sourceX, double sourceY, double sourceZ, double blastScale, BlockPos pos) {
+        final int dimid = world.provider.getDimension();
+        final PacketSpawnBlockExplosion packet = new PacketSpawnBlockExplosion(dimid, sourceX, sourceY, sourceZ, blastScale, pos);
+        final NetworkRegistry.TargetPoint point = new NetworkRegistry.TargetPoint(dimid, pos.getX(), pos.getY(), pos.getZ(), 256);
+        ICBMClassic.packetHandler.sendToAllAround(packet, point);
+    }
+
     @Override
-    public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
-    {
+    public void encodeInto(ChannelHandlerContext ctx, ByteBuf buffer) {
         buffer.writeInt(dimId);
         buffer.writeDouble(sourceX);
         buffer.writeDouble(sourceY);
@@ -57,8 +61,7 @@ public class PacketSpawnBlockExplosion implements IPacket<PacketSpawnBlockExplos
     }
 
     @Override
-    public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer)
-    {
+    public void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer) {
         dimId = buffer.readInt();
         sourceX = buffer.readDouble();
         sourceY = buffer.readDouble();
@@ -69,19 +72,10 @@ public class PacketSpawnBlockExplosion implements IPacket<PacketSpawnBlockExplos
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void handleClientSide(Minecraft minecraft, EntityPlayer player)
-    {
-        if (minecraft.world != null && player.world.provider.getDimension() == dimId)
-        {
+    public void handleClientSide(Minecraft minecraft, EntityPlayer player) {
+        if (minecraft.world != null && player.world.provider.getDimension() == dimId) {
             ICBMClassic.proxy.spawnExplosionParticles(player.world, sourceX, sourceY, sourceZ, blastScale, blockPos);
         }
     }
 
-    public static void sendToAllClients(World world, double sourceX, double sourceY, double sourceZ, double blastScale, BlockPos pos)
-    {
-        final int dimid = world.provider.getDimension();
-        final PacketSpawnBlockExplosion packet = new PacketSpawnBlockExplosion(dimid, sourceX, sourceY, sourceZ, blastScale, pos);
-        final NetworkRegistry.TargetPoint point = new NetworkRegistry.TargetPoint(dimid, pos.getX(), pos.getY(), pos.getZ(), 256);
-        ICBMClassic.packetHandler.sendToAllAround(packet, point);
-    }
 }

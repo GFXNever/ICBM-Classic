@@ -14,15 +14,13 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  * <p>
  * Created by Dark(DarkGuardsman, Robert) on 1/4/19.
  */
-public class ExplosiveRegistryEvent extends Event
-{
+public class ExplosiveRegistryEvent extends Event {
 
     public final IExplosiveRegistry registry;
 
     private ResourceLocation lastRegistered;//TODO remove  after moving enable to a separate event
 
-    public ExplosiveRegistryEvent(IExplosiveRegistry registry)
-    {
+    public ExplosiveRegistryEvent(IExplosiveRegistry registry) {
         this.registry = registry;
     }
 
@@ -34,37 +32,31 @@ public class ExplosiveRegistryEvent extends Event
      * @param blastFactory - handler to build the blast from the explosive type
      * @return this event so we can chain calls //TODO remove return after moving enable to a separate event
      */
-    public ExplosiveRegistryEvent register(ResourceLocation id, EnumTier tier, IBlastFactory blastFactory)
-    {
+    public ExplosiveRegistryEvent register(ResourceLocation id, EnumTier tier, IBlastFactory blastFactory) {
         ICBMClassicAPI.EXPLOSIVE_REGISTRY.register(id, tier, blastFactory);
         lastRegistered = id;
         return this;
     }
 
     //TODO move to a separate event
-    public ExplosiveRegistryEvent enableContent(ResourceLocation contentID)
-    {
+    public ExplosiveRegistryEvent enableContent(ResourceLocation contentID) {
         return enableContent(lastRegistered, contentID);
     }
 
     //TODO move to a separate event
-    public ExplosiveRegistryEvent enableContent(ResourceLocation id, ResourceLocation contentID)
-    {
+    public ExplosiveRegistryEvent enableContent(ResourceLocation id, ResourceLocation contentID) {
         IExplosiveContentRegistry registry = ICBMClassicAPI.EXPLOSIVE_REGISTRY.getContentRegistry(contentID);
-        if (registry != null)
-        {
+        if (registry != null) {
             registry.enableContent(id);
-        }
-        else
-        {
+        } else {
             ICBMClassic.logger().error("ExplosiveRegistryEvent: No content registry found for " + contentID + " while enabling content for " + id);
         }
         return this;
     }
 
     //TODO remove after moving enable to a separate event
-    public void done()
-    {
+    public void done() {
         lastRegistered = null;
     }
+
 }

@@ -17,10 +17,10 @@ import java.util.function.Consumer;
  * Utility class to handle working with Strings
  *
  * @author Darkguardsman
- *         based on Calclavia version from Resonant Engine but has been mostly rewritten so no longer marked as author
+ * based on Calclavia version from Resonant Engine but has been mostly rewritten so no longer marked as author
  */
-public class LanguageUtility
-{
+public class LanguageUtility {
+
     public static int toolTipLineLength = 30;
 
     /**
@@ -30,13 +30,10 @@ public class LanguageUtility
      * @param key - translation key, Example 'tile.sometile.name' or 'tile.modname:sometile.name'
      * @return translated key, or the same string provided if the key didn't match anything
      */
-    public static String getLocal(String key)
-    {
+    public static String getLocal(String key) {
         //Check for empty or null keys
-        if (key == null || key.isEmpty())
-        {
-            if (ICBMClassic.runningAsDev)
-            {
+        if (key == null || key.isEmpty()) {
+            if (ICBMClassic.runningAsDev) {
                 ICBMClassic.logger().error("LanguageUtility.getLocal(" + key + ") - invalid key", new RuntimeException());
             }
             return "error.key.empty";
@@ -44,10 +41,8 @@ public class LanguageUtility
 
         //Get translation
         String translation = I18n.translateToLocal(key);
-        if (translation == null || translation.isEmpty())
-        {
-            if (ICBMClassic.runningAsDev)
-            {
+        if (translation == null || translation.isEmpty()) {
+            if (ICBMClassic.runningAsDev) {
                 ICBMClassic.logger().error("LanguageUtility.getLocal(" + key + ") - no translation", new RuntimeException());
             }
             return key;
@@ -61,28 +56,22 @@ public class LanguageUtility
      * @param key - translation key, Example 'tile.sometile.name' or 'tile.modname:sometile.name'
      * @return translated key, or the same string provided if the key didn't match anything
      */
-    public static String getLocalName(String key)
-    {
+    public static String getLocalName(String key) {
         //Check for empty or null keys
-        if (key == null || key.isEmpty())
-        {
-            if (ICBMClassic.runningAsDev)
-            {
+        if (key == null || key.isEmpty()) {
+            if (ICBMClassic.runningAsDev) {
                 ICBMClassic.logger().error("LanguageUtility.getLocalName(" + key + ")", new RuntimeException());
             }
             return "error.key.empty";
         }
-        if (!key.endsWith(".name"))
-        {
+        if (!key.endsWith(".name")) {
             key = key + ".name";
         }
 
         //Get translation
         String translation = I18n.translateToLocal(key);
-        if (translation == null || translation.isEmpty())
-        {
-            if (ICBMClassic.runningAsDev)
-            {
+        if (translation == null || translation.isEmpty()) {
+            if (ICBMClassic.runningAsDev) {
                 ICBMClassic.logger().error("LanguageUtility.getLocal(" + key + ") - no translation", new RuntimeException());
             }
             return key;
@@ -101,19 +90,13 @@ public class LanguageUtility
      * @param backup - returned if key fails to be found or parsed
      * @return integer parsed from a lang file
      */
-    public static Integer getLangSetting(String key, int backup)
-    {
+    public static Integer getLangSetting(String key, int backup) {
         String result = getLocal(key);
-        if (result != null && !result.isEmpty())
-        {
-            try
-            {
+        if (result != null && !result.isEmpty()) {
+            try {
                 return Integer.parseInt(key);
-            }
-            catch (NumberFormatException e)
-            {
-                if (ICBMClassic.runningAsDev)
-                {
+            } catch (NumberFormatException e) {
+                if (ICBMClassic.runningAsDev) {
                     ICBMClassic.logger().error("LanguageUtility.getLangSetting(" + key + ")", e);
                 }
             }
@@ -128,8 +111,7 @@ public class LanguageUtility
      * @param key
      * @return
      */
-    public static ITextComponent getLocalChat(String key)
-    {
+    public static ITextComponent getLocalChat(String key) {
         return new TextComponentTranslation(key);
     }
 
@@ -140,30 +122,23 @@ public class LanguageUtility
      * @param player - player who will receive the message
      * @param key    - - translation key, Example 'tile.sometile.name' or 'tile.modname:sometile.name'
      */
-    public static void addChatToPlayer(EntityPlayer player, String key)
-    {
-        if (player != null)
-        {
+    public static void addChatToPlayer(EntityPlayer player, String key) {
+        if (player != null) {
             player.sendMessage(getLocalChat(key));
-        }
-        else if (ICBMClassic.runningAsDev)
-        {
+        } else if (ICBMClassic.runningAsDev) {
             ICBMClassic.logger().error("LanguageUtility.addChatToPlayer(Null Player, " + key + ")", new RuntimeException());
         }
     }
 
-    public static List<String> splitStringPerWord(String string)
-    {
+    public static List<String> splitStringPerWord(String string) {
         return Arrays.asList(toWordArray(string));
     }
 
-    public static String[] toWordArray(String string)
-    {
+    public static String[] toWordArray(String string) {
         return string.trim().split("\\W+");
     }
 
-    public static List<String> splitByLine(String string)
-    {
+    public static List<String> splitByLine(String string) {
         return splitByLine(string, toolTipLineLength);
     }
 
@@ -173,24 +148,21 @@ public class LanguageUtility
         return lines;
     }
 
-    public static void splitByLine(String string, int charsPerLine, Consumer<String> lines)
-    {
+    public static void splitByLine(String string, int charsPerLine, Consumer<String> lines) {
         final String[] words = string.split(" ");
-       //TODO predict size for faster runtime
+        //TODO predict size for faster runtime
         String line = "";
         int indent = 0;
-        for (String word : words)
-        {
+        for (String word : words) {
             // Indent logic
-            if(word.trim().startsWith("\\t") || word.trim().startsWith("\t")) {
+            if (word.trim().startsWith("\\t") || word.trim().startsWith("\t")) {
                 indent += 2;
-            }
-            else if(word.trim().startsWith("-\\t") || word.trim().startsWith("-\t")) {
+            } else if (word.trim().startsWith("-\\t") || word.trim().startsWith("-\t")) {
                 indent -= 2;
             }
             // Line break logic
-            else if(word.contains("\\n") || word.contains("\n")) {
-                if(word.equals("\\n") || word.equals("\n")) {
+            else if (word.contains("\\n") || word.contains("\n")) {
+                if (word.equals("\\n") || word.equals("\n")) {
                     lines.accept(addSpacesLeft(line, indent));
                     line = "";
                 }
@@ -200,12 +172,9 @@ public class LanguageUtility
                 }
             }
             // Continue building line
-            else if (word.length() + line.length() <= charsPerLine)
-            {
+            else if (word.length() + line.length() <= charsPerLine) {
                 line += word + " ";
-            }
-            else
-            {
+            } else {
                 // Add existing line
                 lines.accept(addSpacesLeft(line, indent));
 
@@ -219,19 +188,17 @@ public class LanguageUtility
     }
 
     private static String addSpacesLeft(String line, int pad) {
-        if(pad <= 0) {
+        if (pad <= 0) {
             return line;
         }
         return String.format("%1$" + pad + "s", "") + line;
     }
 
-    public static String capitalizeFirst(String str)
-    {
+    public static String capitalizeFirst(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1, str.length());
     }
 
-    public static String decapitalizeFirst(String str)
-    {
+    public static String decapitalizeFirst(String str) {
         return str.substring(0, 1).toLowerCase() + str.substring(1, str.length());
     }
 
@@ -251,12 +218,10 @@ public class LanguageUtility
     public static String buildToolTipString(ITextComponent textComponent) {
         StringBuilder stringbuilder = new StringBuilder();
 
-        for (ITextComponent itextcomponent : textComponent)
-        {
+        for (ITextComponent itextcomponent : textComponent) {
             String s = itextcomponent.getUnformattedComponentText();
 
-            if (!s.isEmpty())
-            {
+            if (!s.isEmpty()) {
                 stringbuilder.append(itextcomponent.getStyle().getFormattingCode());
                 stringbuilder.append(s);
             }
@@ -264,4 +229,5 @@ public class LanguageUtility
 
         return stringbuilder.toString();
     }
+
 }

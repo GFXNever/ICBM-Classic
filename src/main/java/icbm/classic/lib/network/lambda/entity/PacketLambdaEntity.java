@@ -32,9 +32,10 @@ public class PacketLambdaEntity<TARGET> implements IPacket<PacketLambdaEntity<TA
     private PacketCodex<Entity, TARGET> codex;
     private int dimensionId;
     private int entityId;
-    
+
     private List<Consumer<ByteBuf>> writers;
     private List<Consumer<TARGET>> setters;
+
     public PacketLambdaEntity(PacketCodex<Entity, TARGET> codex, Entity entity, TARGET target) {
         this.codex = codex;
         this.entityId = entity.getEntityId();
@@ -59,7 +60,7 @@ public class PacketLambdaEntity<TARGET> implements IPacket<PacketLambdaEntity<TA
         // Read general data
         final int codexId = buffer.readInt();
         codex = PacketCodexReg.get(codexId);
-        if(codex == null) {
+        if (codex == null) {
             ICBMClassic.logger().error(String.format("PacketEntity: Failed to locate codex(%s)", codexId));
             return;
         }
@@ -73,8 +74,7 @@ public class PacketLambdaEntity<TARGET> implements IPacket<PacketLambdaEntity<TA
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void handleClientSide(Minecraft minecraft, EntityPlayer player)
-    {
+    public void handleClientSide(Minecraft minecraft, EntityPlayer player) {
         final int playerDim = player.world.provider.getDimension();
 
         // Normal, player may have changed dim between network calls
@@ -90,8 +90,7 @@ public class PacketLambdaEntity<TARGET> implements IPacket<PacketLambdaEntity<TA
     }
 
     @Override
-    public void handleServerSide(EntityPlayer player)
-    {
+    public void handleServerSide(EntityPlayer player) {
         final int playerDim = player.world.provider.getDimension();
 
         // Normal, player may have changed dim between network calls
@@ -102,7 +101,7 @@ public class PacketLambdaEntity<TARGET> implements IPacket<PacketLambdaEntity<TA
         }
 
         // Issue, should never happen
-        if(!(player.world instanceof WorldServer)) {
+        if (!(player.world instanceof WorldServer)) {
             final String message = String.format(ERROR_NOT_SERVER, getDimensionId());
             codex.logError(player.world, player.getPosition(), message);
             return;
@@ -117,23 +116,25 @@ public class PacketLambdaEntity<TARGET> implements IPacket<PacketLambdaEntity<TA
         try {
             entity = player.world.getEntityByID(getEntityId());
 
-            if(entity != null && codex.isValid(entity)) {
+            if (entity != null && codex.isValid(entity)) {
                 final TARGET target = codex.getConverter().apply(entity);
-                if(target != null) {
+                if (target != null) {
                     setters.forEach(c -> c.accept(target)); //TODO detect for issues and log so we know which setter failed
                 }
-                if(codex.onFinished() != null) {
+                if (codex.onFinished() != null) {
                     codex.onFinished().accept(entity, target, player);
                 }
             }
             // This may be valid, as the tile could have changed or may have become invalid.
             // Average ping is same as tick rate so changes on main-thread are expected
-            else if(ICBMClassic.logger().isDebugEnabled()) {
-                codex.logDebug(world, Optional.ofNullable(entity).map(Entity::getPosition).orElse(null), String.format(DEBUG_INVALID, getEntityId(), entity));
+            else if (ICBMClassic.logger().isDebugEnabled()) {
+                codex.logDebug(world, Optional.ofNullable(entity).map(Entity::getPosition).orElse(null),
+                    String.format(DEBUG_INVALID, getEntityId(), entity));
             }
-        }
-        catch (Exception e) {
-            codex.logError(world, Optional.ofNullable(entity).map(Entity::getPosition).orElse(null), String.format(ERROR_HANDLING, getEntityId(), entity), e);
+        } catch (Exception e) {
+            codex.logError(world, Optional.ofNullable(entity).map(Entity::getPosition).orElse(null),
+                String.format(ERROR_HANDLING, getEntityId(), entity), e);
         }
     }
+
 }

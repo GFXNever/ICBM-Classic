@@ -25,9 +25,9 @@ public class NetworkInventory implements IItemHandler {
 
         network.getComponents().stream().filter(LauncherNode::isAcceptsItems).forEach((node) -> {
             final IItemHandler handler = getHandler(node.getSelf());
-            if(handler != null) {
+            if (handler != null) {
                 final int slotCount = handler.getSlots();
-                for(int i = 0; i < slotCount; i++) {
+                for (int i = 0; i < slotCount; i++) {
                     slots.add(new SlotHolder(handler, i));
                 }
             }
@@ -40,9 +40,10 @@ public class NetworkInventory implements IItemHandler {
     }
 
     private IItemHandler getHandler(TileEntity tile) {
-        if(tile.hasCapability(ICBMClassicAPI.MISSILE_LAUNCHER_CAPABILITY, null) && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+        if (tile.hasCapability(ICBMClassicAPI.MISSILE_LAUNCHER_CAPABILITY, null) && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+            null)) {
             final IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            if(handler != null) {
+            if (handler != null) {
                 return handler;
             }
         }
@@ -96,8 +97,7 @@ public class NetworkInventory implements IItemHandler {
         return holder.handler.isItemValid(holder.getSlotIndex(), stack);
     }
 
-    protected void validateSlotIndex(int slot)
-    {
+    protected void validateSlotIndex(int slot) {
         if (slot < 0 || slot >= slots.size())
             throw new RuntimeException("Slot " + slot + " not in valid range - [0," + slots.size() + ")");
     }
@@ -105,7 +105,10 @@ public class NetworkInventory implements IItemHandler {
     @Data
     @AllArgsConstructor
     private static class SlotHolder {
+
         private final IItemHandler handler;
         private final int slotIndex;
+
     }
+
 }

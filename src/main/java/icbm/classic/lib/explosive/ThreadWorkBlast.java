@@ -10,37 +10,33 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 10/8/2018.
  */
-public class ThreadWorkBlast implements IThreadWork
-{
+public class ThreadWorkBlast implements IThreadWork {
+
     public List<BlockPos> editPositions = new ArrayList();
     public BiFunction<Integer, Consumer<BlockPos>, Boolean> runFunction;
     public Consumer<List<BlockPos>> onComplete;
 
-    public ThreadWorkBlast(BiFunction<Integer, Consumer<BlockPos>, Boolean> runFunction, Consumer<List<BlockPos>> onComplete)
-    {
+    public ThreadWorkBlast(BiFunction<Integer, Consumer<BlockPos>, Boolean> runFunction, Consumer<List<BlockPos>> onComplete) {
         this.runFunction = runFunction;
         this.onComplete = onComplete;
     }
 
     @Override
-    public boolean doRun(int steps)
-    {
+    public boolean doRun(int steps) {
         return runFunction.apply(steps, (blockPos) -> editPositions.add(blockPos));
     }
 
     @Override
-    public void onStarted()
-    {
+    public void onStarted() {
         ICBMClassic.logger().debug(toString() + " started");
     }
 
     @Override
-    public void onCompleted()
-    {
+    public void onCompleted() {
         ICBMClassic.logger().debug(toString() + " completed");
         onComplete.accept(editPositions);
     }
+
 }

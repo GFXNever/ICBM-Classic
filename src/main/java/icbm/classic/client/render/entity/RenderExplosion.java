@@ -11,24 +11,22 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 @SideOnly(Side.CLIENT)
-public class RenderExplosion extends Render<EntityExplosion>
-{
+public class RenderExplosion extends Render<EntityExplosion> {
+
     public static ResourceLocation GREY_TEXTURE = new ResourceLocation(ICBMConstants.DOMAIN, ICBMConstants.TEXTURE_DIRECTORY + "models/grey.png");
 
-    public RenderExplosion(RenderManager renderManager)
-    {
+    public RenderExplosion(RenderManager renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void doRender(EntityExplosion entityExplosion, double x, double y, double z, float entityYaw, float partialTicks)
-    {
+    public void doRender(EntityExplosion entityExplosion, double x, double y, double z, float entityYaw, float partialTicks) {
     }
 
     @Nullable
     @Override
-    protected ResourceLocation getEntityTexture(EntityExplosion entity)
-    {
+    protected ResourceLocation getEntityTexture(EntityExplosion entity) {
         return GREY_TEXTURE;
     }
+
 }

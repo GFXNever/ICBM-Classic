@@ -18,15 +18,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiLauncherScreen extends GuiContainerBase
-{
+public class GuiLauncherScreen extends GuiContainerBase {
+
     public static final ResourceLocation TEXTURE = new ResourceLocation(ICBMConstants.DOMAIN, ICBMConstants.GUI_DIRECTORY + "gui_silo_screen.png");
     public static final ITextComponent ACCURACY_TOOLTIP = new TextComponentTranslation("gui.launcherscreen.inaccuracy.info");
 
     private final TileLauncherScreen tileEntity;
 
-    public GuiLauncherScreen(EntityPlayer player, TileLauncherScreen tileEntity)
-    {
+    public GuiLauncherScreen(EntityPlayer player, TileLauncherScreen tileEntity) {
         super(new ContainerLaunchScreen(player, tileEntity));
         this.tileEntity = tileEntity;
         this.ySize = 166;
@@ -38,10 +37,11 @@ public class GuiLauncherScreen extends GuiContainerBase
         return TEXTURE;
     }
 
-    /** Adds the buttons (and other controls) to the screen in question. */
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     @Override
-    public void initGui()
-    {
+    public void initGui() {
         super.initGui();
 
         int componentID = 0;
@@ -75,13 +75,17 @@ public class GuiLauncherScreen extends GuiContainerBase
         addComponent(new TooltipTranslations(2, 16, 14, 14, LauncherLangs.TRANSLATION_TOOLTIP_TARGET).withDelay(1));
     }
 
-    /** Draw the foreground layer for the GuiContainer (everything in front of the items) */
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
-    {
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         this.fontRenderer.drawString("\u00a77" + LanguageUtility.getLocal("gui.launcherscreen.name"), 30, 6, 4210752);
-        this.fontRenderer.drawString(LanguageUtility.getLocal("gui.launcherscreen.inaccuracy").replaceAll("%1\\$s", String.format("%.2f", tileEntity.getLauncherInaccuracy())), 60, 32, 4210752);
+        this.fontRenderer.drawString(
+            LanguageUtility.getLocal("gui.launcherscreen.inaccuracy").replaceAll("%1\\$s", String.format("%.2f", tileEntity.getLauncherInaccuracy())),
+            60, 32, 4210752);
 
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
     }
+
 }

@@ -2,8 +2,8 @@ package icbm.classic.content.blast;
 
 import icbm.classic.api.explosion.IBlastTickable;
 import icbm.classic.client.ICBMSounds;
-import icbm.classic.content.entity.flyingblock.EntityFlyingBlock;
 import icbm.classic.content.entity.EntityLightBeam;
+import icbm.classic.content.entity.flyingblock.EntityFlyingBlock;
 import icbm.classic.content.entity.flyingblock.FlyingBlock;
 import icbm.classic.lib.explosive.ThreadWorkBlast;
 import icbm.classic.lib.thread.IThreadWork;
@@ -23,8 +23,7 @@ import java.util.function.Consumer;
  *
  * @author Calclavia
  */
-public abstract class BlastBeam extends Blast implements IBlastTickable
-{
+public abstract class BlastBeam extends Blast implements IBlastTickable {
 
     protected final Set<EntityFlyingBlock> flyingBlocks = new HashSet();
     protected final List<BlockPos> blocksToRemove = new ArrayList();
@@ -48,15 +47,12 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
 
     private int secondThreadTimer = 20 * 5;
 
-    public BlastBeam()
-    {
+    public BlastBeam() {
     }
 
     @Override
-    protected boolean doExplode(int callCount)
-    {
-        if (!hasDoneSetup)
-        {
+    protected boolean doExplode(int callCount) {
+        if (!hasDoneSetup) {
             hasDoneSetup = true;
 
             //Play audio
@@ -68,8 +64,8 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
 
             //Create beam
             this.lightBeam = new EntityLightBeam(this.world())
-                    .setPosition(location)
-                    .setColor(this.red, this.green, this.blue);
+                .setPosition(location)
+                .setColor(this.red, this.green, this.blue);
             this.lightBeam.beamSize = 1;
             this.lightBeam.beamGlowSize = 2;
             this.lightBeam.setTargetBeamProgress(0.1f);
@@ -77,30 +73,25 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
         }
 
         //Start first thread if not already started
-        if (!hasStartedFirstThread)
-        {
+        if (!hasStartedFirstThread) {
             hasStartedFirstThread = true;
             this.lightBeam.setTargetBeamProgress(0.2f);
             WorkerThreadManager.INSTANCE.addWork(getFirstThread());
         }
 
         //When first thread is completed start floating blocks and ticking down to start second thread
-        if (hasCompletedFirstThread && !hasStartedSecondThread)
-        {
+        if (hasCompletedFirstThread && !hasStartedSecondThread) {
             //Spawn flying blocks
-            if (!hasGeneratedFlyingBlocks)
-            {
+            if (!hasGeneratedFlyingBlocks) {
                 hasGeneratedFlyingBlocks = true;
                 this.lightBeam.setTargetBeamProgress(0.5f);
 
                 //Edit blocks and queue spawning
-                for (BlockPos blockPos : blocksToRemove)
-                {
+                for (BlockPos blockPos : blocksToRemove) {
                     final IBlockState state = world.getBlockState(blockPos); //TODO filter what can turn into a flying block
 
                     //Remove block
-                    if (world.setBlockToAir(blockPos))
-                    {
+                    if (world.setBlockToAir(blockPos)) {
                         FlyingBlock.spawnFlyingBlock(this.world, blockPos, state, (entity) -> {
                             entity.gravity = -0.01f;
                         }, null);
@@ -111,25 +102,21 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
             }
 
             //Delay second thread start
-            if (secondThreadTimer-- <= 0)
-            {
+            if (secondThreadTimer-- <= 0) {
                 this.lightBeam.setTargetBeamProgress(0.8f);
                 hasStartedSecondThread = true;
                 WorkerThreadManager.INSTANCE.addWork(getSecondThread());
             }
         }
 
-        if (hasCompetedSecondThread)
-        {
+        if (hasCompetedSecondThread) {
             this.lightBeam.setTargetBeamProgress(1f);
-            if (!hasEnabledGravityForFlyingBlocks)
-            {
+            if (!hasEnabledGravityForFlyingBlocks) {
                 hasEnabledGravityForFlyingBlocks = true;
                 flyingBlocks.forEach(entity -> entity.gravity = 0.5f);
             }
 
-            if (!hasPlacedBlocks)
-            {
+            if (!hasPlacedBlocks) {
                 hasPlacedBlocks = true;
                 mutateBlocks(blocksToRemove);
                 blocksToRemove.clear();
@@ -138,8 +125,7 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
         return hasPlacedBlocks;
     }
 
-    protected IThreadWork getFirstThread()
-    {
+    protected IThreadWork getFirstThread() {
         return new ThreadWorkBlast((steps, edits) -> collectFlyingBlocks(edits), edits ->
         {
             blocksToRemove.addAll(edits);
@@ -148,8 +134,7 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
         });
     }
 
-    protected IThreadWork getSecondThread()
-    {
+    protected IThreadWork getSecondThread() {
         return new ThreadWorkBlast((steps, edits) -> collectBlocksToMutate(edits), edits ->
         {
             blocksToRemove.addAll(edits);
@@ -158,29 +143,25 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
         });
     }
 
-    public boolean collectFlyingBlocks(Consumer<BlockPos> edits)
-    {
+    public boolean collectFlyingBlocks(Consumer<BlockPos> edits) {
         collectBlocks(edits, (int) Math.max(5, getBlastRadius() / 10));
         return false;
     }
 
-    public boolean collectBlocksToMutate(Consumer<BlockPos> edits)
-    {
+    public boolean collectBlocksToMutate(Consumer<BlockPos> edits) {
         collectBlocks(edits, (int) getBlastRadius());
         return false;
     }
 
     //TODO make generic and recycle as a generic collector
-    protected void collectBlocks(Consumer<BlockPos> edits, int r)
-    {
+    protected void collectBlocks(Consumer<BlockPos> edits, int r) {
         final int radiusSQ = r * r;
         final BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
 
         BlastHelpers.forEachPosInRadius(r, (x, y, z) ->
         {
             final double distanceSQ = (x * x + y * y + z * z);
-            if (distanceSQ <= radiusSQ)
-            {
+            if (distanceSQ <= radiusSQ) {
                 //Update position
                 blockPos.setPos(location.x() + x, location.y() + y, location.z() + z);
 
@@ -189,8 +170,7 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
                 final Block block = state.getBlock();
 
                 //Validate TODO rework to not access blockstates, instead just collect positions
-                if (!block.isAir(state, world, blockPos) && state.getBlockHardness(world, blockPos) >= 0)
-                {
+                if (!block.isAir(state, world, blockPos) && state.getBlockHardness(world, blockPos) >= 0) {
                     edits.accept(blockPos.toImmutable());
                 }
             }
@@ -200,14 +180,13 @@ public abstract class BlastBeam extends Blast implements IBlastTickable
     protected abstract void mutateBlocks(List<BlockPos> edits);
 
     @Override
-    protected void onBlastCompleted()
-    {
+    protected void onBlastCompleted() {
         ICBMSounds.POWER_DOWN.play(world, location.x(), location.y(), location.z(), 4.0F, 0.8F, true);
 
-        if (this.lightBeam != null)
-        {
+        if (this.lightBeam != null) {
             this.lightBeam.startDeathCycle();
             this.lightBeam.setTargetBeamProgress(0f);
         }
     }
+
 }

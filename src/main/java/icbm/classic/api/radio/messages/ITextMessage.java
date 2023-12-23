@@ -26,10 +26,12 @@ public interface ITextMessage extends IRadioMessage {
 
     /**
      * Data to use for injecting into the translation
+     *
      * @return data or null if not used
      */
     @Nullable
     default Object[] getTranslationInputs() {
         return null;
     }
+
 }

@@ -18,4 +18,5 @@ public interface ITriggerActionMessage extends IRadioMessage {
     default void onTriggerCallback(List<IActionStatus> statusEvents) {
 
     }
+
 }

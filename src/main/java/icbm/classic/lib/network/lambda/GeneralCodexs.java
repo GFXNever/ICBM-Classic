@@ -13,7 +13,8 @@ import java.util.function.Function;
 @NoArgsConstructor(access = AccessLevel.NONE)
 public final class GeneralCodexs {
 
-    public static <T extends TileEntity> PacketCodexTile<T, IRadioChannelAccess> radioChannel(ResourceLocation parent, Function<T, IRadioChannelAccess> converter) {
+    public static <T extends TileEntity> PacketCodexTile<T, IRadioChannelAccess> radioChannel(ResourceLocation parent,
+                                                                                              Function<T, IRadioChannelAccess> converter) {
         return (PacketCodexTile<T, IRadioChannelAccess>) new PacketCodexTile<T, IRadioChannelAccess>(parent, "radio.frequency", converter)
             .fromClient()
             .nodeString(IRadioChannelAccess::getChannel, IRadioChannelAccess::setChannel)
@@ -26,4 +27,5 @@ public final class GeneralCodexs {
             .toggleBoolean(Radio::isDisabled, Radio::setDisabled)
             .onFinished((tile, target, player) -> tile.markDirty());
     }
+
 }

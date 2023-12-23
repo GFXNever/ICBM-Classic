@@ -20,21 +20,19 @@ import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
-/** @author Calclavia */
-public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnData
-{
-    public static final float GRAVITY_DEFAULT = 0.045f;
+/**
+ * @author Calclavia
+ */
+public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnData {
 
+    public static final float GRAVITY_DEFAULT = 0.045f;
+    public float yawChange = 0;
+    public float pitchChange = 0;
+    public float gravity = GRAVITY_DEFAULT;
     @Setter(value = AccessLevel.PACKAGE)
     private IBlockState blockState;
 
-    public float yawChange = 0;
-    public float pitchChange = 0;
-
-    public float gravity = GRAVITY_DEFAULT;
-
-    public EntityFlyingBlock(World world)
-    {
+    public EntityFlyingBlock(World world) {
         super(world);
         this.ticksExisted = 0;
         this.preventEntitySpawning = true;
@@ -43,29 +41,24 @@ public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnD
         this.setSize(0.98F, 0.98F);
     }
 
-    public void restoreGravity()
-    {
+    public void restoreGravity() {
         gravity = GRAVITY_DEFAULT;
     }
 
-    public IBlockState getBlockState()
-    {
-        if (blockState == null)
-        {
+    public IBlockState getBlockState() {
+        if (blockState == null) {
             blockState = Blocks.STONE.getDefaultState();
         }
         return blockState;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "Flying Block [" + getBlockState() + ", " + hashCode() + "]";
     }
 
     @Override
-    public void writeSpawnData(ByteBuf data)
-    {
+    public void writeSpawnData(ByteBuf data) {
         ByteBufUtils.writeTag(data, NBTUtil.writeBlockState(new NBTTagCompound(), getBlockState()));
         data.writeFloat(this.gravity);
         data.writeFloat(yawChange);
@@ -73,8 +66,7 @@ public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnD
     }
 
     @Override
-    public void readSpawnData(ByteBuf data)
-    {
+    public void readSpawnData(ByteBuf data) {
         blockState = NBTUtil.readBlockState(ByteBufUtils.readTag(data));
         gravity = data.readFloat();
         yawChange = data.readFloat();
@@ -82,16 +74,13 @@ public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnD
     }
 
     @Override
-    protected void entityInit()
-    {
+    protected void entityInit() {
     }
 
     @Override
-    public void onUpdate()
-    {
+    public void onUpdate() {
         //Death state handling
-        if (!world.isRemote)
-        {
+        if (!world.isRemote) {
             if (blockState == null || ticksExisted > 20 * 60) //1 min despawn timer
             {
                 this.placeBlockIntoWorld();
@@ -99,14 +88,12 @@ public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnD
             }
 
             //TODO make a black list of blocks that shouldn't be a flying entity block
-            if (this.posY > 400 || this.posY < -40)
-            {
+            if (this.posY > 400 || this.posY < -40) {
                 this.setDead();
                 return;
             }
 
-            if ((this.onGround && this.ticksExisted > 20))
-            {
+            if ((this.onGround && this.ticksExisted > 20)) {
                 this.placeBlockIntoWorld();
                 return;
             }
@@ -119,20 +106,17 @@ public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnD
         this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
 
         //Handle collisions
-        if (this.collided)
-        {
+        if (this.collided) {
             this.setPosition(this.posX, (this.getEntityBoundingBox().minY + this.getEntityBoundingBox().maxY) / 2.0D, this.posZ);
         }
 
         //Animation
-        if (this.yawChange > 0)
-        {
+        if (this.yawChange > 0) {
             this.rotationYaw += this.yawChange;
             this.yawChange -= 2;
         }
 
-        if (this.pitchChange > 0)
-        {
+        if (this.pitchChange > 0) {
             this.rotationPitch += this.pitchChange;
             this.pitchChange -= 2;
         }
@@ -141,10 +125,8 @@ public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnD
         this.ticksExisted++;
     }
 
-    public void placeBlockIntoWorld()
-    {
-        if (!this.world.isRemote)
-        {
+    public void placeBlockIntoWorld() {
+        if (!this.world.isRemote) {
             final int i = MathHelper.floor(posX);
             final int j = MathHelper.floor(posY);
             final int k = MathHelper.floor(posZ);
@@ -153,8 +135,7 @@ public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnD
 
             final IBlockState currentState = world.getBlockState(pos);
 
-            if (currentState.getBlock().isReplaceable(this.world, pos))
-            {
+            if (currentState.getBlock().isReplaceable(this.world, pos)) {
                 this.world.setBlockState(pos, getBlockState(), 3);
             }
             //TODO find first block if not replaceable
@@ -163,18 +144,16 @@ public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnD
         this.setDead();
     }
 
-    /** Checks to see if and entity is touching the missile. If so, blow up! */
+    /**
+     * Checks to see if and entity is touching the missile. If so, blow up!
+     */
 
     @Override
-    public AxisAlignedBB getCollisionBox(Entity par1Entity)
-    {
+    public AxisAlignedBB getCollisionBox(Entity par1Entity) {
         // Make sure the entity is not an item
-        if (par1Entity instanceof EntityLiving)
-        {
-            if (getBlockState() != null)
-            {
-                if (!(getBlockState().getBlock() instanceof IFluidBlock) && (this.motionX > 2 || this.motionY > 2 || this.motionZ > 2))
-                {
+        if (par1Entity instanceof EntityLiving) {
+            if (getBlockState() != null) {
+                if (!(getBlockState().getBlock() instanceof IFluidBlock) && (this.motionX > 2 || this.motionY > 2 || this.motionZ > 2)) {
                     int damage = (int) (1.2 * (Math.abs(this.motionX) + Math.abs(this.motionY) + Math.abs(this.motionZ)));
                     ((EntityLiving) par1Entity).attackEntityFrom(DamageSource.FALLING_BLOCK, damage);
                 }
@@ -185,40 +164,34 @@ public class EntityFlyingBlock extends Entity implements IEntityAdditionalSpawnD
     }
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
-    {
-        if (blockState != null)
-        {
+    protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+        if (blockState != null) {
             nbttagcompound.setTag(NBTConstants.BLOCK_STATE, NBTUtil.writeBlockState(new NBTTagCompound(), blockState));
         }
         nbttagcompound.setFloat(NBTConstants.GRAVITY, this.gravity);
     }
 
     @Override
-    protected void readEntityFromNBT(NBTTagCompound nbttagcompound)
-    {
-        if (nbttagcompound.hasKey(NBTConstants.BLOCK_STATE))
-        {
+    protected void readEntityFromNBT(NBTTagCompound nbttagcompound) {
+        if (nbttagcompound.hasKey(NBTConstants.BLOCK_STATE)) {
             blockState = NBTUtil.readBlockState(nbttagcompound.getCompoundTag(NBTConstants.BLOCK_STATE));
         }
         this.gravity = nbttagcompound.getFloat(NBTConstants.GRAVITY);
     }
 
     @Override
-    public boolean canBePushed()
-    {
+    public boolean canBePushed() {
         return true;
     }
 
     @Override
-    protected boolean canTriggerWalking()
-    {
+    protected boolean canTriggerWalking() {
         return true;
     }
 
     @Override
-    public boolean canBeCollidedWith()
-    {
+    public boolean canBeCollidedWith() {
         return true;
     }
+
 }

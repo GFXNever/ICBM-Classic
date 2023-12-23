@@ -16,14 +16,25 @@ import java.util.function.Consumer;
  */
 public abstract class AccelerateByFacingLogic extends FlightLogic {
 
-    /** Direction to move */
-    @Getter @Setter @Accessors(chain = true)
+    private static final NbtSaveHandler<AccelerateByFacingLogic> SAVE_LOGIC = new NbtSaveHandler<AccelerateByFacingLogic>()
+        .mainRoot()
+        /* */.nodeDouble("acceleration", AccelerateByFacingLogic::getAcceleration, AccelerateByFacingLogic::setAcceleration)
+        /* */.nodeFacing("direction", AccelerateByFacingLogic::getDirection, AccelerateByFacingLogic::setDirection)
+        .base();
+    /**
+     * Direction to move
+     */
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private EnumFacing direction;
-
-    /** Acceleration to move at per tick */
-    @Getter @Setter @Accessors(chain = true)
+    /**
+     * Acceleration to move at per tick
+     */
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private double acceleration;
-
     @Getter
     private double velocityAdded = 0;
 
@@ -37,7 +48,7 @@ public abstract class AccelerateByFacingLogic extends FlightLogic {
     @Override
     public void onEntityTick(Entity entity, IMissile missile, int ticksInAir) {
         super.onEntityTick(entity, missile, ticksInAir);
-        if(isValid() && !isDone()) {
+        if (isValid() && !isDone()) {
             // Move missile
             entity.motionX += direction.getFrontOffsetX() * acceleration;
             entity.motionY += direction.getFrontOffsetY() * acceleration;
@@ -64,9 +75,4 @@ public abstract class AccelerateByFacingLogic extends FlightLogic {
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<AccelerateByFacingLogic> SAVE_LOGIC = new NbtSaveHandler<AccelerateByFacingLogic>()
-        .mainRoot()
-        /* */.nodeDouble("acceleration", AccelerateByFacingLogic::getAcceleration, AccelerateByFacingLogic::setAcceleration)
-        /* */.nodeFacing("direction", AccelerateByFacingLogic::getDirection, AccelerateByFacingLogic::setDirection)
-        .base();
 }

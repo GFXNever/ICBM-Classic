@@ -14,6 +14,7 @@ import net.minecraft.entity.Entity;
  */
 public interface IMissile extends IWorldPosition // TODO add registry and require each missile (ex combinations included) to have a key
 {
+
     /**
      * The amount of ticks this missile has been flying for. Returns -1 if the missile is not
      * flying.
@@ -27,20 +28,14 @@ public interface IMissile extends IWorldPosition // TODO add registry and requir
      */
     Entity getMissileEntity();
 
+    IMissileTarget getTargetData();
+
     /**
      * Sets the missile targeting data
      *
      * @param data defining the target and any specialized impact settings
      */
     void setTargetData(IMissileTarget data);
-
-    IMissileTarget getTargetData();
-
-    /**
-     * Sets the flight logic to use for the missile
-     * @param logic to use
-     */
-    void setFlightLogic(IMissileFlightLogic logic);
 
     /**
      * Called to switch the flight logic to a new logic or next step
@@ -55,14 +50,15 @@ public interface IMissile extends IWorldPosition // TODO add registry and requir
     IMissileFlightLogic getFlightLogic();
 
     /**
-     * Sets the missile source information
-     * @param source
+     * Sets the flight logic to use for the missile
+     *
+     * @param logic to use
      */
-    void setMissileSource(IMissileSource source);
+    void setFlightLogic(IMissileFlightLogic logic);
 
     /**
      * Gets the missile source
-     *
+     * <p>
      * Should not be exposed to the player
      *
      * @return source
@@ -70,12 +66,20 @@ public interface IMissile extends IWorldPosition // TODO add registry and requir
     IMissileSource getMissileSource();
 
     /**
-     * Tells the missile to start motion
+     * Sets the missile source information
      *
+     * @param source
+     */
+    void setMissileSource(IMissileSource source);
+
+    /**
+     * Tells the missile to start motion
+     * <p>
      * This will trigger flight logic to run calculation and lock in start conditions.
      * After which the entity will start moving and handle any updates as required.
-     *
+     * <p>
      * Once launched don't expect the flight logic or other systems to allow modifications.
      */
     void launch();
+
 }

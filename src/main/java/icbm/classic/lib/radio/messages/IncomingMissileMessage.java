@@ -9,6 +9,7 @@ import java.util.Optional;
 
 @Data
 public class IncomingMissileMessage implements IIncomingMissileMessage {
+
     private final String channel;
     private final IMissile missile;
 
@@ -16,4 +17,5 @@ public class IncomingMissileMessage implements IIncomingMissileMessage {
     public Vec3d getTarget() {
         return Optional.ofNullable(missile).map(IMissile::getVec3d).orElse(null);
     }
+
 }

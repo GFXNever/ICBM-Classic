@@ -15,24 +15,23 @@ import java.util.stream.Collectors;
 /**
  * Created by Robert Seifert on 1/6/20.
  */
-public class CommandBlastList extends SubCommand
-{
-    public CommandBlastList()
-    {
+public class CommandBlastList extends SubCommand {
+
+    public CommandBlastList() {
         super("list");
     }
 
     @Override
-    public void handleCommand(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException
-    {
+    public void handleCommand(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
         //Convert list of explosives to string registry names
         String names = ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosives().stream()
-                .map(IExplosiveData::getRegistryName)
-                .map(ResourceLocation::toString)
-                .sorted()
-                .collect(Collectors.joining(", "));
+            .map(IExplosiveData::getRegistryName)
+            .map(ResourceLocation::toString)
+            .sorted()
+            .collect(Collectors.joining(", "));
 
         //Output message TODO translate if possible?
         sender.sendMessage(new TextComponentString("Explosive Types: " + names));
     }
+
 }

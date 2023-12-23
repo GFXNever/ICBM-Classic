@@ -3,11 +3,10 @@ package icbm.classic.api.refs;
 import icbm.classic.api.reg.IExplosiveData;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 1/7/19.
  */
-public final class ICBMExplosives
-{
+public final class ICBMExplosives {
+
     //=================== Tier 1
     public static IExplosiveData CONDENSED;
     public static IExplosiveData SHRAPNEL;
@@ -36,7 +35,9 @@ public final class ICBMExplosives
     public static IExplosiveData ANTI_GRAVITATIONAL;
     public static IExplosiveData ENDER;
 
-    /** @Deprecated for removal in next major MC version, currently placeholder to prevent game save errors */
+    /**
+     * @Deprecated for removal in next major MC version, currently placeholder to prevent game save errors
+     */
     @Deprecated
     public static IExplosiveData HYPERSONIC;
 
@@ -49,4 +50,5 @@ public final class ICBMExplosives
     public static IExplosiveData MUTATION;
     public static IExplosiveData ROT;
     public static IExplosiveData CLUSTER;
+
 }

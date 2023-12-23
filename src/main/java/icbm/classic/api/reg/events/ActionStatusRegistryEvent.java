@@ -7,12 +7,12 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 /**
  * Fired to allow registering action status message types
  */
-public class ActionStatusRegistryEvent extends Event
-{
+public class ActionStatusRegistryEvent extends Event {
+
     public final IBuilderRegistry<IActionStatus> registry;
 
-    public ActionStatusRegistryEvent(IBuilderRegistry<IActionStatus> registry)
-    {
+    public ActionStatusRegistryEvent(IBuilderRegistry<IActionStatus> registry) {
         this.registry = registry;
     }
+
 }

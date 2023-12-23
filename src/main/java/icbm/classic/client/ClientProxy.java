@@ -24,23 +24,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.Random;
 
 @SideOnly(Side.CLIENT)
-public class ClientProxy extends CommonProxy
-{
+public class ClientProxy extends CommonProxy {
+
     @Override
-    public void init()
-    {
+    public void init() {
         super.init();
         final Render render = Minecraft.getMinecraft().getRenderManager().getEntityClassRenderObject(EntityChicken.class);
-        if(render instanceof RenderChicken) {
+        if (render instanceof RenderChicken) {
             ((RenderChicken) render).addLayer(new LayerChickenHelmet((RenderChicken) render));
         }
     }
 
     @Override
-    public void spawnSmoke(World world, Pos position, double v, double v1, double v2, float red, float green, float blue, float scale, int ticksToLive)
-    {
-        if (world != null)
-        {
+    public void spawnSmoke(World world, Pos position, double v, double v1, double v2, float red, float green, float blue, float scale,
+                           int ticksToLive) {
+        if (world != null) {
             ParticleSmokeICBM particleSmokeICBM = new ParticleSmokeICBM(world, position, v, v1, v2, scale);
             particleSmokeICBM.setColor(red, green, blue, true);
             particleSmokeICBM.setAge(ticksToLive);
@@ -49,10 +47,9 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public void spawnAirParticle(World world, double x, double y, double z, double v, double v1, double v2, float red, float green, float blue, float scale, int ticksToLive)
-    {
-        if (world != null)
-        {
+    public void spawnAirParticle(World world, double x, double y, double z, double v, double v1, double v2, float red, float green, float blue,
+                                 float scale, int ticksToLive) {
+        if (world != null) {
             ParticleAirICBM particleAirParticleICBM = new ParticleAirICBM(world, x, y, z, v, v1, v2, scale);
             particleAirParticleICBM.setColor(red, green, blue, true);
             particleAirParticleICBM.setAge(ticksToLive);
@@ -61,8 +58,8 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public void spawnExplosionParticles(final World world, final double sourceX, final double sourceY, final double sourceZ, final double blastScale, final BlockPos blockPos)
-    {
+    public void spawnExplosionParticles(final World world, final double sourceX, final double sourceY, final double sourceZ, final double blastScale,
+                                        final BlockPos blockPos) {
         //Random position near destroyed block
         final double particleX = (blockPos.getX() + world.rand.nextFloat());
         final double particleY = (blockPos.getY() + world.rand.nextFloat());
@@ -95,10 +92,8 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public void spawnMissileSmoke(Entity entity, IMissileFlightLogic flightLogic, int ticksInAir)
-    {
-        if (entity.world.isRemote && ConfigClient.MISSILE_ENGINE_SMOKE)
-        {
+    public void spawnMissileSmoke(Entity entity, IMissileFlightLogic flightLogic, int ticksInAir) {
+        if (entity.world.isRemote && ConfigClient.MISSILE_ENGINE_SMOKE) {
             Pos position = new Pos(entity);
             // The distance of the smoke relative
             // to the missile.
@@ -113,8 +108,7 @@ public class ClientProxy extends CommonProxy
             double z = Math.cos(Math.toRadians(entity.rotationYaw)) * dH;
             position = position.add(x, y, z);
 
-            for (int i = 0; i < 10; i++)
-            {
+            for (int i = 0; i < 10; i++) {
                 spawnAirParticle(entity.world,
                     position.x(), position.y(), position.z(),
                     -entity.motionX * 0.5, -entity.motionY * 0.5, -entity.motionZ * 0.5,
@@ -126,9 +120,8 @@ public class ClientProxy extends CommonProxy
     }
 
     @Override
-    public void spawnPadSmoke(Entity entity, IMissileFlightLogic flightLogic, int ticksInAir)
-    {
-        if(ConfigClient.MISSILE_LAUNCH_SMOKE) {
+    public void spawnPadSmoke(Entity entity, IMissileFlightLogic flightLogic, int ticksInAir) {
+        if (ConfigClient.MISSILE_LAUNCH_SMOKE) {
             final World world = entity.world;
             final Random random = world.rand;
 
@@ -161,7 +154,7 @@ public class ClientProxy extends CommonProxy
         Random rand = world.rand;
         ParticleManager particleManager = Minecraft.getMinecraft().effectRenderer;
 
-        for (int i = 0 ; i < 10 ; i++) {
+        for (int i = 0; i < 10; i++) {
             float scale = 10 + 8 * rand.nextFloat();
 
             double randX = 0.1 * normalizedRandom(rand);
@@ -190,9 +183,10 @@ public class ClientProxy extends CommonProxy
             particleMY *= multiplier;
             particleMZ *= multiplier;
 
-            ParticleSmokeICBM particle = new ParticleSmokeICBM(world, new Pos(particleX, particleY, particleZ), particleMX, particleMY, particleMZ, scale);
+            ParticleSmokeICBM particle =
+                new ParticleSmokeICBM(world, new Pos(particleX, particleY, particleZ), particleMX, particleMY, particleMZ, scale);
             particle.setColor(0.3f, 0.3f, 0.3f, true);
-            particle.setAge(20*40);
+            particle.setAge(20 * 40);
 
             particleManager.addEffect(particle);
         }
@@ -201,4 +195,5 @@ public class ClientProxy extends CommonProxy
     private double normalizedRandom(Random random) {
         return (random.nextFloat() - 0.5) * 2;
     }
+
 }

@@ -13,8 +13,8 @@ import javax.annotation.Nullable;
  * <p>
  * Created by Dark(DarkGuardsman, Robert) on 1/26/2020.
  */
-public interface IBlastVelocity
-{
+public interface IBlastVelocity {
+
     /**
      * Called to handle motion being applied
      *
@@ -27,4 +27,5 @@ public interface IBlastVelocity
      * @return true if handled, false to apply default handling
      */
     boolean onBlastApplyMotion(@Nullable Entity source, IBlast blast, double xDifference, double yDifference, double zDifference, double distance);
+
 }

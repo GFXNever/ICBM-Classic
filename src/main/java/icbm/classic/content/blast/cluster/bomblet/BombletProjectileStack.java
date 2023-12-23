@@ -18,4 +18,5 @@ public class BombletProjectileStack implements IProjectileStack<EntityBombDrople
     public IProjectileData<EntityBombDroplet> getProjectileData() {
         return new BombletProjectileData().setExplosiveStack(stack.get());
     }
+
 }

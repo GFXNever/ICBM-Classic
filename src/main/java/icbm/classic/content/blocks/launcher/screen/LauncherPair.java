@@ -5,7 +5,9 @@ import lombok.Data;
 
 @Data
 public class LauncherPair {
+
     private final Integer group;
     private final Integer index;
     private final IActionStatus status;
+
 }

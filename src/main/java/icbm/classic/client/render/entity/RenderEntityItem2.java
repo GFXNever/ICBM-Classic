@@ -19,14 +19,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.Random;
 
 @SideOnly(Side.CLIENT)
-public class RenderEntityItem2 extends Render<EntityItem>
-{
+public class RenderEntityItem2 extends Render<EntityItem> {
+
     private final RenderItem itemRenderer;
     private final Random random = new Random();
     private final ItemCameraTransforms.TransformType transformType;
 
-    public RenderEntityItem2(RenderManager renderManagerIn, RenderItem p_i46167_2_, ItemCameraTransforms.TransformType transformType)
-    {
+    public RenderEntityItem2(RenderManager renderManagerIn, RenderItem p_i46167_2_, ItemCameraTransforms.TransformType transformType) {
         super(renderManagerIn);
         this.itemRenderer = p_i46167_2_;
         this.transformType = transformType;
@@ -37,15 +36,13 @@ public class RenderEntityItem2 extends Render<EntityItem>
     /**
      * Renders the desired {@code T} type Entity.
      */
-    public void doRender(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
+    public void doRender(EntityItem entity, double x, double y, double z, float entityYaw, float partialTicks) {
         ItemStack itemstack = entity.getItem();
         int i = itemstack.isEmpty() ? 187 : Item.getIdFromItem(itemstack.getItem()) + itemstack.getMetadata();
         this.random.setSeed((long) i);
         boolean flag = false;
 
-        if (this.bindEntityTexture(entity))
-        {
+        if (this.bindEntityTexture(entity)) {
             this.renderManager.renderEngine.getTexture(this.getEntityTexture(entity)).setBlurMipmap(false, false);
             flag = true;
         }
@@ -54,12 +51,12 @@ public class RenderEntityItem2 extends Render<EntityItem>
         GlStateManager.alphaFunc(516, 0.1F);
         GlStateManager.enableBlend();
         RenderHelper.enableStandardItemLighting();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+            GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         GlStateManager.pushMatrix();
         IBakedModel ibakedmodel = this.itemRenderer.getItemModelWithOverrides(itemstack, entity.world, (EntityLivingBase) null);
 
-        if (this.renderOutlines)
-        {
+        if (this.renderOutlines) {
             GlStateManager.enableColorMaterial();
             GlStateManager.enableOutlineMode(this.getTeamColor(entity));
         }
@@ -69,8 +66,7 @@ public class RenderEntityItem2 extends Render<EntityItem>
         this.itemRenderer.renderItem(itemstack, ibakedmodel);
         GlStateManager.popMatrix();
 
-        if (this.renderOutlines)
-        {
+        if (this.renderOutlines) {
             GlStateManager.disableOutlineMode();
             GlStateManager.disableColorMaterial();
         }
@@ -80,8 +76,7 @@ public class RenderEntityItem2 extends Render<EntityItem>
         GlStateManager.disableBlend();
         this.bindEntityTexture(entity);
 
-        if (flag)
-        {
+        if (flag) {
             this.renderManager.renderEngine.getTexture(this.getEntityTexture(entity)).restoreLastBlurMipmap();
         }
 
@@ -91,8 +86,8 @@ public class RenderEntityItem2 extends Render<EntityItem>
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(EntityItem entity)
-    {
+    protected ResourceLocation getEntityTexture(EntityItem entity) {
         return TextureMap.LOCATION_BLOCKS_TEXTURE;
     }
+
 }

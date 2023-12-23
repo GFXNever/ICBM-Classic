@@ -7,8 +7,7 @@ import net.minecraft.util.ResourceLocation;
  * Holds references related to ICBM entities
  * Created by Robin Seifert on 1/7/19.
  */
-public final class ICBMEntities
-{
+public final class ICBMEntities {
 
     //TODO refactor all entity names to match vanilla `_` style
     public static final ResourceLocation BLOCK_GRAVITY = new ResourceLocation(ICBMClassicAPI.ID, "block.gravity");
@@ -27,4 +26,5 @@ public final class ICBMEntities
     public static final ResourceLocation REDMATTER = new ResourceLocation(ICBMClassicAPI.ID, "redmatter");
 
     public static final ResourceLocation SMOKE = new ResourceLocation(ICBMClassicAPI.ID, "smoke");
+
 }

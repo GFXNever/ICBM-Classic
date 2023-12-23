@@ -9,6 +9,7 @@ import net.minecraft.util.EnumFacing;
 
 @Data
 public class LauncherEntry {
+
     private final IMissileLauncher launcher;
     private final TileEntity host;
     private final EnumFacing side;
@@ -17,4 +18,5 @@ public class LauncherEntry {
     private IActionStatus lastFiringStatus;
     private FiringPackage lastFiringPackage;
     private long lastFiringTime;
+
 }

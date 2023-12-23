@@ -6,8 +6,8 @@ package icbm.classic.api.explosion;
  * @author Calclavia
  */
 @Deprecated //TODO replace with events or more specialized logic
-public interface IBlastIgnore
-{
+public interface IBlastIgnore {
+
     /**
      * Can 'this' entity ignore the explosive
      *
@@ -15,4 +15,5 @@ public interface IBlastIgnore
      * @return
      */
     boolean canIgnore(IBlast explosion); //TODO rethink this design - 3/12/2018 Dark
+
 }

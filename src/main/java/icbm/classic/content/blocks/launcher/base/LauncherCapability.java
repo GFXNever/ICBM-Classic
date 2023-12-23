@@ -44,7 +44,7 @@ public class LauncherCapability extends LauncherBaseCapability {
     public static final double MISSILE_CLIMB_HEIGHT = 2; //TODO add config
 
     private static final EulerAngle angle = new EulerAngle(0, 0, 0);
-    private static final Vec3d[] SPAWN_OFFSETS = new Vec3d[] {
+    private static final Vec3d[] SPAWN_OFFSETS = new Vec3d[]{
         //DOWN
         new Vec3d(0, -3.1f, 0),
         //UP
@@ -60,18 +60,41 @@ public class LauncherCapability extends LauncherBaseCapability {
     };
     private final TileLauncherBase host;
 
+    /**
+     * Calculates inaccuracy to apply to target before firing the missile.
+     *
+     * @param distanceSq from the target squared
+     * @param missiles   fired in the same cluster
+     * @return inaccuracy to apply to the target
+     */
+    public static float calculateInaccuracy(double distanceSq, int missiles) {
+
+        // Min amount
+        float inaccuracy = (float) ConfigLauncher.MIN_INACCURACY;
+
+        // Range drift
+        final double scale = distanceSq / (ConfigLauncher.RANGE * ConfigLauncher.RANGE);
+        inaccuracy += (float) (scale * ConfigLauncher.SCALED_INACCURACY_DISTANCE);
+
+        // Add inaccuracy for each launcher fired in circuit
+        if (missiles > 1) {
+            inaccuracy += (float) ((missiles - 1) * ConfigLauncher.SCALED_INACCURACY_LAUNCHERS);
+        }
+        return inaccuracy;
+    }
+
     @Override
     public IActionStatus getStatus() {
         // Min power check
-        if(!host.energyStorage.consumePower(host.getFiringCost(), true)) {
+        if (!host.energyStorage.consumePower(host.getFiringCost(), true)) {
             return LauncherStatus.ERROR_POWER;
         }
         // No missile stack
-        else if(host.missileHolder.getMissileStack().isEmpty()) {
+        else if (host.missileHolder.getMissileStack().isEmpty()) {
             return LauncherStatus.ERROR_EMPTY_STACK;
         }
         // Missile in process of firing, but is delayed
-        else if(host.getFiringPackage() != null && host.getFiringPackage().getCountDown() > 0) {
+        else if (host.getFiringPackage() != null && host.getFiringPackage().getCountDown() > 0) {
             return new FiringWithDelay(host.getFiringPackage().getCountDown());
         }
         return LauncherStatus.READY;
@@ -80,15 +103,15 @@ public class LauncherCapability extends LauncherBaseCapability {
     @Override
     public IActionStatus preCheckLaunch(IMissileTarget targetData, @Nullable IMissileCause cause) {
         // Validate target data
-        if(targetData == null || targetData.getPosition() == null) {
+        if (targetData == null || targetData.getPosition() == null) {
             return LauncherStatus.ERROR_TARGET_NULL;
         }
         // User safety, yes they will shoot themselves
-        else if(isTargetTooClose(targetData.getPosition())) {
+        else if (isTargetTooClose(targetData.getPosition())) {
             return LauncherStatus.ERROR_MIN_RANGE;
         }
         // Max range TODO once fuel is added make this a warning that can be bypassed
-        else if(isTargetTooFar(targetData.getPosition())) {
+        else if (isTargetTooFar(targetData.getPosition())) {
             return LauncherStatus.ERROR_MAX_RANGE;
         }
         //TODO if firing package countdown finishes, validate it triggered the launch... if not return QUEUED
@@ -102,7 +125,7 @@ public class LauncherCapability extends LauncherBaseCapability {
 
         // Check current status, if blocking stop launch and return
         final IActionStatus preCheck = preCheckLaunch(targetData, cause);
-        if(preCheck.shouldBlockInteraction()) {
+        if (preCheck.shouldBlockInteraction()) {
             return preCheck;
         }
 
@@ -110,41 +133,40 @@ public class LauncherCapability extends LauncherBaseCapability {
         final BlockCause selfCause = new BlockCause(host.getWorld(), host.getPos(), host.getBlockState()); // TODO add more information about launcher
         selfCause.setPreviousCause(cause);
 
-        final Vec3d spawnPosition = SPAWN_OFFSETS[host.getLaunchDirection().ordinal()].addVector(host.getPos().getX() + 0.5, host.getPos().getY() + 0.5, host.getPos().getZ() + 0.5);
+        final Vec3d spawnPosition =
+            SPAWN_OFFSETS[host.getLaunchDirection().ordinal()].addVector(host.getPos().getX() + 0.5, host.getPos().getY() + 0.5,
+                host.getPos().getZ() + 0.5);
         final MissileSource source = new MissileSource(host.getWorld(), spawnPosition, selfCause);
 
         //Allow canceling missile launches
         final LauncherEvent.PreLaunch event = new LauncherEvent.PreLaunch(source, this, host.missileHolder, targetData, simulate);
-        if (MinecraftForge.EVENT_BUS.post(event))
-        {
-            if(event.cancelReason != null) {
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            if (event.cancelReason != null) {
                 return event.cancelReason;
             }
             return LauncherStatus.CANCELED;
         }
 
         final ItemStack stack = host.missileHolder.getMissileStack();
-        if (stack.hasCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null))
-        {
+        if (stack.hasCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null)) {
             final ICapabilityMissileStack missileStack = stack.getCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null);
-            if (missileStack != null)
-            {
+            if (missileStack != null) {
                 // TODO we may need to walk cause history to get correct launcher count info
                 final Vec3d target = applyInaccuracy(targetData.getPosition(), Math.max(1, solution.getFiringCount()));
 
                 //TODO add distance check? --- something seems to be missing
 
                 // Ignore delay if we are currently using a firing package
-                if(host.getFiringPackage() == null) {
+                if (host.getFiringPackage() == null) {
                     // Check if we have a delay before firing
                     int delay = host.getFiringDelay();
-                    if(targetData instanceof IMissileTargetDelayed) {
+                    if (targetData instanceof IMissileTargetDelayed) {
                         delay += ((IMissileTargetDelayed) targetData).getFiringDelay();
                     }
 
                     // If delay, store firing information and return
-                    if(delay > 0) {
-                        if(!simulate) {
+                    if (delay > 0) {
+                        if (!simulate) {
                             host.setFiringPackage(new FiringPackage(targetData, cause, delay));
                         }
                         return new FiringWithDelay(delay); //TODO provide callback for when missile finishes launching
@@ -152,7 +174,7 @@ public class LauncherCapability extends LauncherBaseCapability {
                 }
 
                 // Return launched on client or if we are simulating
-                if(!getHost().isServer() || simulate) {
+                if (!getHost().isServer() || simulate) {
                     return LauncherStatus.LAUNCHED;
                 }
 
@@ -166,7 +188,7 @@ public class LauncherCapability extends LauncherBaseCapability {
     private IActionStatus fireMissile(IMissile missile, MissileSource source, Vec3d target) {
 
         // Should always work but in rare cases capability might have failed
-        if(!host.missileHolder.consumeMissile()) {
+        if (!host.missileHolder.consumeMissile()) {
             return LauncherStatus.ERROR_INVALID_STACK;
         }
 
@@ -186,12 +208,12 @@ public class LauncherCapability extends LauncherBaseCapability {
         missile.launch();
 
         //Spawn entity
-        if(!host.getWorld().spawnEntity(entity)) {
+        if (!host.getWorld().spawnEntity(entity)) {
             return LauncherStatus.ERROR_SPAWN;
         }
 
         // Check power again, with firing delay things could change
-        if(!host.energyStorage.consumePower(host.getFiringCost(), true)) {
+        if (!host.energyStorage.consumePower(host.getFiringCost(), true)) {
             return LauncherStatus.ERROR_POWER;
         }
         host.energyStorage.consumePower(host.getFiringCost(), false);
@@ -211,7 +233,7 @@ public class LauncherCapability extends LauncherBaseCapability {
 
     public IMissileFlightLogic buildFLightPath() {
 
-        if(host.getLaunchDirection() != EnumFacing.UP) {
+        if (host.getLaunchDirection() != EnumFacing.UP) {
 
             IMissileFlightLogicStep stepLockHeight = new MoveByFacingLogic()
                 .setDistance(host.getLockHeight())
@@ -254,31 +276,7 @@ public class LauncherCapability extends LauncherBaseCapability {
         return calculateInaccuracy(distance, launcherCount);
     }
 
-    /**
-     * Calculates inaccuracy to apply to target before firing the missile.
-     *
-     * @param distanceSq from the target squared
-     * @param missiles fired in the same cluster
-     * @return inaccuracy to apply to the target
-     */
-    public static float calculateInaccuracy(double distanceSq, int missiles) {
-
-        // Min amount
-        float inaccuracy = (float)ConfigLauncher.MIN_INACCURACY;
-
-        // Range drift
-        final double scale = distanceSq / (ConfigLauncher.RANGE * ConfigLauncher.RANGE);
-        inaccuracy += (float) (scale * ConfigLauncher.SCALED_INACCURACY_DISTANCE);
-
-        // Add inaccuracy for each launcher fired in circuit
-        if(missiles > 1) {
-            inaccuracy += (float) ((missiles - 1) * ConfigLauncher.SCALED_INACCURACY_LAUNCHERS);
-        }
-        return inaccuracy;
-    }
-
-    protected Vec3d applyInaccuracy(Vec3d target, int launcherCount)
-    {
+    protected Vec3d applyInaccuracy(Vec3d target, int launcherCount) {
 
         //Randomize distance
         float inaccuracy = getInaccuracy(target, launcherCount) * host.getWorld().rand.nextFloat();
@@ -296,18 +294,17 @@ public class LauncherCapability extends LauncherBaseCapability {
      * @param target
      * @return
      */
-    public boolean isTargetTooClose(Vec3d target)
-    {
+    public boolean isTargetTooClose(Vec3d target) {
         final int minDistance = 10; //TODO config driven and user driven
         final double deltaX = Math.abs(target.x - (host.getPos().getX() + 0.5));
-        final double  deltaZ = Math.abs(target.z - (host.getPos().getZ() + 0.5));
+        final double deltaZ = Math.abs(target.z - (host.getPos().getZ() + 0.5));
         return deltaX < minDistance && deltaZ < minDistance;
     }
 
-    public boolean isTargetTooFar(Vec3d target)
-    {
+    public boolean isTargetTooFar(Vec3d target) {
         final double deltaX = Math.abs(target.x - (host.getPos().getX() + 0.5));
-        final double  deltaZ = Math.abs(target.z - (host.getPos().getZ() + 0.5));
+        final double deltaZ = Math.abs(target.z - (host.getPos().getZ() + 0.5));
         return deltaX > ConfigLauncher.RANGE || deltaZ > ConfigLauncher.RANGE;
     }
+
 }

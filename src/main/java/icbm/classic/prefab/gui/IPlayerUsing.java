@@ -9,17 +9,16 @@ import java.util.Collection;
  * for GUI handling.
  * Created by robert on 1/12/2015.
  */
-public interface IPlayerUsing
-{
+public interface IPlayerUsing {
+
     Collection<EntityPlayer> getPlayersUsing();
 
-    default boolean addPlayerToUseList(EntityPlayer player)
-    {
+    default boolean addPlayerToUseList(EntityPlayer player) {
         return getPlayersUsing().add(player);
     }
 
-    default boolean removePlayerToUseList(EntityPlayer player)
-    {
+    default boolean removePlayerToUseList(EntityPlayer player) {
         return getPlayersUsing().remove(player);
     }
+
 }

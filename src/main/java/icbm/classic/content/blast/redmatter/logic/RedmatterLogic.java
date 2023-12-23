@@ -33,30 +33,39 @@ import java.util.Queue;
 /**
  * Handles logic of the redmatter tick
  */
-public class RedmatterLogic
-{
+public class RedmatterLogic {
+
     //Host of the logic
     public final EntityRedmatter host;
-
-    /** Blocks destroyed in the current size cycle... cycle can last few ticks to several minutes */
-    protected int blockDestroyedThisCycle = 0;
-    /** Blocks destroyed this tick, used to limit max world edits */
-    protected int blockDestroyedThisTick = 0;
-    /** Raytrace lines run to detect blocks this tick, used to limit CPU usage */
-    protected int raytracesThisTick = 0;
-    /** Cycles run since we removed blocks, used to track starve rate */
-    protected int cyclesSinceLastBlockRemoved = -1;
-    /** Current scan radius for blocks */
-    protected int currentBlockDestroyRadius = -1;
-
-    /** Queue of raytraces to run for searching blocks, this defaults to edge blocks only */
+    /**
+     * Queue of raytraces to run for searching blocks, this defaults to edge blocks only
+     */
     protected final Queue<BlockPos> rayTraceTargets = new LinkedList();
+    /**
+     * Blocks destroyed in the current size cycle... cycle can last few ticks to several minutes
+     */
+    protected int blockDestroyedThisCycle = 0;
+    /**
+     * Blocks destroyed this tick, used to limit max world edits
+     */
+    protected int blockDestroyedThisTick = 0;
+    /**
+     * Raytrace lines run to detect blocks this tick, used to limit CPU usage
+     */
+    protected int raytracesThisTick = 0;
+    /**
+     * Cycles run since we removed blocks, used to track starve rate
+     */
+    protected int cyclesSinceLastBlockRemoved = -1;
+    /**
+     * Current scan radius for blocks
+     */
+    protected int currentBlockDestroyRadius = -1;
 
     /**
      * @param host - redmatter entity running this logic
      */
-    public RedmatterLogic(EntityRedmatter host)
-    {
+    public RedmatterLogic(EntityRedmatter host) {
         this.host = host;
     }
 
@@ -65,45 +74,44 @@ public class RedmatterLogic
      *
      * @return blocks that can be removed each tick
      */
-    public int getBlocksPerTick()
-    {
+    public int getBlocksPerTick() {
         return ConfigBlast.redmatter.MAX_BLOCKS_EDITS_PER_TICK;
     }
 
-    /** Invoked each tick by the controlling entity */
-    public void tick()
-    {
+    /**
+     * Invoked each tick by the controlling entity
+     */
+    public void tick() {
         preTick();
         doTick();
         postTick();
     }
 
-    /** Prep cycle to cleanup from last tick */
-    protected void preTick()
-    {
+    /**
+     * Prep cycle to cleanup from last tick
+     */
+    protected void preTick() {
         raytracesThisTick = 0;
         blockDestroyedThisTick = 0;
 
         //Init destroy radius based on host's saved value
-        if (currentBlockDestroyRadius < 0)
-        {
+        if (currentBlockDestroyRadius < 0) {
             currentBlockDestroyRadius = (int) Math.floor(host.getBlastSize());
         }
     }
 
-    /** Actual work cycle */
-    protected void doTick()
-    {
+    /**
+     * Actual work cycle
+     */
+    protected void doTick() {
         //Do actions
         detectAndDestroyBlocks();
         doEntityEffects();
 
         //Play effects
-        if (ConfigBlast.redmatter.ENABLE_AUDIO)
-        {
+        if (ConfigBlast.redmatter.ENABLE_AUDIO) {
             //TODO collapse audio should play near blocks destroyed for better effect
-            if (host.world.rand.nextInt(8) == 0)
-            {
+            if (host.world.rand.nextInt(8) == 0) {
                 final double playX = host.posX + CalculationHelpers.randFloatRange(host.world.rand, host.getBlastSize());
                 final double playY = host.posY + CalculationHelpers.randFloatRange(host.world.rand, host.getBlastSize());
                 final double playZ = host.posZ + CalculationHelpers.randFloatRange(host.world.rand, host.getBlastSize());
@@ -112,42 +120,41 @@ public class RedmatterLogic
                 ICBMSounds.COLLAPSE.play(host.world, playX, playY, playZ, volume, pitch, true);
             }
             //TODO check if this should play every tick
-            ICBMSounds.REDMATTER.play(host.world, host.posX, host.posY, host.posZ, 3.0F, CalculationHelpers.randFloatRange(host.world.rand, -0.8f, 1.2f), true);
+            ICBMSounds.REDMATTER.play(host.world, host.posX, host.posY, host.posZ, 3.0F,
+                CalculationHelpers.randFloatRange(host.world.rand, -0.8f, 1.2f), true);
         }
     }
 
-    /** Post work cycle */
-    protected void postTick()
-    {
+    /**
+     * Post work cycle
+     */
+    protected void postTick() {
         //Decrease block if we don't destroy anything
-        if (blockDestroyedThisCycle <= 0)
-        {
+        if (blockDestroyedThisCycle <= 0) {
             decreaseScale();
         }
     }
 
-    /** Handles decreasing the size of the redmatter */
-    protected void decreaseScale()
-    {
+    /**
+     * Handles decreasing the size of the redmatter
+     */
+    protected void decreaseScale() {
         final float size = host.getBlastSize();
 
         //We are not removing blocks so the redmatter is starving (has no blocks to remove), decrease size
-        if (size <= cyclesSinceLastBlockRemoved)
-        {
+        if (size <= cyclesSinceLastBlockRemoved) {
             //TODO make it optional to remove small redmatters. This way we can leave land marks were old redmatter exist
             //TODO if we leave small redmatters allow players to remove them and/or capture in jars
-            if (size <= ConfigBlast.redmatter.MIN_SIZE)
-            {
+            if (size <= ConfigBlast.redmatter.MIN_SIZE) {
                 host.setBlastSize(0);
                 host.setDead();
                 ICBMClassic.logger().info("Redmatter[{}] has starved to death at {} {} {} {}",
-                        host.getEntityId(),
-                        host.posX,
-                        host.posY,
-                        host.posZ,
-                        host.world.provider.getDimension());
-            }
-            else
+                    host.getEntityId(),
+                    host.posX,
+                    host.posY,
+                    host.posZ,
+                    host.world.provider.getDimension());
+            } else
             //Decrease mass
             {
                 final float newSize = size < 1 ? size * 0.9f : size * ConfigBlast.redmatter.STARVE_SCALE;
@@ -156,18 +163,17 @@ public class RedmatterLogic
         }
     }
 
-    /** Handles looking for blocks and starting the destroy process */
-    protected void detectAndDestroyBlocks()
-    {
+    /**
+     * Handles looking for blocks and starting the destroy process
+     */
+    protected void detectAndDestroyBlocks() {
         //Match blast size it if changes
-        if (currentBlockDestroyRadius > host.getBlastMaxSize())
-        {
+        if (currentBlockDestroyRadius > host.getBlastMaxSize()) {
             setCurrentBlockDestroyRadius((int) Math.floor(host.getBlastSize()));
         }
 
         //Init stage
-        if (rayTraceTargets.isEmpty())
-        {
+        if (rayTraceTargets.isEmpty()) {
             startNextBlockDestroyCycle();
         }
 
@@ -175,24 +181,24 @@ public class RedmatterLogic
         cycleDestroyBlocks();
     }
 
-    /** Detects blocks and removes them */
-    protected void cycleDestroyBlocks()
-    {
+    /**
+     * Detects blocks and removes them
+     */
+    protected void cycleDestroyBlocks() {
         //Loop targets and trace limit per tick
         final Vec3d center = host.getPositionVector();
-        while (!shouldStopBreakingBlocks() && !rayTraceTargets.isEmpty())
-        {
+        while (!shouldStopBreakingBlocks() && !rayTraceTargets.isEmpty()) {
             raytracesThisTick++;
             rayTraceTowardsBlock(center, rayTraceTargets.poll());
         }
     }
 
-    /** Triggers the next block cycle finding all raytrace paths */
-    protected void startNextBlockDestroyCycle()
-    {
+    /**
+     * Triggers the next block cycle finding all raytrace paths
+     */
+    protected void startNextBlockDestroyCycle() {
         //Increase size
-        if (cyclesSinceLastBlockRemoved > 0)
-        {
+        if (cyclesSinceLastBlockRemoved > 0) {
             cyclesSinceLastBlockRemoved = 0;
             setCurrentBlockDestroyRadius(currentBlockDestroyRadius + 1);  //TODO change scale to number of blocks eaten
         }
@@ -210,8 +216,7 @@ public class RedmatterLogic
         Collections.shuffle((List<?>) rayTraceTargets);
 
         //If we didn't destroy anything at this layer expand
-        if (blockDestroyedThisCycle <= 0)
-        {
+        if (blockDestroyedThisCycle <= 0) {
             cyclesSinceLastBlockRemoved += 1;
         }
         blockDestroyedThisCycle = 0;
@@ -227,8 +232,7 @@ public class RedmatterLogic
      * @param center - redmatter center, passed in to avoid recreating
      * @param target - block target to trace towards
      */
-    protected void rayTraceTowardsBlock(final Vec3d center, final BlockPos target)
-    {
+    protected void rayTraceTowardsBlock(final Vec3d center, final BlockPos target) {
         //Build target position
         final double targetX = target.getX() + center.x;
         final double targetY = target.getY() + center.y;
@@ -238,8 +242,7 @@ public class RedmatterLogic
         //Raytrace towards block
         final RayTraceResult rayTrace = host.world.rayTraceBlocks(center, pos, true, false, false);
 
-        if (rayTrace != null && rayTrace.typeOfHit == RayTraceResult.Type.BLOCK)
-        {
+        if (rayTrace != null && rayTrace.typeOfHit == RayTraceResult.Type.BLOCK) {
             processNextBlock(rayTrace.getBlockPos());
         }
     }
@@ -249,11 +252,10 @@ public class RedmatterLogic
      *
      * @return true to stop
      */
-    protected boolean shouldStopBreakingBlocks()
-    {
+    protected boolean shouldStopBreakingBlocks() {
         return raytracesThisTick > ConfigBlast.redmatter.DEFAULT_BLOCK_RAYTRACE_PER_TICK
-                || blockDestroyedThisTick > getBlocksPerTick()
-                || host.isDead;
+            || blockDestroyedThisTick > getBlocksPerTick()
+            || host.isDead;
     }
 
     /**
@@ -261,30 +263,25 @@ public class RedmatterLogic
      *
      * @param blockPos - blockToEdit
      */
-    protected void processNextBlock(BlockPos blockPos)
-    {
+    protected void processNextBlock(BlockPos blockPos) {
         final double dist = MathHelper.sqrt(host.getDistanceSqToCenter(blockPos));
 
         //We are looping in a shell orbit around the center
-        if (dist < (this.currentBlockDestroyRadius + 1))
-        {
+        if (dist < (this.currentBlockDestroyRadius + 1)) {
             final IBlockState blockState = host.world.getBlockState(blockPos);
             if (shouldRemoveBlock(blockPos, blockState)) //TODO calculate a pressure or pull force to destroy weaker blocks before stronger blocks
             {
                 //TODO handle multi-blocks
                 //TODO: render fluid streams moving into hole
 
-                if (host.world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 3))
-                {
+                if (host.world.setBlockState(blockPos, Blocks.AIR.getDefaultState(), 3)) {
                     //Freeze fluid blocks to improve pull rate
-                    if (blockState.getBlock() == Blocks.WATER || blockState.getBlock() == Blocks.FLOWING_WATER)
-                    {
+                    if (blockState.getBlock() == Blocks.WATER || blockState.getBlock() == Blocks.FLOWING_WATER) {
                         freezeWaterAround(blockPos);
                     }
 
                     //Convert a random amount of destroyed blocks into flying blocks for visuals
-                    if (canTurnIntoFlyingBlock(blockState) && host.world.rand.nextFloat() > ConfigBlast.redmatter.CHANCE_FOR_FLYING_BLOCK)
-                    {
+                    if (canTurnIntoFlyingBlock(blockState) && host.world.rand.nextFloat() > ConfigBlast.redmatter.CHANCE_FOR_FLYING_BLOCK) {
                         spawnFlyingBlock(blockPos, blockState);
                     }
                     markBlockRemoved();
@@ -295,19 +292,16 @@ public class RedmatterLogic
 
     private void freezeWaterAround(BlockPos pos) //TODO convert to map<Block, Action> to allow introducing more effects
     {
-        for (EnumFacing side : EnumFacing.values())
-        {
+        for (EnumFacing side : EnumFacing.values()) {
             final BlockPos blockPos = pos.add(side.getDirectionVec());
             final IBlockState blockState = host.world.getBlockState(blockPos);
-            if (blockState.getBlock() == Blocks.WATER || blockState.getBlock() == Blocks.FLOWING_WATER)
-            {
+            if (blockState.getBlock() == Blocks.WATER || blockState.getBlock() == Blocks.FLOWING_WATER) {
                 host.world.setBlockState(blockPos, Blocks.ICE.getDefaultState(), 3); //TODO turn into fake ice that melts randomly
             }
         }
     }
 
-    private void markBlockRemoved()
-    {
+    private void markBlockRemoved() {
         blockDestroyedThisCycle++; //Tracks blocks removed over several ticks
         blockDestroyedThisTick++; //Tracks blocks removed in a single tick
         cyclesSinceLastBlockRemoved = 0;
@@ -320,18 +314,16 @@ public class RedmatterLogic
      * @param blockState - state of the block
      * @return true to remove
      */
-    protected boolean shouldRemoveBlock(BlockPos blockPos, IBlockState blockState)
-    {
+    protected boolean shouldRemoveBlock(BlockPos blockPos, IBlockState blockState) {
         final Block block = blockState.getBlock();
         final boolean isFluid = BlastBlockHelpers.isFluid(blockState);
         //Ignore air blocks and unbreakable blocks
         return !block.isAir(blockState, host.world, blockPos)
-                && (BlastBlockHelpers.isFlowingWater(blockState) || !isFluid && blockState.getBlockHardness(host.world, blockPos) >= 0);
+            && (BlastBlockHelpers.isFlowingWater(blockState) || !isFluid && blockState.getBlockHardness(host.world, blockPos) >= 0);
 
     }
 
-    protected boolean canTurnIntoFlyingBlock(IBlockState blockState)
-    {
+    protected boolean canTurnIntoFlyingBlock(IBlockState blockState) {
         return ConfigBlast.redmatter.SPAWN_FLYING_BLOCKS && !BlastBlockHelpers.isFluid(blockState);
     }
 
@@ -343,42 +335,37 @@ public class RedmatterLogic
         }, this::handleEntities);
     }
 
-    private float getEntityImpactRange()
-    {
+    private float getEntityImpactRange() {
         return host.getBlastSize() * ConfigBlast.redmatter.GRAVITY_SCALE;
     }
 
-    protected void doEntityEffects()
-    {
+    protected void doEntityEffects() {
         final float entityRadius = getEntityImpactRange();
 
         final AxisAlignedBB bounds = new AxisAlignedBB(
-                host.posX - entityRadius,
-                host.posY - entityRadius,
-                host.posZ - entityRadius,
-                host.posX + entityRadius,
-                host.posY + entityRadius,
-                host.posZ + entityRadius);
+            host.posX - entityRadius,
+            host.posY - entityRadius,
+            host.posZ - entityRadius,
+            host.posX + entityRadius,
+            host.posY + entityRadius,
+            host.posZ + entityRadius);
 
         //Get all entities in the cube area
         host.world.getEntitiesWithinAABB(Entity.class, bounds)
-                //Filter down
-                .stream().filter(this::shouldHandleEntity)
-                //Apply to each
-                .forEach(this::handleEntities);
+            //Filter down
+            .stream().filter(this::shouldHandleEntity)
+            //Apply to each
+            .forEach(this::handleEntities);
     }
 
-    private boolean shouldHandleEntity(Entity entity)
-    {
+    private boolean shouldHandleEntity(Entity entity) {
         //Ignore self
-        if (entity == host)
-        {
+        if (entity == host) {
             return false;
         }
 
         //Ignore players that are in creative mode or can't be harmed TODO may need to check for spectator?
-        if (entity instanceof EntityPlayer && (((EntityPlayer) entity).capabilities.isCreativeMode || ((EntityPlayer) entity).capabilities.disableDamage))
-        {
+        if (entity instanceof EntityPlayer && (((EntityPlayer) entity).capabilities.isCreativeMode || ((EntityPlayer) entity).capabilities.disableDamage)) {
             return false;
         }
 
@@ -394,8 +381,7 @@ public class RedmatterLogic
     /**
      * Makes an entity get affected by Red Matter.
      */
-    protected void handleEntities(Entity entity)
-    {
+    protected void handleEntities(Entity entity) {
         //Calculate different from center
         final double xDifference = host.posX - entity.posX;
         final double yDifference = host.posY - entity.posY;
@@ -407,12 +393,10 @@ public class RedmatterLogic
         attackEntity(entity, distance);
     }
 
-    private boolean moveEntity(Entity entity, double xDifference, double yDifference, double zDifference, double distance)
-    {
+    private boolean moveEntity(Entity entity, double xDifference, double yDifference, double zDifference, double distance) {
         //Allow overriding default pull logic
         final IBlastVelocity cap = entity.getCapability(ICBMClassicAPI.BLAST_VELOCITY_CAPABILITY, null);
-        if (cap != null && cap.onBlastApplyMotion(host, host.blastData, xDifference, yDifference, zDifference, distance))
-        {
+        if (cap != null && cap.onBlastApplyMotion(host, host.blastData, xDifference, yDifference, zDifference, distance)) {
             return true;
         }
 
@@ -431,17 +415,14 @@ public class RedmatterLogic
         return true;
     }
 
-    private void attackEntity(Entity entity, double distance)
-    {
+    private void attackEntity(Entity entity, double distance) {
         //TODO move each section to capability or reg system
         //TODO make config driven, break section out into its own method
 
         //Handle eating logic
         final double attackRange = Math.max(1, ConfigBlast.redmatter.KILL_SCALE * host.getBlastSize());
-        if (distance < attackRange)
-        {
-            if (entity instanceof EntityRedmatter && !entity.isDead)
-            {
+        if (distance < attackRange) {
+            if (entity instanceof EntityRedmatter && !entity.isDead) {
                 //https://www.wolframalpha.com/input/?i=(4%2F3)pi+*+r%5E3+%3D+(4%2F3)pi+*+a%5E3+%2B+(4%2F3)pi+*+b%5E3
 
                 //We are going to merge both blasts together
@@ -459,32 +440,22 @@ public class RedmatterLogic
 
                 //TODO fire an event when combined (non-cancelable to allow acting on combined result)
                 entity.setDead();
-            }
-            else if (entity instanceof EntityExplosion)
-            {
+            } else if (entity instanceof EntityExplosion) {
                 final IBlast blast = ((EntityExplosion) entity).getBlast();
 
                 //Kill the blast
                 blast.clearBlast();
-            }
-            else if (entity.hasCapability(ICBMClassicAPI.EXPLOSIVE_CAPABILITY, null))
-            {
+            } else if (entity.hasCapability(ICBMClassicAPI.EXPLOSIVE_CAPABILITY, null)) {
                 final IExplosive explosive = entity.getCapability(ICBMClassicAPI.EXPLOSIVE_CAPABILITY, null);
                 ExplosiveHandler.createExplosion(host, entity.world, entity.posX, entity.posY, entity.posZ, explosive);
                 entity.setDead();
-            }
-            else if (entity instanceof EntityLiving || entity instanceof EntityPlayer)
-            {
+            } else if (entity instanceof EntityLiving || entity instanceof EntityPlayer) {
                 entity.attackEntityFrom(new DamageSourceRedmatter(this), 2000);
-            }
-            else
-            {
+            } else {
                 //Kill entity in the center of the ball
                 entity.setDead();
-                if (entity instanceof EntityFlyingBlock)
-                {
-                    if (host.getBlastSize() < host.getBlastMaxSize())
-                    {
+                if (entity instanceof EntityFlyingBlock) {
+                    if (host.getBlastSize() < host.getBlastMaxSize()) {
                         host.setBlastSize(host.getBlastSize() + 0.05f); //TODO magic number and config
                     }
                 }
@@ -492,9 +463,9 @@ public class RedmatterLogic
         }
     }
 
-    public void setCurrentBlockDestroyRadius(int size)
-    {
+    public void setCurrentBlockDestroyRadius(int size) {
         this.currentBlockDestroyRadius = (int) Math.max(1, Math.min(size, host.getBlastMaxSize()));
         this.host.setBlastSize(size);
     }
+
 }

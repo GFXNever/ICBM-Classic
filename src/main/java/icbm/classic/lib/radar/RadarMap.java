@@ -21,6 +21,7 @@ import java.util.function.Consumer;
  * Created by Dark(DarkGuardsman, Robert) on 3/5/2016.
  */
 public class RadarMap {
+
     public static final int UPDATE_DELAY = 20;
 
     /**
@@ -33,10 +34,8 @@ public class RadarMap {
      */
     private final HashMap<ChunkPos, List<RadarEntity>> chunk_to_entities = new HashMap();
     private final List<RadarEntity> allEntities = new ArrayList(); //TODO turn into wrapper array around chunk map
-
-    private boolean accessingData = false;
-
     public int ticks = 0;
+    private boolean accessingData = false;
 
     /**
      * Dimension ID
@@ -279,4 +278,5 @@ public class RadarMap {
     public boolean isEmpty() {
         return chunk_to_entities.isEmpty();
     }
+
 }

@@ -7,8 +7,7 @@ import java.util.Collection;
 /**
  * Created by Robert Seifert on 1/6/20.
  */
-public interface ICommandGroup extends ISubCommand
-{
+public interface ICommandGroup extends ISubCommand {
 
     /**
      * Gets the list of sub commands in this command group
@@ -31,4 +30,5 @@ public interface ICommandGroup extends ISubCommand
      * @return string usage of the command
      */
     String getUsage(ICommandSender sender);
+
 }

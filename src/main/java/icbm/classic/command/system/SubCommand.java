@@ -14,52 +14,43 @@ import java.util.function.Consumer;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 4/13/2018.
  */
-public abstract class SubCommand implements ISubCommand
-{
+public abstract class SubCommand implements ISubCommand {
 
     private final String name;
     protected ICommandGroup parent;
 
-    public SubCommand(String name)
-    {
+    public SubCommand(String name) {
         this.name = name;
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     @Override
-    public String getUsage(ICommandSender sender)
-    {
-        if (parent == null)
-        {
+    public String getUsage(ICommandSender sender) {
+        if (parent == null) {
             return "/" + getName();
         }
         return parent.getUsage(sender) + " " + getName();
     }
 
     @Override
-    public void displayHelp(ICommandSender sender)
-    {
+    public void displayHelp(ICommandSender sender) {
         collectHelpForAll((string) -> sendHelpMessage(sender, string));
 
         //If we have a command sender entity then we can run world based commands
-        if (sender.getCommandSenderEntity() != null)
-        {
+        if (sender.getCommandSenderEntity() != null) {
             collectHelpWorldOnly((string) -> sendHelpMessage(sender, string));
         }
 
-        if (sender instanceof MinecraftServer)
-        {
+        if (sender instanceof MinecraftServer) {
             collectHelpServerOnly((string) -> sendHelpMessage(sender, string));
         }
     }
 
-    private void sendHelpMessage(ICommandSender sender, String message)
-    {
+    private void sendHelpMessage(ICommandSender sender, String message) {
         sender.sendMessage(new TextComponentString((getUsage(sender) + " " + message).trim()));
     }
 
@@ -68,8 +59,7 @@ public abstract class SubCommand implements ISubCommand
      *
      * @param consumer - collector
      */
-    protected void collectHelpForAll(Consumer<String> consumer)
-    {
+    protected void collectHelpForAll(Consumer<String> consumer) {
         consumer.accept("");
     }
 
@@ -78,8 +68,7 @@ public abstract class SubCommand implements ISubCommand
      *
      * @param consumer - collector
      */
-    protected void collectHelpWorldOnly(Consumer<String> consumer)
-    {
+    protected void collectHelpWorldOnly(Consumer<String> consumer) {
 
     }
 
@@ -88,19 +77,18 @@ public abstract class SubCommand implements ISubCommand
      *
      * @param consumer - collector
      */
-    protected void collectHelpServerOnly(Consumer<String> consumer)
-    {
+    protected void collectHelpServerOnly(Consumer<String> consumer) {
 
     }
 
     @Override
-    public List<String> getTabSuggestions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args, @Nullable BlockPos targetPos)
-    {
+    public List<String> getTabSuggestions(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args,
+                                          @Nullable BlockPos targetPos) {
         return Collections.<String>emptyList();
     }
 
-    public void setParent(ICommandGroup parent)
-    {
+    public void setParent(ICommandGroup parent) {
         this.parent = parent;
     }
+
 }

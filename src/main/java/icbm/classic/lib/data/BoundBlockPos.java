@@ -19,8 +19,8 @@ public class BoundBlockPos implements IBoundBox<BlockPos> {
     }
 
     public BoundBlockPos(Vec3d pos, int range) {
-        this.min = new BlockPos((int)Math.floor(pos.x) - range, (int)Math.floor(pos.y) - range, (int)Math.floor(pos.z) - range);
-        this.max = new BlockPos((int)Math.floor(pos.x) + range, (int)Math.floor(pos.y) + range, (int)Math.floor(pos.z) + range);
+        this.min = new BlockPos((int) Math.floor(pos.x) - range, (int) Math.floor(pos.y) - range, (int) Math.floor(pos.z) - range);
+        this.max = new BlockPos((int) Math.floor(pos.x) + range, (int) Math.floor(pos.y) + range, (int) Math.floor(pos.z) + range);
     }
 
     public BoundBlockPos(BlockPos pos, int range) {
@@ -37,4 +37,5 @@ public class BoundBlockPos implements IBoundBox<BlockPos> {
     public BlockPos upperBound() {
         return max;
     }
+
 }

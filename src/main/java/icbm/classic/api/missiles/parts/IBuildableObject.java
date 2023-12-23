@@ -25,4 +25,5 @@ public interface IBuildableObject extends INBTSerializable<NBTTagCompound> {
     default ResourceLocation getTranslationKey() {
         return getRegistryName();
     }
+
 }

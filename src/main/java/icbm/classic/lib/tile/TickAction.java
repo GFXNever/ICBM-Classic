@@ -36,8 +36,9 @@ public class TickAction implements ITick {
 
     @Override
     public void update(int tick, boolean isServer) {
-        if(shouldRun.apply(tick, isServer)) {
+        if (shouldRun.apply(tick, isServer)) {
             action.accept(tick);
         }
     }
+
 }

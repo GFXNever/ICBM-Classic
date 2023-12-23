@@ -6,7 +6,7 @@ import net.minecraft.util.text.ITextComponent;
 /**
  * Status response for triggering an action. This can be used
  * for various events that were triggered.
- *
+ * <p>
  * Specific examples will be missile launchers and emp towers.
  * Both will respond with a status of what happened after they
  * were triggered by the player.

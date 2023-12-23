@@ -32,20 +32,17 @@ public class BlockStateConfigList {
     // TODO once ContentBuilder Json system is published for MC replace this with JSON version to support programmatic and more complex entries
     //      entries to consider once JSON is allowed: time/date specific, conditional statements such as IF(MOD) IF(WORLD) IF(MATH) IF(GEO_AREA), block sets/lists
 
-    // Constructor
-    @Getter
-    private final String name;
-    private final Consumer<BlockStateConfigList> reloadCallback;
-
     // Temporary storage
     final List<String> mods = new ArrayList<>();
     final Map<String, List<Function<Block, Boolean>>> fuzzyBlockChecks = new HashMap<>();
-
     // Block lists
     final HashSet<IBlockState> blockStates = new HashSet();
     final HashSet<Block> blocks = new HashSet();
     final Map<Block, List<Function<IBlockState, Boolean>>> blockStateMatchers = new HashMap();
-
+    // Constructor
+    @Getter
+    private final String name;
+    private final Consumer<BlockStateConfigList> reloadCallback;
     // States
     @Getter
     private boolean isLocked = false;
@@ -106,11 +103,10 @@ public class BlockStateConfigList {
         if (state == null) {
             return false;
         }
-        if(blocks.contains(state.getBlock()) || blockStates.contains(state))
-        {
+        if (blocks.contains(state.getBlock()) || blockStates.contains(state)) {
             return true;
         }
-        if(Optional.ofNullable(blockStateMatchers.get(state.getBlock()))
+        if (Optional.ofNullable(blockStateMatchers.get(state.getBlock()))
             .map(l -> l.stream().anyMatch(f -> f.apply(state))).orElse(false)) {
             blockStates.add(state);
             return true;
@@ -161,7 +157,8 @@ public class BlockStateConfigList {
 
     private boolean checkLock(String type, Supplier<String> entry) {
         if (this.isLocked) {
-            ICBMClassic.logger().error(name + ": list is locked. Unable to add '" + type + "' entry '" + entry.get() + "'", new IllegalArgumentException());
+            ICBMClassic.logger()
+                .error(name + ": list is locked. Unable to add '" + type + "' entry '" + entry.get() + "'", new IllegalArgumentException());
             return true;
         }
         return false;
@@ -196,11 +193,11 @@ public class BlockStateConfigList {
 
     boolean handleSimpleBlock(String entry) {
         final ResourceLocation blockKey = this.getBlockKey(entry);
-        if(blockKey == null) {
+        if (blockKey == null) {
             return false;
         }
 
-        if(!ForgeRegistries.BLOCKS.containsKey(blockKey)) {
+        if (!ForgeRegistries.BLOCKS.containsKey(blockKey)) {
             ICBMClassic.logger().error(name + ": Failed to find block matching entry `" + entry + "`");
             return false;
         }
@@ -225,14 +222,16 @@ public class BlockStateConfigList {
         // Validate general format
         final String[] metaSplit = entry.split("@");
         if (metaSplit.length != 2 || !metaSplit[1].matches("\\d+") || !metaSplit[0].contains(":")) {
-            ICBMClassic.logger().error(name + ": Detected invalid metadata format for `" + entry + "`  for banAllow list. Expected `mod:key@number` example: `minecraft:stone@2`");
+            ICBMClassic.logger().error(
+                name + ": Detected invalid metadata format for `" + entry + "`  for banAllow list. Expected `mod:key@number` example: `minecraft:stone@2`");
             return false; //TODO maybe throw instead so we can unit test the errors?
         }
 
         // Validate key format
         final ResourceLocation blockKey = this.getBlockKey(metaSplit[0]);
         if (blockKey == null) {
-            ICBMClassic.logger().error(name + ": Detected invalid metadata format for `" + entry + "`  for banAllow list. Expected `mod:key@number` example: `minecraft:stone@2`");
+            ICBMClassic.logger().error(
+                name + ": Detected invalid metadata format for `" + entry + "`  for banAllow list. Expected `mod:key@number` example: `minecraft:stone@2`");
             return false;
         }
 
@@ -249,14 +248,16 @@ public class BlockStateConfigList {
 
         // Null state is a sign of a buggy mod-block
         if (state == null) {
-            ICBMClassic.logger().error(name + ": Failed to find state matching entry `" + entry + "` for banAllow list. This is a bug in '" + blockKey.getResourceDomain() + "'!");
+            ICBMClassic.logger().error(
+                name + ": Failed to find state matching entry `" + entry + "` for banAllow list. This is a bug in '" + blockKey.getResourceDomain() + "'!");
             return false;
         }
 
         // Validate metadata, default implementation is to return meta value of 0 for unknowns
         final int metaActual = block.getMetaFromState(state);
         if (desiredMetadata != metaActual) {
-            ICBMClassic.logger().error(name + ": Block returned a state with metadata[" + metaActual + "] but it didn't match metadata[" + desiredMetadata + "] for entry `" + entry + "` for banAllow list.");
+            ICBMClassic.logger().error(
+                name + ": Block returned a state with metadata[" + metaActual + "] but it didn't match metadata[" + desiredMetadata + "] for entry `" + entry + "` for banAllow list.");
             return false;
         }
 
@@ -277,7 +278,8 @@ public class BlockStateConfigList {
         final Block block = ForgeRegistries.BLOCKS.getValue(regName);
 
         if (block == null) {
-            ICBMClassic.logger().error("Config Flying Block: Failed to find block '" + regName + "' matching entry `" + entry + "` for banAllow list.");
+            ICBMClassic.logger()
+                .error("Config Flying Block: Failed to find block '" + regName + "' matching entry `" + entry + "` for banAllow list.");
             return false;
         }
 
@@ -293,7 +295,8 @@ public class BlockStateConfigList {
 
             final IProperty property = block.getBlockState().getProperty(propName);
             if (property == null) {
-                ICBMClassic.logger().error("Config Flying Block: Failed to find property '" + propName + "' for block '" + regName + "' matching entry `" + entry + "` for banAllow list.");
+                ICBMClassic.logger().error(
+                    "Config Flying Block: Failed to find property '" + propName + "' for block '" + regName + "' matching entry `" + entry + "` for banAllow list.");
                 return false;
             }
 
@@ -303,8 +306,9 @@ public class BlockStateConfigList {
                 final String stringMatch = propValue.substring(1).trim();
                 final List<Comparable<?>> valuesToMatch = (List<Comparable<?>>) property.getAllowedValues().stream()
                     .filter(o -> property.getName((Comparable) o).endsWith(stringMatch)).collect(Collectors.toList());
-                if(valuesToMatch.isEmpty()) {
-                    ICBMClassic.logger().error("Config Flying Block: Failed to find values matching '" + propValue + "' for property '" + propName + "' and block '" + regName + "' matching entry `" + entry + "`");
+                if (valuesToMatch.isEmpty()) {
+                    ICBMClassic.logger().error(
+                        "Config Flying Block: Failed to find values matching '" + propValue + "' for property '" + propName + "' and block '" + regName + "' matching entry `" + entry + "`");
                     return false;
                 }
                 matchers.put(property, valuesToMatch::contains);
@@ -312,27 +316,30 @@ public class BlockStateConfigList {
                 final String stringMatch = propValue.substring(0, propValue.length() - 1).trim();
                 final List<Comparable<?>> valuesToMatch = (List<Comparable<?>>) property.getAllowedValues().stream()
                     .filter(o -> property.getName((Comparable) o).startsWith(stringMatch)).collect(Collectors.toList());
-                if(valuesToMatch.isEmpty()) {
-                    ICBMClassic.logger().error("Config Flying Block: Failed to find values matching '" + propValue + "' for property '" + propName + "' and block '" + regName + "' matching entry `" + entry + "`");
+                if (valuesToMatch.isEmpty()) {
+                    ICBMClassic.logger().error(
+                        "Config Flying Block: Failed to find values matching '" + propValue + "' for property '" + propName + "' and block '" + regName + "' matching entry `" + entry + "`");
                     return false;
                 }
                 matchers.put(property, valuesToMatch::contains);
             } else {
                 // Simple value matcher
-                final Optional value = property.getAllowedValues().stream().filter(o -> property.getName((Comparable) o).equalsIgnoreCase(propValue)).findFirst();
+                final Optional value =
+                    property.getAllowedValues().stream().filter(o -> property.getName((Comparable) o).equalsIgnoreCase(propValue)).findFirst();
                 if (!value.isPresent()) {
-                    ICBMClassic.logger().error("Config Flying Block: Failed to find value '" + propValue + "' for property '" + propName + "' and block '" + regName + "' matching entry `" + entry + "`");
+                    ICBMClassic.logger().error(
+                        "Config Flying Block: Failed to find value '" + propValue + "' for property '" + propName + "' and block '" + regName + "' matching entry `" + entry + "`");
                     return false;
                 }
                 matchers.put(property, (o) -> Objects.equals(value.get(), o));
             }
         }
 
-        if(matchers.isEmpty()) {
+        if (matchers.isEmpty()) {
             return false;
         }
 
-        if(!blockStateMatchers.containsKey(block)) {
+        if (!blockStateMatchers.containsKey(block)) {
             blockStateMatchers.put(block, new ArrayList());
         }
         return blockStateMatchers.get(block).add((blockState) -> matchesFuzzyState(blockState, matchers));
@@ -340,13 +347,13 @@ public class BlockStateConfigList {
 
     boolean matchesFuzzyState(IBlockState state, Map<IProperty, Function<Comparable, Boolean>> matchers) {
         final ImmutableMap<IProperty<?>, Comparable<?>> stateProps = state.getProperties();
-        for(IProperty propKey: matchers.keySet()) {
-            if(!stateProps.containsKey(propKey)) {
+        for (IProperty propKey : matchers.keySet()) {
+            if (!stateProps.containsKey(propKey)) {
                 return false;
             }
 
             final Function<Comparable, Boolean> check = matchers.get(propKey);
-            if(check != null && !check.apply(stateProps.get(propKey))) {
+            if (check != null && !check.apply(stateProps.get(propKey))) {
                 return false;
             }
         }
@@ -359,7 +366,8 @@ public class BlockStateConfigList {
         // TODO replace with regex
         //FORMAT CHECK: Requires single ':' and should contain only a single '~'
         if (split.length != 2 || split[1].lastIndexOf("~") != split[1].indexOf("~") || split[0].contains("~") || split[0].isEmpty()) {
-            ICBMClassic.logger().error(name + ": Detected invalid fuzzy format for `" + entry + "`  for banAllow list. Expected `mod:~`, `mod:key~` or `mod:~key`");
+            ICBMClassic.logger()
+                .error(name + ": Detected invalid fuzzy format for `" + entry + "`  for banAllow list. Expected `mod:~`, `mod:key~` or `mod:~key`");
             return false;
         }
 
@@ -383,7 +391,8 @@ public class BlockStateConfigList {
             return true;
         }
 
-        ICBMClassic.logger().error(name + ": Couldn't match fuzzy format for `" + entry + "`  for banAllow list. Expected `mod:~`, `mod:key~` or `mod:~key`");
+        ICBMClassic.logger()
+            .error(name + ": Couldn't match fuzzy format for `" + entry + "`  for banAllow list. Expected `mod:~`, `mod:key~` or `mod:~key`");
         return false;
     }
 
@@ -405,10 +414,11 @@ public class BlockStateConfigList {
     public List<String> dumpBlocksContained() {
         final List<String> list = new ArrayList<>();
         ForgeRegistries.BLOCKS.forEach(block -> {
-            if(this.contains(block.getDefaultState())) {
+            if (this.contains(block.getDefaultState())) {
                 list.add(block.getRegistryName().toString());
             }
         });
         return list;
     }
+
 }

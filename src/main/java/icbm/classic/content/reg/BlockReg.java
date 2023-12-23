@@ -33,8 +33,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
  * Created by Dark(DarkGuardsman, Robert) on 1/7/19.
  */
 @Mod.EventBusSubscriber(modid = ICBMConstants.DOMAIN)
-public class BlockReg
-{
+public class BlockReg {
+
     @ObjectHolder(ICBMConstants.PREFIX + "glassPressurePlate")
     public static Block blockGlassPlate;
     @ObjectHolder(ICBMConstants.PREFIX + "glassButton")
@@ -65,8 +65,7 @@ public class BlockReg
     public static Block multiBlock;
 
     @SubscribeEvent
-    public static void registerBlocks(RegistryEvent.Register<Block> event)
-    {
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(new BlockGlassPressurePlate());
         event.getRegistry().register(new BlockGlassButton());
         event.getRegistry().register(new BlockSpikes());
@@ -95,4 +94,5 @@ public class BlockReg
         GameRegistry.registerTileEntity(TileMulti.class, new ResourceLocation(ICBMConstants.DOMAIN, "multiblock"));
         TileCruiseLauncher.register();
     }
+
 }

@@ -4,7 +4,8 @@ import com.google.common.collect.Lists;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.util.IStringSerializable;
 
-public class PropertyTowerStates  extends PropertyEnum<PropertyTowerStates.EnumTowerTypes> {
+public class PropertyTowerStates extends PropertyEnum<PropertyTowerStates.EnumTowerTypes> {
+
     protected PropertyTowerStates() {
         super("type", EnumTowerTypes.class, Lists.newArrayList(EnumTowerTypes.values()));
     }
@@ -20,4 +21,5 @@ public class PropertyTowerStates  extends PropertyEnum<PropertyTowerStates.EnumT
             return name().toLowerCase();
         }
     }
+
 }

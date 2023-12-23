@@ -6,8 +6,8 @@ import net.minecraft.util.ResourceLocation;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 1/4/19.
  */
-public interface IExBlockRegistry extends IExplosiveContentRegistry, IExFuseBlockRegistry
-{
+public interface IExBlockRegistry extends IExplosiveContentRegistry, IExFuseBlockRegistry {
+
     /**
      * Called to set a function to invoke when an explosive block is clicked
      * <p>
@@ -18,4 +18,5 @@ public interface IExBlockRegistry extends IExplosiveContentRegistry, IExFuseBloc
      * @param function
      */
     void setActivationListener(ResourceLocation exName, BlockActivateFunction function);
+
 }

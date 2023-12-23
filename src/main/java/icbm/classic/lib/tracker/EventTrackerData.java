@@ -1,7 +1,5 @@
 package icbm.classic.lib.tracker;
 
-import com.builtbroken.jlib.lang.StringHelpers;
-import icbm.classic.lib.LanguageUtility;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import net.minecraft.entity.Entity;
@@ -20,8 +18,9 @@ import java.util.Set;
 
 @NoArgsConstructor(access = AccessLevel.NONE)
 final class EventTrackerData {
+
     final Set<Class> VALID_OBJECTS = new HashSet<>();
-   final Set<Class> INVALID_OBJECTS = new HashSet<>();
+    final Set<Class> INVALID_OBJECTS = new HashSet<>();
     final Set<Class> CURRENTLY_SCANNING = new HashSet<>();
 
     public boolean DEBUG = false;
@@ -73,21 +72,21 @@ final class EventTrackerData {
         debug("checking " + objClass, depth);
 
         // Always use errors, as they are effectively immutable in usage
-        if(Throwable.class.isAssignableFrom(objClass)) {
+        if (Throwable.class.isAssignableFrom(objClass)) {
             debug("isThrowable " + objClass, depth);
             return true;
         }
 
-        if(VALID_OBJECTS.contains(objClass)) {
+        if (VALID_OBJECTS.contains(objClass)) {
             debug("isValid " + objClass, depth);
             return true;
         }
-        if(INVALID_OBJECTS.contains(objClass)) {
+        if (INVALID_OBJECTS.contains(objClass)) {
             debug("isInvalid " + objClass, depth);
             return false;
         }
 
-        if(!scanClass(objClass, depth)) {
+        if (!scanClass(objClass, depth)) {
             debug("adding to invalid " + objClass, depth);
             INVALID_OBJECTS.add(objClass);
             return false;
@@ -105,7 +104,7 @@ final class EventTrackerData {
         debug("scanning " + objClass, depth);
 
         // Check parent first
-        if(objClass.getSuperclass() != null && !isValidType(objClass.getSuperclass(), depth + 1)) {
+        if (objClass.getSuperclass() != null && !isValidType(objClass.getSuperclass(), depth + 1)) {
             return false;
         }
 
@@ -116,15 +115,14 @@ final class EventTrackerData {
 
             debug("field " + objField, depth);
 
-            if(!Modifier.isFinal(objField.getModifiers())) {
+            if (!Modifier.isFinal(objField.getModifiers())) {
                 debug("notFinal " + objField, depth);
                 isValid = false;
             }
             // Prevent re-scanning the same object causing a loop
             else if (!CURRENTLY_SCANNING.contains(objField.getType())) {
                 isValid = isValid && isValidType(objField.getType(), depth + 1);
-            }
-            else {
+            } else {
                 debug("already scanning " + objField, depth);
             }
         }
@@ -135,8 +133,9 @@ final class EventTrackerData {
     }
 
     private void debug(String msg, int depth) {
-        if(DEBUG) {
+        if (DEBUG) {
             System.out.println("EvenTrackerData: " + StringUtils.repeat("\t", depth) + msg);
         }
     }
+
 }

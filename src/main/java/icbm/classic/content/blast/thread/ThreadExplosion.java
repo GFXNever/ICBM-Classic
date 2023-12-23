@@ -7,24 +7,30 @@ import icbm.classic.lib.transform.vector.Location;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 
-/** @author Calclavia */
+/**
+ * @author Calclavia
+ */
 @Deprecated
 public abstract class ThreadExplosion extends Thread //TODO replace with worker threads, best not to spawn a thread per blast
 {
+
+    private static int threadIDNumber;
     public final Blast blast;
     public final Location position;
     public int radius;
     public float energy;
     public Entity source;
-
-    /** Is the thread completed */
+    /**
+     * Is the thread completed
+     */
     public boolean isComplete = false;
-
-    /** Used to kill the thread on its next loop cycle */
+    /**
+     * Used to kill the thread on its next loop cycle
+     */
     protected boolean kill = false;
 
-    public ThreadExplosion(Blast blast, int radius, float energy, Entity source)
-    {
+
+    public ThreadExplosion(Blast blast, int radius, float energy, Entity source) {
         super(null, null, "ThreadExplosion-" + nextThreadID(), 0);
         this.blast = blast;
         this.position = blast.location;
@@ -35,49 +41,38 @@ public abstract class ThreadExplosion extends Thread //TODO replace with worker 
         this.setDaemon(true); //Fix for threads still running when MC closes
     }
 
-
-    private static int threadIDNumber;
     private static synchronized int nextThreadID() {
         return threadIDNumber++;
     }
 
     @Override
-    public void interrupt()
-    {
-        if (ConfigDebug.DEBUG_THREADS)
-        {
+    public void interrupt() {
+        if (ConfigDebug.DEBUG_THREADS) {
             String msg = String.format("ThreadExplosion#interrupt() \nBlast = %s\nPosition = %s\nRadius = %s",
-                    blast != null ? blast : "null", blast != null ? position : "null", radius);
+                blast != null ? blast : "null", blast != null ? position : "null", radius);
             ICBMClassic.logger().error(msg,
-                    new RuntimeException("Trace"));
+                new RuntimeException("Trace"));
         }
         super.interrupt();
     }
 
     @Override
-    public final void run()
-    {
+    public final void run() {
         //Debug
-        if (ConfigDebug.DEBUG_THREADS)
-        {
-            ICBMClassic.logger().info(String.format("ThreadExplosion#run() -> start \nBlast = %s\nPosition = %s\nRadius = %s", blast, position, radius));
+        if (ConfigDebug.DEBUG_THREADS) {
+            ICBMClassic.logger()
+                .info(String.format("ThreadExplosion#run() -> start \nBlast = %s\nPosition = %s\nRadius = %s", blast, position, radius));
         }
 
         //Normal run
-        try
-        {
-            if (position != null && position.world() != null)
-            {
+        try {
+            if (position != null && position.world() != null) {
                 doRun(position.world, position);
-            }
-            else
-            {
+            } else {
                 ICBMClassic.logger().error("ThreadExplosion#run() -> Invalid world or position provided for thread. " +
-                        "Canceling action to prevent issues. \n Pos = " + position + " World = " + (position != null ? position.world : "null"));
+                    "Canceling action to prevent issues. \n Pos = " + position + " World = " + (position != null ? position.world : "null"));
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             ICBMClassic.logger().error("ThreadExplosion#run() -> Unexpected error ", e);
         }
 
@@ -86,22 +81,21 @@ public abstract class ThreadExplosion extends Thread //TODO replace with worker 
         this.blast.markThreadCompleted(this);
 
         //Debug
-        if (ConfigDebug.DEBUG_THREADS)
-        {
-            ICBMClassic.logger().info(String.format("ThreadExplosion#run() -> end \nBlast = %s\nPosition = %s\nRadius = %s", blast, position, radius));
+        if (ConfigDebug.DEBUG_THREADS) {
+            ICBMClassic.logger()
+                .info(String.format("ThreadExplosion#run() -> end \nBlast = %s\nPosition = %s\nRadius = %s", blast, position, radius));
         }
     }
 
-    public void kill()
-    {
+    public void kill() {
         kill = true;
 
         //Debug
-        if (ConfigDebug.DEBUG_THREADS)
-        {
+        if (ConfigDebug.DEBUG_THREADS) {
             ICBMClassic.logger().info(String.format("ThreadExplosion#kill() \nBlast = %s\nPosition = %s\nRadius = %s", blast, position, radius));
         }
     }
 
     protected abstract void doRun(World world, Location center);
+
 }

@@ -23,8 +23,8 @@ import java.util.function.Consumer;
 /**
  * Created by Robert Seifert on 1/6/20.
  */
-public class CommandBlastTrigger extends SubCommand
-{
+public class CommandBlastTrigger extends SubCommand {
+
     //Translations
     private static final String TRANSLATION_KEY = "command.icbmclassic:icbm.blast";
     public static final String TRANSLATION_TRIGGERED = TRANSLATION_KEY + ".triggered";
@@ -40,84 +40,8 @@ public class CommandBlastTrigger extends SubCommand
     public static final String TRANSLATION_ERROR_SCALE_ZERO = TRANSLATION_ERROR + ".scale.zero";
     public static final String TRANSLATION_ERROR_EXPLOSIVE_ID = TRANSLATION_ERROR + ".explosive.id";
 
-    public CommandBlastTrigger()
-    {
+    public CommandBlastTrigger() {
         super("trigger");
-    }
-
-    @Override
-    protected void collectHelpForAll(Consumer<String> consumer)
-    {
-        consumer.accept("<id> <dim> <x> <y> <z> <scale>");
-    }
-
-    @Override
-    protected void collectHelpWorldOnly(Consumer<String> consumer)
-    {
-        consumer.accept("<id> <scale>");
-    }
-
-    @Override
-    public void handleCommand(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException
-    {
-        if (args.length <= 0 || !doCommand(server, sender, args))
-        {
-            throw new WrongUsageException(ICBMCommands.TRANSLATION_UNKNOWN_COMMAND, getUsage(sender));
-        }
-    }
-
-    private boolean doCommand(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws SyntaxErrorException
-    {
-        //Get explosive from user
-        final IExplosiveData explosiveData = getExplosive(args[0]);
-
-        if (args.length == 6)
-        {
-            longVersion(sender, explosiveData, args);
-            return true;
-        }
-        else if (!(sender instanceof MinecraftServer) && args.length == 2)
-        {
-            shortVersion(sender, explosiveData, args);
-            return true;
-        }
-        return false;
-    }
-
-    private void shortVersion(ICommandSender sender, IExplosiveData explosiveData, String[] args) throws SyntaxErrorException
-    {
-        final float scale = Float.parseFloat(args[1]);
-        if (scale <= 0)
-        {
-            throw new SyntaxErrorException(TRANSLATION_ERROR_SCALE_ZERO);
-        }
-
-        //Get position data
-        final World world = sender.getEntityWorld();
-        final double x = sender.getPositionVector().x;
-        final double y = sender.getPositionVector().y;
-        final double z = sender.getPositionVector().z;
-
-        //Trigger blast
-        trigger(sender, world, x, y, z, explosiveData, scale);
-    }
-
-    private void longVersion(ICommandSender sender, IExplosiveData explosiveData, String[] args) throws SyntaxErrorException
-    {
-        final float scale = Float.parseFloat(args[5]);
-        if (scale <= 0)
-        {
-            throw new SyntaxErrorException(TRANSLATION_ERROR_SCALE_ZERO);
-        }
-
-        //Get position data
-        final World world = CommandUtils.getWorld(sender, args[1], sender.getEntityWorld());
-        final double x = CommandUtils.getNumber(sender, args[2], sender.getPositionVector().x);
-        final double y = CommandUtils.getNumber(sender, args[3], sender.getPositionVector().y);
-        final double z = CommandUtils.getNumber(sender, args[4], sender.getPositionVector().z);
-
-        //Trigger blast
-        trigger(sender, world, x, y, z, explosiveData, scale);
     }
 
     /**
@@ -127,46 +51,17 @@ public class CommandBlastTrigger extends SubCommand
      * @return explosive data
      * @throws WrongUsageException - if ID is not found
      */
-    public static IExplosiveData getExplosive(String explosive_id) throws SyntaxErrorException
-    {
+    public static IExplosiveData getExplosive(String explosive_id) throws SyntaxErrorException {
         final IExplosiveData explosiveData = ICBMClassicHelpers.getExplosive(explosive_id, true);
-        if (explosiveData == null)
-        {
+        if (explosiveData == null) {
             throw new SyntaxErrorException(TRANSLATION_ERROR_EXPLOSIVE_ID, explosive_id);
         }
         return explosiveData;
     }
 
-    /**
-     * Triggers the explosive at the location
-     *
-     * @param sender        - user running the command
-     * @param world         - position data
-     * @param x             - position data
-     * @param y             - position data
-     * @param z             - position data
-     * @param explosiveData - explosive to run
-     * @param scale         - scale to apply, keep this small as its scale and not size (size defaults to 25 * scale of 2 = 50 size)
-     */
-    private void trigger(ICommandSender sender, World world, double x, double y, double z, IExplosiveData explosiveData, float scale)
-    {
-        final BlastResponse result = ExplosiveHandler.createExplosion(null,
-                world, x, y, z,
-                explosiveData.getRegistryID(), scale,
-                null);
-
-        //Send translated message to user
-        sender.sendMessage(new TextComponentTranslation(getTranslationKey(result.state), //TODO update to include sub-errors
-                explosiveData.getRegistryName(), scale,
-                world.provider.getDimension(), world.getWorldType().getName(),
-                x, y, z));
-    }
-
     //Used to select translation for output message
-    public static String getTranslationKey(BlastState result)
-    {
-        switch (result)
-        {
+    public static String getTranslationKey(BlastState result) {
+        switch (result) {
             case TRIGGERED:
                 return TRANSLATION_TRIGGERED;
             case THREADING:
@@ -182,4 +77,92 @@ public class CommandBlastTrigger extends SubCommand
                 return TRANSLATION_ERROR_UNKNOWN;
         }
     }
+
+    @Override
+    protected void collectHelpForAll(Consumer<String> consumer) {
+        consumer.accept("<id> <dim> <x> <y> <z> <scale>");
+    }
+
+    @Override
+    protected void collectHelpWorldOnly(Consumer<String> consumer) {
+        consumer.accept("<id> <scale>");
+    }
+
+    @Override
+    public void handleCommand(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws CommandException {
+        if (args.length <= 0 || !doCommand(server, sender, args)) {
+            throw new WrongUsageException(ICBMCommands.TRANSLATION_UNKNOWN_COMMAND, getUsage(sender));
+        }
+    }
+
+    private boolean doCommand(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args) throws SyntaxErrorException {
+        //Get explosive from user
+        final IExplosiveData explosiveData = getExplosive(args[0]);
+
+        if (args.length == 6) {
+            longVersion(sender, explosiveData, args);
+            return true;
+        } else if (!(sender instanceof MinecraftServer) && args.length == 2) {
+            shortVersion(sender, explosiveData, args);
+            return true;
+        }
+        return false;
+    }
+
+    private void shortVersion(ICommandSender sender, IExplosiveData explosiveData, String[] args) throws SyntaxErrorException {
+        final float scale = Float.parseFloat(args[1]);
+        if (scale <= 0) {
+            throw new SyntaxErrorException(TRANSLATION_ERROR_SCALE_ZERO);
+        }
+
+        //Get position data
+        final World world = sender.getEntityWorld();
+        final double x = sender.getPositionVector().x;
+        final double y = sender.getPositionVector().y;
+        final double z = sender.getPositionVector().z;
+
+        //Trigger blast
+        trigger(sender, world, x, y, z, explosiveData, scale);
+    }
+
+    private void longVersion(ICommandSender sender, IExplosiveData explosiveData, String[] args) throws SyntaxErrorException {
+        final float scale = Float.parseFloat(args[5]);
+        if (scale <= 0) {
+            throw new SyntaxErrorException(TRANSLATION_ERROR_SCALE_ZERO);
+        }
+
+        //Get position data
+        final World world = CommandUtils.getWorld(sender, args[1], sender.getEntityWorld());
+        final double x = CommandUtils.getNumber(sender, args[2], sender.getPositionVector().x);
+        final double y = CommandUtils.getNumber(sender, args[3], sender.getPositionVector().y);
+        final double z = CommandUtils.getNumber(sender, args[4], sender.getPositionVector().z);
+
+        //Trigger blast
+        trigger(sender, world, x, y, z, explosiveData, scale);
+    }
+
+    /**
+     * Triggers the explosive at the location
+     *
+     * @param sender        - user running the command
+     * @param world         - position data
+     * @param x             - position data
+     * @param y             - position data
+     * @param z             - position data
+     * @param explosiveData - explosive to run
+     * @param scale         - scale to apply, keep this small as its scale and not size (size defaults to 25 * scale of 2 = 50 size)
+     */
+    private void trigger(ICommandSender sender, World world, double x, double y, double z, IExplosiveData explosiveData, float scale) {
+        final BlastResponse result = ExplosiveHandler.createExplosion(null,
+            world, x, y, z,
+            explosiveData.getRegistryID(), scale,
+            null);
+
+        //Send translated message to user
+        sender.sendMessage(new TextComponentTranslation(getTranslationKey(result.state), //TODO update to include sub-errors
+            explosiveData.getRegistryName(), scale,
+            world.provider.getDimension(), world.getWorldType().getName(),
+            x, y, z));
+    }
+
 }

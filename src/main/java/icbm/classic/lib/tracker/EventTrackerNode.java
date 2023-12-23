@@ -9,7 +9,9 @@ import java.util.LinkedList;
  */
 @Data
 public class EventTrackerNode {
+
     private EventTrackerEntry start;
     private LinkedList<EventTrackerEntry> entries;
     private EventTrackerEntry end;
+
 }

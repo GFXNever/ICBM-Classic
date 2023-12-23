@@ -1,6 +1,5 @@
 package icbm.classic.config;
 
-import icbm.classic.ICBMClassic;
 import icbm.classic.ICBMConstants;
 import icbm.classic.content.entity.flyingblock.FlyingBlock;
 import net.minecraftforge.common.config.Config;
@@ -17,8 +16,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 @Config(modid = ICBMConstants.DOMAIN, name = "icbmclassic/main")
 @Config.LangKey("config.icbmclassic:main.title")
 @Mod.EventBusSubscriber(modid = ICBMConstants.DOMAIN)
-public class ConfigMain
-{
+public class ConfigMain {
+
     @Config.Name("use_energy")
     @Config.Comment("Range of tier 1 launcher")
     public static boolean REQUIRES_POWER = true;
@@ -29,14 +28,13 @@ public class ConfigMain
     public static int ROCKET_LAUNCHER_TIER_FIRE_LIMIT = 2;
 
     @SubscribeEvent
-    public static void onConfigChangedEvent(final ConfigChangedEvent.OnConfigChangedEvent event)
-    {
-        if (event.getModID().equals(ICBMConstants.DOMAIN))
-        {
+    public static void onConfigChangedEvent(final ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (event.getModID().equals(ICBMConstants.DOMAIN)) {
             ConfigManager.sync(ICBMConstants.DOMAIN, Config.Type.INSTANCE);
 
             // Reload config so we can convert to easier to hash lists
             FlyingBlock.loadFromConfig();
         }
     }
+
 }

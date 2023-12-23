@@ -12,4 +12,5 @@ public class ConfigExBasics {
     public ConfigExBasics(double scale) {
         this.scale = scale;
     }
+
 }

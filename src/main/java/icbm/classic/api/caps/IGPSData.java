@@ -14,11 +14,33 @@ import java.util.Optional;
 public interface IGPSData {
 
     /**
+     * Gets the position component of the GPS data
+     *
+     * @return position
+     */
+    @Nullable
+    Vec3d getPosition();
+
+    /**
      * Sets the stored location
      *
      * @param position to set, can be set to null to clear
      */
     void setPosition(@Nullable Vec3d position);
+
+    /**
+     * Gets the world instance, if client side use {@link #getWorldId()}
+     *
+     * @return world
+     */
+    @Nullable
+    default World getWorld() {
+        final Integer id = getWorldId();
+        if (id != null) {
+            return DimensionManager.getWorld(id);
+        }
+        return null;
+    }
 
     /**
      * Sets the dimension
@@ -37,32 +59,11 @@ public interface IGPSData {
     void setWorld(@Nullable Integer dimension);
 
     /**
-     * Gets the position component of the GPS data
-     *
-     * @return position
-     */
-    @Nullable
-    Vec3d getPosition();
-
-    /**
-     * Gets the world instance, if client side use {@link #getWorldId()}
-     *
-     * @return world
-     */
-    @Nullable
-    default World getWorld() {
-        final Integer id = getWorldId();
-        if(id != null) {
-            return DimensionManager.getWorld(id);
-        }
-        return null;
-    }
-
-    /**
      * Gets the stored world id
      *
      * @return id
      */
     @Nullable
     Integer getWorldId();
+
 }

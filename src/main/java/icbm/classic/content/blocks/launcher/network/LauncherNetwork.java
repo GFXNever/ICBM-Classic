@@ -22,14 +22,12 @@ import java.util.stream.Stream;
 
 public class LauncherNetwork implements ICapabilityProvider {
 
-    @Getter
-    private final HashSet<LauncherNode> components = new HashSet<LauncherNode>();
-
-    @Getter
-    private final List<LauncherEntry> launchers = new LinkedList();
-
     public final NetworkEnergyStorage energyStorage = new NetworkEnergyStorage(this);
     public final NetworkInventory inventory = new NetworkInventory(this);
+    @Getter
+    private final HashSet<LauncherNode> components = new HashSet<LauncherNode>();
+    @Getter
+    private final List<LauncherEntry> launchers = new LinkedList();
 
     public void invalidate(LauncherNode source) {
         final HashSet<LauncherNode> components = new HashSet(this.components);
@@ -75,7 +73,7 @@ public class LauncherNetwork implements ICapabilityProvider {
 
     public void addToNetwork(LauncherNode node) {
 
-        if(!components.contains(node)) {
+        if (!components.contains(node)) {
             components.add(node);
 
             // Setting node with this
@@ -84,7 +82,7 @@ public class LauncherNetwork implements ICapabilityProvider {
             // Adding if launcher
             if (node.getSelf().hasCapability(ICBMClassicAPI.MISSILE_LAUNCHER_CAPABILITY, null)) {
                 final IMissileLauncher launcher = node.getSelf().getCapability(ICBMClassicAPI.MISSILE_LAUNCHER_CAPABILITY, null);
-                if(launcher != null) {
+                if (launcher != null) {
                     launchers.add(new LauncherEntry(launcher, node.getSelf(), null));
                     onNetworkUpdated();
                 }
@@ -104,12 +102,12 @@ public class LauncherNetwork implements ICapabilityProvider {
     @Nullable
     @Override
     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
-        if(capability == CapabilityEnergy.ENERGY) {
+        if (capability == CapabilityEnergy.ENERGY) {
             return CapabilityEnergy.ENERGY.cast(energyStorage);
-        }
-        else if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+        } else if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(inventory);
         }
         return null;
     }
+
 }

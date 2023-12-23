@@ -8,15 +8,13 @@ import net.minecraft.nbt.NBTUtil;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class SaveNodeBlockState<E> extends NbtSaveNode<E, NBTTagCompound>
-{
-    public SaveNodeBlockState(String name, Function<E, IBlockState> save, BiConsumer<E, IBlockState> load)
-    {
+public class SaveNodeBlockState<E> extends NbtSaveNode<E, NBTTagCompound> {
+
+    public SaveNodeBlockState(String name, Function<E, IBlockState> save, BiConsumer<E, IBlockState> load) {
         super(name,
             (obj) -> {
                 final IBlockState blockState = save.apply(obj);
-                if (blockState != null)
-                {
+                if (blockState != null) {
                     return NBTUtil.writeBlockState(new NBTTagCompound(), blockState);
                 }
                 return null;
@@ -26,4 +24,5 @@ public class SaveNodeBlockState<E> extends NbtSaveNode<E, NBTTagCompound>
             }
         );
     }
+
 }

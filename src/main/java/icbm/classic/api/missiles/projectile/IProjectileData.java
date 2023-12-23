@@ -13,10 +13,12 @@ import javax.annotation.Nullable;
  *
  * @param <E> created
  */
-public interface IProjectileData<E extends Entity>  extends IBuildableObject {
+public interface IProjectileData<E extends Entity> extends IBuildableObject {
 
 
-    /** Default type to return */
+    /**
+     * Default type to return
+     */
     ProjectileType[] TYPE_DEFAULT = new ProjectileType[]{ProjectileType.TYPE_PROJECTILE};
 
     //TODO add a way to check size, this way we can limit weapon systems from using extremely large projectiles if too small... share size data with radar
@@ -24,7 +26,7 @@ public interface IProjectileData<E extends Entity>  extends IBuildableObject {
     /**
      * Type(s) of projectile, used to check if a projectile can work
      * with other systems.
-     *
+     * <p>
      * A projectile can be valid for more than 1 type. Good example
      * is things like missiles which are both {@link ProjectileType#TYPE_MISSILE}
      * and {@link ProjectileType#TYPE_BOMB} if they contain an explosive.
@@ -44,8 +46,8 @@ public interface IProjectileData<E extends Entity>  extends IBuildableObject {
      * @return true if is valid
      */
     default boolean isType(ProjectileType type) {
-        for(ProjectileType projectileType : getTypes()) {
-            if(projectileType.isValidType(type)) {
+        for (ProjectileType projectileType : getTypes()) {
+            if (projectileType.isValidType(type)) {
                 return true;
             }
         }
@@ -55,7 +57,7 @@ public interface IProjectileData<E extends Entity>  extends IBuildableObject {
     /**
      * Called to generate a new projectile entity
      *
-     * @param world to spawn inside
+     * @param world           to spawn inside
      * @param allowItemPickup true to allow entity to be collected, such as picking up arrows
      * @return entity to spawn
      */
@@ -64,7 +66,7 @@ public interface IProjectileData<E extends Entity>  extends IBuildableObject {
     /**
      * Called after the entity has been added to the world. Useful
      * for adding riding entities or customize based on position.
-     *
+     * <p>
      * Usually at this point the entity has it's set position, motion, and rotations. It
      * is recommended to not change this information as it can break interactions.
      *
@@ -74,4 +76,5 @@ public interface IProjectileData<E extends Entity>  extends IBuildableObject {
     default void onEntitySpawned(@Nonnull E entity, @Nullable Entity source) { //TODO consider moving an a spawnAction
 
     }
+
 }

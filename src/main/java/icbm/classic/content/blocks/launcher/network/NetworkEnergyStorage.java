@@ -21,17 +21,19 @@ public class NetworkEnergyStorage implements IEnergyStorage {
         int actualReceived = 0;
         int launcherCount = 0;
 
-        final List<IEnergyStorage> nodes = powerNodes().collect(Collectors.toList());;
-        for(IEnergyStorage storage: nodes) {
+        final List<IEnergyStorage> nodes = powerNodes().collect(Collectors.toList());
+        ;
+        for (IEnergyStorage storage : nodes) {
             final int launchersLeft = nodes.size() - (launcherCount++);
             final int energyLeft = maxReceive - actualReceived;
 
             // Add 1 to prevent rounding from going to zero if launcherCount > energy
             //      Mekanism cables will do 1 FE sim checks causing this to be zero
-            final int energyToGive = Math.min(energyLeft, ((int)Math.floor(energyLeft / (float) launchersLeft)) + 1);
+            final int energyToGive = Math.min(energyLeft, ((int) Math.floor(energyLeft / (float) launchersLeft)) + 1);
 
             actualReceived += storage.receiveEnergy(energyToGive, simulate);
-        };
+        }
+        ;
         return actualReceived;
     }
 
@@ -69,4 +71,5 @@ public class NetworkEnergyStorage implements IEnergyStorage {
     public boolean canReceive() {
         return true;
     }
+
 }

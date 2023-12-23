@@ -8,17 +8,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderSeat extends Render<EntityPlayerSeat>
-{
-    public RenderSeat(RenderManager renderManager)
-    {
+public class RenderSeat extends Render<EntityPlayerSeat> {
+
+    public RenderSeat(RenderManager renderManager) {
         super(renderManager);
         this.shadowSize = 0.0F;
     }
 
     @Override
-    public void doRender(EntityPlayerSeat seat, double x, double y, double z, float entityYaw, float partialTicks)
-    {
+    public void doRender(EntityPlayerSeat seat, double x, double y, double z, float entityYaw, float partialTicks) {
         super.doRender(seat, x, y, z, entityYaw, partialTicks);
         //GlStateManager.pushMatrix();
         //renderOffsetAABB(seat.getEntityBoundingBox(), x - seat.lastTickPosX, y - seat.lastTickPosY, z - seat.lastTickPosZ);
@@ -26,8 +24,8 @@ public class RenderSeat extends Render<EntityPlayerSeat>
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(EntityPlayerSeat entity)
-    {
+    protected ResourceLocation getEntityTexture(EntityPlayerSeat entity) {
         return null;
     }
+
 }

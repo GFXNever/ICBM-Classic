@@ -15,10 +15,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
-public class BlockGlassButton extends BlockButton
-{
-    public BlockGlassButton()
-    {
+public class BlockGlassButton extends BlockButton {
+
+    public BlockGlassButton() {
         super(false);
         this.setTickRandomly(true);
         this.setUnlocalizedName(ICBMConstants.PREFIX + "glassButton");
@@ -29,26 +28,23 @@ public class BlockGlassButton extends BlockButton
 
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer()
-    {
+    public BlockRenderLayer getBlockLayer() {
         return BlockRenderLayer.CUTOUT;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @Override
-    protected void playClickSound(@Nullable EntityPlayer player, World worldIn, BlockPos pos)
-    {
+    protected void playClickSound(@Nullable EntityPlayer player, World worldIn, BlockPos pos) {
         worldIn.playSound(player, pos, SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON, SoundCategory.BLOCKS, 0.3F, 0.6F);
     }
 
     @Override
-    protected void playReleaseSound(World worldIn, BlockPos pos)
-    {
-        worldIn.playSound((EntityPlayer)null, pos, SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF, SoundCategory.BLOCKS, 0.3F, 0.5F);
+    protected void playReleaseSound(World worldIn, BlockPos pos) {
+        worldIn.playSound((EntityPlayer) null, pos, SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF, SoundCategory.BLOCKS, 0.3F, 0.5F);
     }
+
 }

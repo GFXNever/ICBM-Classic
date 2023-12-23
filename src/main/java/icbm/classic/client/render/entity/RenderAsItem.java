@@ -15,14 +15,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.function.Function;
 
 @SideOnly(Side.CLIENT)
-public class RenderAsItem<E extends Entity> extends Render<E>
-{
-    private EntityItem entityItem;
+public class RenderAsItem<E extends Entity> extends Render<E> {
+
     private final RenderEntityItem renderEntityItem;
     private final Function<E, ItemStack> itemAccessor;
+    private EntityItem entityItem;
 
-    public RenderAsItem(RenderManager renderManagerIn, Function<E, ItemStack> itemAccessor)
-    {
+    public RenderAsItem(RenderManager renderManagerIn, Function<E, ItemStack> itemAccessor) {
         super(renderManagerIn);
         this.itemAccessor = itemAccessor;
         this.renderEntityItem = new RenderEntityItem(renderManagerIn, Minecraft.getMinecraft().getRenderItem());
@@ -31,8 +30,7 @@ public class RenderAsItem<E extends Entity> extends Render<E>
     }
 
     @Override
-    public void doRender(E entity, double x, double y, double z, float par8, float par9)
-    {
+    public void doRender(E entity, double x, double y, double z, float par8, float par9) {
         setupFakeItem(entity);
         renderEntityItem.doRender(entityItem, x, y, z, par8, par9);
     }
@@ -40,7 +38,7 @@ public class RenderAsItem<E extends Entity> extends Render<E>
     protected void setupFakeItem(E entity) {
 
         //Create fake item if missing
-        if(entityItem == null) {
+        if (entityItem == null) {
             entityItem = new EntityItem(entity.world);
         }
 
@@ -53,8 +51,8 @@ public class RenderAsItem<E extends Entity> extends Render<E>
     }
 
     @Override
-    protected ResourceLocation getEntityTexture(E entity)
-    {
+    protected ResourceLocation getEntityTexture(E entity) {
         return TextureMap.LOCATION_BLOCKS_TEXTURE;
     }
+
 }

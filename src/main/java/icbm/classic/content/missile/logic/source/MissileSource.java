@@ -18,20 +18,6 @@ import net.minecraft.world.World;
 @AllArgsConstructor
 public final class MissileSource implements IMissileSource {
 
-    private World world;
-    private Vec3d position;
-    private IMissileCause cause;
-
-    @Override
-    public NBTTagCompound serializeNBT() {
-        return SAVE_LOGIC.save(this, new NBTTagCompound());
-    }
-
-    @Override
-    public void deserializeNBT(NBTTagCompound save) {
-        SAVE_LOGIC.load(this, save);
-    }
-
     public static final NbtSaveNode<MissileSource, NBTTagCompound> CAUSE_SAVE = new NbtSaveNode<MissileSource, NBTTagCompound>("cause",
         (source) -> { //TODO convert to class to make cleaner and provide better testing surface
             final NBTTagCompound save = new NBTTagCompound();
@@ -56,11 +42,24 @@ public final class MissileSource implements IMissileSource {
             }
         }
     );
-
     private static final NbtSaveHandler<MissileSource> SAVE_LOGIC = new NbtSaveHandler<MissileSource>()
         .mainRoot()
         /* */.nodeWorldDim("dimension", MissileSource::getWorld, MissileSource::setWorld)
         /* */.nodeVec3d("pos", MissileSource::getPosition, MissileSource::setPosition)
         /* */.node(CAUSE_SAVE)
         .base();
+    private World world;
+    private Vec3d position;
+    private IMissileCause cause;
+
+    @Override
+    public NBTTagCompound serializeNBT() {
+        return SAVE_LOGIC.save(this, new NBTTagCompound());
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound save) {
+        SAVE_LOGIC.load(this, save);
+    }
+
 }

@@ -21,23 +21,41 @@ import javax.annotation.Nullable;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 1/7/19.
  */
-public class CapabilityExplosive implements IExplosive, ICapabilitySerializable<NBTTagCompound>
-{
+public class CapabilityExplosive implements IExplosive, ICapabilitySerializable<NBTTagCompound> {
+
     public int explosiveID; //TODO change over to resource location or include in save to check for issues using ID only for in memory
 
-    public CapabilityExplosive()
-    {
+    public CapabilityExplosive() {
     }
 
-    public CapabilityExplosive(int id)
-    {
+    public CapabilityExplosive(int id) {
         this.explosiveID = id;
+    }
+
+    public static void register() {
+        CapabilityManager.INSTANCE.register(IExplosive.class, new Capability.IStorage<IExplosive>() {
+                @Nullable
+                @Override
+                public NBTBase writeNBT(Capability<IExplosive> capability, IExplosive instance, EnumFacing side) {
+                    if (instance instanceof CapabilityExplosive) {
+                        return ((CapabilityExplosive) instance).serializeNBT();
+                    }
+                    return null;
+                }
+
+                @Override
+                public void readNBT(Capability<IExplosive> capability, IExplosive instance, EnumFacing side, NBTBase nbt) {
+                    if (instance instanceof CapabilityExplosive && nbt instanceof NBTTagCompound) {
+                        ((CapabilityExplosive) instance).deserializeNBT((NBTTagCompound) nbt);
+                    }
+                }
+            },
+            () -> new CapabilityExplosive(-1));
     }
 
     @Nullable
     @Override
-    public IExplosiveData getExplosiveData()
-    {
+    public IExplosiveData getExplosiveData() {
         return ICBMClassicHelpers.getExplosive(explosiveID, false);
     }
 
@@ -53,31 +71,26 @@ public class CapabilityExplosive implements IExplosive, ICapabilitySerializable<
 
     @Nullable
     @Override
-    public ItemStack toStack()
-    {
+    public ItemStack toStack() {
         return null;
     }
 
     @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
-    {
+    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
         return capability == ICBMClassicAPI.EXPLOSIVE_CAPABILITY;
     }
 
     @Nullable
     @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
-    {
-        if (capability == ICBMClassicAPI.EXPLOSIVE_CAPABILITY)
-        {
+    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == ICBMClassicAPI.EXPLOSIVE_CAPABILITY) {
             return (T) this;
         }
         return null;
     }
 
     @Override
-    public final NBTTagCompound serializeNBT()
-    {
+    public final NBTTagCompound serializeNBT() {
         final NBTTagCompound tagCompound = new NBTTagCompound();
         serializeNBT(tagCompound);
 
@@ -85,44 +98,15 @@ public class CapabilityExplosive implements IExplosive, ICapabilitySerializable<
         return tagCompound;
     }
 
-    protected void serializeNBT(NBTTagCompound tag)
-    {
+    protected void serializeNBT(NBTTagCompound tag) {
 
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt)
-    {
-        if (nbt.hasKey(NBTConstants.EXPLOSIVE_ID))
-        {
+    public void deserializeNBT(NBTTagCompound nbt) {
+        if (nbt.hasKey(NBTConstants.EXPLOSIVE_ID)) {
             explosiveID = nbt.getInteger(NBTConstants.EXPLOSIVE_ID);
         }
     }
 
-    public static void register()
-    {
-        CapabilityManager.INSTANCE.register(IExplosive.class, new Capability.IStorage<IExplosive>()
-        {
-            @Nullable
-            @Override
-            public NBTBase writeNBT(Capability<IExplosive> capability, IExplosive instance, EnumFacing side)
-            {
-                if (instance instanceof CapabilityExplosive)
-                {
-                    return ((CapabilityExplosive) instance).serializeNBT();
-                }
-                return null;
-            }
-
-            @Override
-            public void readNBT(Capability<IExplosive> capability, IExplosive instance, EnumFacing side, NBTBase nbt)
-            {
-                if (instance instanceof CapabilityExplosive && nbt instanceof NBTTagCompound)
-                {
-                    ((CapabilityExplosive) instance).deserializeNBT((NBTTagCompound) nbt);
-                }
-            }
-        },
-        () -> new CapabilityExplosive(-1));
-    }
 }

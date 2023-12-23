@@ -2,14 +2,10 @@ package icbm.classic.content.missile.entity.anti;
 
 import icbm.classic.ICBMClassic;
 import icbm.classic.client.ICBMSounds;
-import icbm.classic.client.fx.ParticleSmokeICBM;
 import icbm.classic.config.missile.ConfigMissile;
 import icbm.classic.content.missile.entity.EntityMissile;
 import icbm.classic.content.missile.logic.flight.FollowTargetLogic;
 import icbm.classic.content.reg.ItemReg;
-import icbm.classic.lib.transform.vector.Pos;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
@@ -24,9 +20,8 @@ import javax.annotation.Nullable;
  */
 public class EntitySurfaceToAirMissile extends EntityMissile<EntitySurfaceToAirMissile> {
 
-    private ItemStack renderStackCache;
     protected final SAMTargetData scanLogic = new SAMTargetData(this);
-
+    private ItemStack renderStackCache;
     private boolean hasStartedFollowing = false;
 
     public EntitySurfaceToAirMissile(World world) {
@@ -35,15 +30,14 @@ public class EntitySurfaceToAirMissile extends EntityMissile<EntitySurfaceToAirM
     }
 
     @Override
-    public float getMaxHealth()
-    {
+    public float getMaxHealth() {
         return ConfigMissile.TIER_2_HEALTH;
     }
 
     @Override
     public void onUpdate() {
 
-        if(!world.isRemote) {
+        if (!world.isRemote) {
 
             //Scan for targets
             scanLogic.tick();
@@ -102,12 +96,13 @@ public class EntitySurfaceToAirMissile extends EntityMissile<EntitySurfaceToAirM
 
     @Override
     public ItemStack toStack() {
-        if(world.isRemote) {
-            if(renderStackCache == null) {
+        if (world.isRemote) {
+            if (renderStackCache == null) {
                 renderStackCache = new ItemStack(ItemReg.itemSAM);
             }
             return renderStackCache;
         }
         return new ItemStack(ItemReg.itemSAM);
     }
+
 }

@@ -17,52 +17,44 @@ import javax.annotation.Nonnull;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 7/28/2019.
  */
-public class ExIngredientFactory implements IIngredientFactory
-{
+public class ExIngredientFactory implements IIngredientFactory {
+
     public static final String DEVICE_KEY = "device";
     public static final String EX_KEY = "explosive";
 
     @Nonnull
-    @Override
-    public Ingredient parse(JsonContext context, JsonObject json)
-    {
-        return parse(json);
-    }
-
-    @Nonnull
-    public static ItemStack getStack(JsonObject json)
-    {
+    public static ItemStack getStack(JsonObject json) {
         final String device = JsonUtils.getString(json, DEVICE_KEY, ICBMClassicAPI.EX_BLOCK.toString());
 
         //TODO fix having to work around missile module not showing in content registry as `icbmclassic:missile`
-        if("icbmclassic:missile.module".equalsIgnoreCase(device)) {
+        if ("icbmclassic:missile.module".equalsIgnoreCase(device)) {
             return new ItemStack(ItemReg.itemExplosiveMissile, 1, 24);
         }
 
         final String explosive = JsonUtils.getString(json, EX_KEY);
 
         final IExplosiveContentRegistry reg = ICBMClassicAPI.EXPLOSIVE_REGISTRY.getContentRegistry(new ResourceLocation(device));
-        if (reg != null)
-        {
+        if (reg != null) {
             ItemStack exStack = reg.getDeviceStack(new ResourceLocation(explosive));
-            if (exStack != null)
-            {
+            if (exStack != null) {
                 return exStack;
-            }
-            else
-            {
+            } else {
                 throw new JsonSyntaxException("ExIngredientFactory: Failed to locate explosive type of [" + explosive + "]");
             }
-        }
-        else
-        {
+        } else {
             throw new JsonSyntaxException("ExIngredientFactory: Failed to locate device type of [" + device + "]");
         }
     }
 
     @Nonnull
-    public static Ingredient parse(JsonObject json)
-    {
+    public static Ingredient parse(JsonObject json) {
         return Ingredient.fromStacks(getStack(json));
     }
+
+    @Nonnull
+    @Override
+    public Ingredient parse(JsonContext context, JsonObject json) {
+        return parse(json);
+    }
+
 }

@@ -14,9 +14,8 @@ public interface IBuilderRegistry<Part extends IBuildableObject> {
     /**
      * Registers a new factory for loading the part
      *
-     * @param name to register with
+     * @param name    to register with
      * @param builder to create new instances
-     *
      * @throws RuntimeException if registry is locked or name is already used
      */
     void register(ResourceLocation name, Supplier<Part> builder);
@@ -31,9 +30,9 @@ public interface IBuilderRegistry<Part extends IBuildableObject> {
 
     default NBTTagList save(Collection<Part> parts) {
         final NBTTagList list = new NBTTagList();
-        for(Part part : parts) {
+        for (Part part : parts) {
             final NBTTagCompound save = save(part);
-            if(save != null) {
+            if (save != null) {
                 list.appendTag(save);
             }
         }
@@ -41,11 +40,10 @@ public interface IBuilderRegistry<Part extends IBuildableObject> {
     }
 
     default NBTTagCompound save(Part part) {
-        if(part == null) {
+        if (part == null) {
             ICBMClassic.logger().warn("Failed to save part due to null value", new RuntimeException());
             return null;
-        }
-        else if(part.getRegistryName() == null) {
+        } else if (part.getRegistryName() == null) {
             ICBMClassic.logger().warn("Failed to save part due to missing registry name: " + part, new RuntimeException());
             return null;
         }
@@ -63,9 +61,9 @@ public interface IBuilderRegistry<Part extends IBuildableObject> {
     }
 
     default <C extends Collection<Part>> C load(NBTTagList save, C list) {
-        for(int i = 0; i < save.tagCount(); i++) {
+        for (int i = 0; i < save.tagCount(); i++) {
             final Part part = load((NBTTagCompound) save.get(i));
-            if(part != null) {
+            if (part != null) {
                 list.add(part);
             }
         }
@@ -73,10 +71,10 @@ public interface IBuilderRegistry<Part extends IBuildableObject> {
     }
 
     default Part load(NBTTagCompound save) {
-        if(save != null && !save.hasNoTags() && save.hasKey("id")) {
+        if (save != null && !save.hasNoTags() && save.hasKey("id")) {
             final ResourceLocation id = new ResourceLocation(save.getString("id"));
             final Part part = build(id);
-            if(part != null && save.hasKey("data")) {
+            if (part != null && save.hasKey("data")) {
                 final NBTTagCompound additionalData = save.getCompoundTag("data");
                 part.deserializeNBT(additionalData);
             }
@@ -84,4 +82,5 @@ public interface IBuilderRegistry<Part extends IBuildableObject> {
         }
         return null;
     }
+
 }

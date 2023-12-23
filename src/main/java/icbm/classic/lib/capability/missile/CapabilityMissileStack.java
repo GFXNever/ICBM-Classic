@@ -20,12 +20,27 @@ import java.util.Optional;
 /**
  * Applied to {@link ItemStack} that are missiles
  */
-public class CapabilityMissileStack implements ICapabilityMissileStack
-{
+public class CapabilityMissileStack implements ICapabilityMissileStack {
+
     private final ItemStack stack; //TODO decouple from stack and directly save init data
 
     public CapabilityMissileStack(ItemStack stack) {
         this.stack = stack;
+    }
+
+    public static void register() {
+        CapabilityManager.INSTANCE.register(ICapabilityMissileStack.class, new Capability.IStorage<ICapabilityMissileStack>() {
+                @Nullable
+                @Override
+                public NBTBase writeNBT(Capability<ICapabilityMissileStack> capability, ICapabilityMissileStack instance, EnumFacing side) {
+                    return null;
+                }
+
+                @Override
+                public void readNBT(Capability<ICapabilityMissileStack> capability, ICapabilityMissileStack instance, EnumFacing side, NBTBase nbt) {
+                }
+            },
+            () -> new CapabilityMissileStack(ItemStack.EMPTY));
     }
 
     @Override
@@ -40,29 +55,10 @@ public class CapabilityMissileStack implements ICapabilityMissileStack
     }
 
     @Override
-    public IMissile newMissile(World world)
-    {
+    public IMissile newMissile(World world) {
         final EntityExplosiveMissile missile = new EntityExplosiveMissile(world);
         missile.explosive.setStack(stack);
         return missile.getMissileCapability();
     }
 
-    public static void register()
-    {
-        CapabilityManager.INSTANCE.register(ICapabilityMissileStack.class, new Capability.IStorage<ICapabilityMissileStack>()
-            {
-                @Nullable
-                @Override
-                public NBTBase writeNBT(Capability<ICapabilityMissileStack> capability, ICapabilityMissileStack instance, EnumFacing side)
-                {
-                    return null;
-                }
-
-                @Override
-                public void readNBT(Capability<ICapabilityMissileStack> capability, ICapabilityMissileStack instance, EnumFacing side, NBTBase nbt)
-                {
-                }
-            },
-            () -> new CapabilityMissileStack(ItemStack.EMPTY));
-    }
 }

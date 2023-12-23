@@ -5,12 +5,8 @@ import icbm.classic.api.caps.IExplosive;
 import icbm.classic.api.explosion.IBlast;
 import icbm.classic.api.reg.IExplosiveCustomization;
 import icbm.classic.api.reg.IExplosiveData;
-import icbm.classic.content.reg.BlockReg;
-import icbm.classic.lib.NBTConstants;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
@@ -25,20 +21,17 @@ import java.util.function.Consumer;
  * Used by any item that has an explosive capability
  * Created by Dark(DarkGuardsman, Robert) on 1/7/19.
  */
-public class CapabilityExplosiveStack implements IExplosive, ICapabilitySerializable<NBTTagCompound>
-{
+public class CapabilityExplosiveStack implements IExplosive, ICapabilitySerializable<NBTTagCompound> {
+
     private final ItemStack stack;
     private final List<IExplosiveCustomization> customizationList = new ArrayList();
 
-    public CapabilityExplosiveStack(ItemStack stack)
-    {
+    public CapabilityExplosiveStack(ItemStack stack) {
         this.stack = stack;
     }
 
-    protected int getExplosiveID()
-    {
-        if(stack == null)
-        {
+    protected int getExplosiveID() {
+        if (stack == null) {
             return 0;
         }
         return stack.getItemDamage(); //TODO replace meta usage for 1.14 update
@@ -46,8 +39,7 @@ public class CapabilityExplosiveStack implements IExplosive, ICapabilitySerializ
 
     @Nullable
     @Override
-    public IExplosiveData getExplosiveData()
-    {
+    public IExplosiveData getExplosiveData() {
         return ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosiveData(getExplosiveID());
     }
 
@@ -62,17 +54,15 @@ public class CapabilityExplosiveStack implements IExplosive, ICapabilitySerializ
     }
 
     @Override
-    public void collectInformation(Consumer<String> collector){
+    public void collectInformation(Consumer<String> collector) {
         //TODO debug explosive id and name if F3+something keybind is enabled
         customizationList.forEach(c -> c.collectCustomizationInformation(collector));
     }
 
     @Nullable
     @Override
-    public ItemStack toStack()
-    {
-        if (stack == null)
-        {
+    public ItemStack toStack() {
+        if (stack == null) {
             return ItemStack.EMPTY;
         }
 
@@ -83,35 +73,31 @@ public class CapabilityExplosiveStack implements IExplosive, ICapabilitySerializ
     }
 
     @Override
-    public NBTTagCompound serializeNBT()
-    {
+    public NBTTagCompound serializeNBT() {
         final NBTTagCompound save = new NBTTagCompound();
         save.setTag("customizations", ICBMClassicAPI.EXPLOSIVE_CUSTOMIZATION_REGISTRY.save(customizationList));
         return save;
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt)
-    {
-        if(nbt.hasKey("customizations")) {
+    public void deserializeNBT(NBTTagCompound nbt) {
+        if (nbt.hasKey("customizations")) {
             ICBMClassicAPI.EXPLOSIVE_CUSTOMIZATION_REGISTRY.load(nbt.getTagList("customizations", 10), customizationList);
         }
     }
 
     @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
-    {
+    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
         return capability == ICBMClassicAPI.EXPLOSIVE_CAPABILITY;
     }
 
     @Nullable
     @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
-    {
-        if (capability == ICBMClassicAPI.EXPLOSIVE_CAPABILITY)
-        {
+    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == ICBMClassicAPI.EXPLOSIVE_CAPABILITY) {
             return ICBMClassicAPI.EXPLOSIVE_CAPABILITY.cast(this);
         }
         return null;
     }
+
 }

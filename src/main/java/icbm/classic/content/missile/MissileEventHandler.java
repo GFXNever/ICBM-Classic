@@ -25,33 +25,27 @@ import java.util.List;
  * Created by Dark(DarkGuardsman, Robert) on 8/4/2019.
  */
 @Mod.EventBusSubscriber(modid = ICBMConstants.DOMAIN)
-public class MissileEventHandler
-{
+public class MissileEventHandler {
+
     @SubscribeEvent
-    public static void onEntityMount(EntityMountEvent event)
-    {
+    public static void onEntityMount(EntityMountEvent event) {
         if (event.isDismounting()
-                && event.getEntityBeingMounted().hasCapability(ICBMClassicAPI.MISSILE_CAPABILITY, null)
-                && event.getEntityMounting() instanceof EntityPlayer)
-        {
+            && event.getEntityBeingMounted().hasCapability(ICBMClassicAPI.MISSILE_CAPABILITY, null)
+            && event.getEntityMounting() instanceof EntityPlayer) {
             IMissile missile = event.getEntityBeingMounted().getCapability(ICBMClassicAPI.MISSILE_CAPABILITY, null);
-            if(missile != null)
-            {
+            if (missile != null) {
                 event.setCanceled(MinecraftForge.EVENT_BUS.post(new MissileRideEvent.Stop(missile, (EntityPlayer) event.getEntityMounting())));
             }
         }
     }
 
     @SubscribeEvent
-    public static void chunkUnload(ChunkEvent.Unload event)
-    {
+    public static void chunkUnload(ChunkEvent.Unload event) {
         final World world = event.getWorld();
-        if (!world.isRemote)
-        {
+        if (!world.isRemote) {
             final Chunk chunk = event.getChunk();
             final RadarMap map = RadarRegistry.getRadarMapForWorld(world);
-            if (map != null)
-            {
+            if (map != null) {
                 // Collect missiles we are about to unload, using list to avoid concurrent mod from radar remove TODO have radar system track removals in list and apply next tick
                 final List<EntityExplosiveMissile> unloading = new LinkedList();
                 map.collectEntitiesInChunk(chunk.x, chunk.z, (radarEntity -> {
@@ -67,4 +61,5 @@ public class MissileEventHandler
             }
         }
     }
+
 }

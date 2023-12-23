@@ -62,8 +62,10 @@ public class FaceRotations {
         .rotation(EAST, NORTH)
         .build();
 
-    /** Rotates around the face clockwise */
-    public static final EnumFacing[][] CW_FACE = new EnumFacing[][] {
+    /**
+     * Rotates around the face clockwise
+     */
+    public static final EnumFacing[][] CW_FACE = new EnumFacing[][]{
 
         // UP
         CW_UP_AXIS,
@@ -81,10 +83,10 @@ public class FaceRotations {
 
     /**
      * Rotates clockwise, towards right relative to self on a clock face
-     *
+     * <p>
      * Clockwise {@see https://en.wikipedia.org/wiki/Clockwise}
      *
-     * @param face to rotate around
+     * @param face    to rotate around
      * @param current rotation
      * @return next rotation, if current is same as face or inverse of face it will pick starting rotation
      */
@@ -94,10 +96,10 @@ public class FaceRotations {
 
     /**
      * Rotates counter-clockwise, towards left relative to self on a clock face
-     *
+     * <p>
      * Clockwise {@see https://en.wikipedia.org/wiki/Clockwise}
      *
-     * @param face to rotate around
+     * @param face    to rotate around
      * @param current rotation
      * @return next rotation, if current is same as face or inverse of face it will pick starting rotation
      */
@@ -106,9 +108,12 @@ public class FaceRotations {
     }
 
     public static class RotationBuilder {
+
         private final EnumFacing[] rotations = new EnumFacing[6];
 
-        public RotationBuilder() {}
+        public RotationBuilder() {
+        }
+
         public RotationBuilder(EnumFacing[] sides) {
             System.arraycopy(sides, 0, rotations, 0, 6);
         }
@@ -119,7 +124,7 @@ public class FaceRotations {
         }
 
         public RotationBuilder start(EnumFacing face) {
-            for(int i = 0; i < 6; i++) {
+            for (int i = 0; i < 6; i++) {
                 this.rotations[i] = face;
             }
             return this;
@@ -130,5 +135,7 @@ public class FaceRotations {
             System.arraycopy(this.rotations, 0, rotations, 0, 6);
             return rotations;
         }
+
     }
+
 }

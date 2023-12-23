@@ -32,10 +32,11 @@ public class GuiTextFieldBase extends GuiTextField implements IGuiComponent {
 
     @Override
     public boolean onKeyTyped(char key, int keyId) {
-        if(isFocused()) {
+        if (isFocused()) {
             textboxKeyTyped(key, keyId);
             return true;
         }
         return false;
     }
+
 }

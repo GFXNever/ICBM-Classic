@@ -11,14 +11,13 @@ import icbm.classic.prefab.gui.tooltip.TooltipTranslations;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
-public class GuiRadarStation extends GuiContainerBase
-{
+public class GuiRadarStation extends GuiContainerBase {
+
     public static final ResourceLocation TEXTURE = new ResourceLocation(ICBMConstants.DOMAIN, ICBMConstants.GUI_DIRECTORY + "gui_radar.png");
 
     private final TileRadarStation tileEntity;
 
-    public GuiRadarStation(EntityPlayer player, TileRadarStation tileEntity)
-    {
+    public GuiRadarStation(EntityPlayer player, TileRadarStation tileEntity) {
         super(new ContainerRadarStation(player, tileEntity));
         this.tileEntity = tileEntity;
         this.ySize = 184;
@@ -31,8 +30,7 @@ public class GuiRadarStation extends GuiContainerBase
     }
 
     @Override
-    public void initGui()
-    {
+    public void initGui() {
         super.initGui();
 
         int componentID = 0;
@@ -51,9 +49,9 @@ public class GuiRadarStation extends GuiContainerBase
 
         addComponent(
             new RedstoneButton(0, 160 + guiLeft, 3 + guiTop, tileEntity::isOutputRedstone)
-            .setAction(() -> TileRadarStation.PACKET_REDSTONE_OUTPUT.sendToServer(tileEntity))
+                .setAction(() -> TileRadarStation.PACKET_REDSTONE_OUTPUT.sendToServer(tileEntity))
                 .setTooltip(() -> {
-                    if(tileEntity.isOutputRedstone()) {
+                    if (tileEntity.isOutputRedstone()) {
                         return TileRadarStation.TRANSLATION_TOOLTIP_REDSTONE_ON;
                     }
                     return TileRadarStation.TRANSLATION_TOOLTIP_REDSTONE_OFF;
@@ -68,17 +66,20 @@ public class GuiRadarStation extends GuiContainerBase
         addComponent(new RadarComponent(tileEntity, 5, 18));
 
         // Range tooltip
-        addComponent(new TooltipTranslations(4, 76, 14, 14, TileRadarStation.TRANSLATION_TOOLTIP_RANGE).withShift(TileRadarStation.TRANSLATION_TOOLTIP_RANGE_SHIFT).withDelay(1));
+        addComponent(new TooltipTranslations(4, 76, 14, 14, TileRadarStation.TRANSLATION_TOOLTIP_RANGE).withShift(
+            TileRadarStation.TRANSLATION_TOOLTIP_RANGE_SHIFT).withDelay(1));
 
         // Radio tooltip
         addComponent(new TooltipTranslations(119, 16, 14, 14, LauncherLangs.TRANSLATION_TOOLTIP_RADIO).withDelay(1));
     }
 
-    /** Draw the foreground layer for the GuiContainer (everything in front of the items) */
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
-    {
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         this.fontRenderer.drawString("\u00a77" + tileEntity.getDisplayName().getFormattedText(), 30, 6, 4210752);
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
     }
+
 }

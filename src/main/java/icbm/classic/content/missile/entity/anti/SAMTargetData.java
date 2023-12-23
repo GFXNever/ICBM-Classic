@@ -26,11 +26,8 @@ public class SAMTargetData implements IMissileTarget {
     private static final int MAX_RANGE = 100;
 
     private final Queue<Entity> targets = new LinkedList();
-
-    private Entity currentTarget;
-
     private final EntitySurfaceToAirMissile host;
-
+    private Entity currentTarget;
     private int scanDelayTick = 0;
 
     public SAMTargetData(EntitySurfaceToAirMissile host) {
@@ -91,14 +88,14 @@ public class SAMTargetData implements IMissileTarget {
     public Entity getTarget() {
 
         //Invalidate target if it is no longer valid (likely dead)
-        if(!isValid(currentTarget)) {
+        if (!isValid(currentTarget)) {
             currentTarget = null;
         }
 
         //Loop until we find a good target or run out of targets
         while (currentTarget == null && targets.peek() != null) {
             currentTarget = targets.poll();
-            if(!isValid(currentTarget)) {
+            if (!isValid(currentTarget)) {
                 currentTarget = null;
             }
         }
@@ -146,4 +143,5 @@ public class SAMTargetData implements IMissileTarget {
     public void deserializeNBT(NBTTagCompound nbt) {
 
     }
+
 }

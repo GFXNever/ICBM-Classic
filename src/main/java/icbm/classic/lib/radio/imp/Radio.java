@@ -13,25 +13,26 @@ public abstract class Radio implements IRadio, INBTSerializable<NBTTagCompound>,
 
     private String channel;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean isDisabled = false;
 
-    @Override
-    public void setChannel(String channel) {
-        this.channel = channel;
-    }
-
     public String getChannel() {
-        if(channel == null) {
+        if (channel == null) {
             this.channel = RandomStringUtils.random(4, true, true);
         }
         return channel;
     }
 
     @Override
+    public void setChannel(String channel) {
+        this.channel = channel;
+    }
+
+    @Override
     public NBTTagCompound serializeNBT() {
         final NBTTagCompound tag = new NBTTagCompound();
-        if(channel != null) {
+        if (channel != null) {
             tag.setString("channel", channel);
         }
         tag.setBoolean("disabled", isDisabled);
@@ -43,4 +44,5 @@ public abstract class Radio implements IRadio, INBTSerializable<NBTTagCompound>,
         this.channel = nbt.getString("channel");
         this.isDisabled = nbt.getBoolean("disabled");
     }
+
 }

@@ -43,68 +43,56 @@ import java.util.List;
  * @author Calclavia
  */
 
-public class ItemRocketLauncher extends ItemICBMElectrical
-{
+public class ItemRocketLauncher extends ItemICBMElectrical {
+
     private static final int ENERGY = 1000000;
     private static final int firingDelay = 1000;
     private final HashMap<String, Long> clickTimePlayer = new HashMap<String, Long>();
 
-    public ItemRocketLauncher()
-    {
+    public ItemRocketLauncher() {
         super("rocketLauncher");
-        this.addPropertyOverride(new ResourceLocation("pulling"), new IItemPropertyGetter()
-        {
+        this.addPropertyOverride(new ResourceLocation("pulling"), new IItemPropertyGetter() {
             @SideOnly(Side.CLIENT)
-            public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn)
-            {
+            public float apply(ItemStack stack, @Nullable World worldIn, @Nullable EntityLivingBase entityIn) {
                 return entityIn != null && entityIn.isHandActive() && entityIn.getActiveItemStack() == stack ? 1.0F : 0.0F;
             }
         });
     }
 
     @Override
-    public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected)
-    {
+    public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
 
     }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack stack)
-    {
+    public int getMaxItemUseDuration(ItemStack stack) {
         return Integer.MAX_VALUE;
     }
 
     @Override
-    public EnumAction getItemUseAction(ItemStack par1ItemStack)
-    {
+    public EnumAction getItemUseAction(ItemStack par1ItemStack) {
         return EnumAction.BOW;
     }
 
     @Override
-    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase shooter, int timeLeft)
-    {
-        if (shooter instanceof EntityPlayer)
-        {
+    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase shooter, int timeLeft) {
+        if (shooter instanceof EntityPlayer) {
             final EntityPlayer player = (EntityPlayer) shooter;
-            if (this.getEnergy(stack) >= ENERGY || player.capabilities.isCreativeMode)
-            {
+            if (this.getEnergy(stack) >= ENERGY || player.capabilities.isCreativeMode) {
                 // Check the player's inventory and look for missiles.
                 for (int slot = 0; slot < player.inventory.getSizeInventory(); slot++) //TODO add ammo wheel to select missile to use
                 {
                     final ItemStack inventoryStack = player.inventory.getStackInSlot(slot);
 
-                    if (inventoryStack.hasCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null))
-                    {
-                        final ICapabilityMissileStack capabilityMissileStack = inventoryStack.getCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null);
-                        if (capabilityMissileStack != null)
-                        {
-                            if (!world.isRemote)
-                            {
+                    if (inventoryStack.hasCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null)) {
+                        final ICapabilityMissileStack capabilityMissileStack =
+                            inventoryStack.getCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null);
+                        if (capabilityMissileStack != null) {
+                            if (!world.isRemote) {
                                 final IMissile missile = capabilityMissileStack.newMissile(world);
                                 final Entity missileEntity = missile.getMissileEntity();
 
-                                if (missileEntity instanceof IMissileAiming)
-                                {
+                                if (missileEntity instanceof IMissileAiming) {
                                     //Setup aiming and offset from player
                                     ((IMissileAiming) missileEntity).initAimingPosition(player, 1, ConfigMissile.DIRECT_FLIGHT_SPEED);
 
@@ -114,15 +102,12 @@ public class ItemRocketLauncher extends ItemICBMElectrical
                                     missile.launch();
 
                                     //Spawn entity into world
-                                    if(world.spawnEntity(missileEntity))
-                                    {
+                                    if (world.spawnEntity(missileEntity)) {
                                         if (player.isSneaking()) //TODO allow missile to have control of when riding is allowed
                                         {
                                             player.startRiding(missileEntity);
                                             player.setSneaking(false);
-                                        }
-
-                                        else if(player.getHeldItem(EnumHand.OFF_HAND).getItem() == Items.LEAD) {
+                                        } else if (player.getHeldItem(EnumHand.OFF_HAND).getItem() == Items.LEAD) {
 
                                             final double x = shooter.posX;
                                             final double y = shooter.posY;
@@ -131,10 +116,8 @@ public class ItemRocketLauncher extends ItemICBMElectrical
                                             for (EntityLiving victim : world.getEntitiesWithinAABB(EntityLiving.class, new AxisAlignedBB(
                                                 x - 7.0D, y - 7.0D, z - 7.0D,
                                                 x + 7.0D, y + 7.0D, z + 7.0D))
-                                            )
-                                            {
-                                                if (victim.getLeashHolder() == player)
-                                                {
+                                            ) {
+                                                if (victim.getLeashHolder() == player) {
                                                     //victim.setLeashHolder(missileEntity, true);
                                                     victim.startRiding(missileEntity);
                                                     break;
@@ -142,21 +125,18 @@ public class ItemRocketLauncher extends ItemICBMElectrical
                                             }
                                         }
 
-                                        if (!player.capabilities.isCreativeMode)
-                                        {
+                                        if (!player.capabilities.isCreativeMode) {
                                             player.inventory.setInventorySlotContents(slot, capabilityMissileStack.consumeMissile());
                                             player.inventoryContainer.detectAndSendChanges();
                                             this.discharge(stack, ENERGY, true);
                                         }
+                                    } else {
+                                        player.sendStatusMessage(new TextComponentTranslation("item.icbmclassic:rocketLauncher.error.spawning"),
+                                            true);
                                     }
-                                    else
-                                    {
-                                        player.sendStatusMessage(new TextComponentTranslation("item.icbmclassic:rocketLauncher.error.spawning"), true);
-                                    }
-                                }
-                                else
-                                {
-                                    player.sendStatusMessage(new TextComponentTranslation("item.icbmclassic:rocketLauncher.error.IMissileAiming", inventoryStack), true);
+                                } else {
+                                    player.sendStatusMessage(
+                                        new TextComponentTranslation("item.icbmclassic:rocketLauncher.error.IMissileAiming", inventoryStack), true);
                                 }
 
                                 //Exit loop to prevent firing all missiles in inventory
@@ -173,15 +153,12 @@ public class ItemRocketLauncher extends ItemICBMElectrical
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand handIn)
-    {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand handIn) {
         ItemStack itemstack = player.getHeldItem(handIn);
 
         long clickMs = System.currentTimeMillis();
-        if (clickTimePlayer.containsKey(player.getName()))
-        {
-            if (clickMs - clickTimePlayer.get(player.getName()) < firingDelay)
-            {
+        if (clickTimePlayer.containsKey(player.getName())) {
+            if (clickMs - clickTimePlayer.get(player.getName()) < firingDelay) {
                 //TODO play weapon empty click audio to note the gun is reloading
                 return new ActionResult<ItemStack>(EnumActionResult.FAIL, itemstack);
             }
@@ -193,18 +170,18 @@ public class ItemRocketLauncher extends ItemICBMElectrical
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag flag)
-    {
+    public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag flag) {
         final String key = "item.icbmclassic:rocketLauncher.info";
         String translation = LanguageUtility.getLocal(key);
 
-        if (translation.contains("%s"))
-        {
+        if (translation.contains("%s")) {
             String str = String.format(translation, String.valueOf(ConfigMain.ROCKET_LAUNCHER_TIER_FIRE_LIMIT));
             splitAdd(str, list, false, false);
         }
 
         if (Minecraft.getMinecraft().player != null && Minecraft.getMinecraft().player.isCreative())
-            list.add(new TextComponentTranslation("item.icbmclassic:rocketLauncher.info.creative").setStyle(new Style().setColor(TextFormatting.LIGHT_PURPLE)).getFormattedText());
+            list.add(new TextComponentTranslation("item.icbmclassic:rocketLauncher.info.creative").setStyle(
+                new Style().setColor(TextFormatting.LIGHT_PURPLE)).getFormattedText());
     }
+
 }

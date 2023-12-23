@@ -10,8 +10,11 @@ import net.minecraft.util.EnumFacing;
  *
  * @author Calclavia
  */
-public interface IRotatable extends IRotation
-{
-	/** Sets the facing direction, is not supported by all machines */
-	void setDirection(EnumFacing direction);
+public interface IRotatable extends IRotation {
+
+    /**
+     * Sets the facing direction, is not supported by all machines
+     */
+    void setDirection(EnumFacing direction);
+
 }

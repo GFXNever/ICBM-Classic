@@ -46,4 +46,5 @@ public abstract class RadioTile<T extends TileEntity> extends Radio {
             // Validate channel, this might create the channel string if null
             && Objects.equals(getChannel(), packet.getChannel());
     }
+
 }

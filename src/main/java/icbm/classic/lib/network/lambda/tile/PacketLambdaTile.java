@@ -36,7 +36,7 @@ public class PacketLambdaTile<TARGET> implements IPacket<PacketLambdaTile<TARGET
     }
 
     public PacketLambdaTile(PacketCodexTile codex, World dimensionId, BlockPos pos, TARGET target) {
-      this(codex, dimensionId, pos.getX(), pos.getY(), pos.getZ(), target);
+        this(codex, dimensionId, pos.getX(), pos.getY(), pos.getZ(), target);
     }
 
     public PacketLambdaTile(PacketCodexTile codex, World dimensionId, int x, int y, int z, TARGET target) {
@@ -75,8 +75,7 @@ public class PacketLambdaTile<TARGET> implements IPacket<PacketLambdaTile<TARGET
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void handleClientSide(final Minecraft minecraft, final EntityPlayer player)
-    {
+    public void handleClientSide(final Minecraft minecraft, final EntityPlayer player) {
         final int playerDim = player.world.provider.getDimension();
 
         // Normal, player may have changed dim between network calls
@@ -91,8 +90,7 @@ public class PacketLambdaTile<TARGET> implements IPacket<PacketLambdaTile<TARGET
     }
 
     @Override
-    public void handleServerSide(EntityPlayer player)
-    {
+    public void handleServerSide(EntityPlayer player) {
         final int playerDim = player.world.provider.getDimension();
 
         // Normal, player may have changed dim between network calls
@@ -102,7 +100,7 @@ public class PacketLambdaTile<TARGET> implements IPacket<PacketLambdaTile<TARGET
         }
 
         // Issue, should never happen
-        if(!(player.world instanceof WorldServer)) {
+        if (!(player.world instanceof WorldServer)) {
             PacketEvents.onNotServerWorld(codex, getDimensionId());
             return;
         }
@@ -114,7 +112,7 @@ public class PacketLambdaTile<TARGET> implements IPacket<PacketLambdaTile<TARGET
     private void loadDataIntoTile(World world, EntityPlayer player) {
 
         // Area is no longer loaded, this is normal in most cases
-        if(!world.isBlockLoaded(pos)) {
+        if (!world.isBlockLoaded(pos)) {
             return;
         }
 
@@ -122,21 +120,21 @@ public class PacketLambdaTile<TARGET> implements IPacket<PacketLambdaTile<TARGET
             final TileEntity tile = player.world.getTileEntity(pos);
 
             // Could be normal, as data changes in main thread... especially given latency
-            if(tile == null || !codex.isValid(tile)) {
+            if (tile == null || !codex.isValid(tile)) {
                 PacketTileEvents.onInvalidTile(codex, world, pos);
                 return;
             }
 
             final TARGET target = (TARGET) codex.getConverter().apply(tile);
-            if(target != null) {
+            if (target != null) {
                 setters.forEach(c -> c.accept(target));
             }
-            if(codex.onFinished() != null) {
+            if (codex.onFinished() != null) {
                 codex.onFinished().accept(tile, target, player);
             }
-        }
-        catch (Exception e) {
-           PacketTileEvents.onHandlingError(codex, world, pos, e);
+        } catch (Exception e) {
+            PacketTileEvents.onHandlingError(codex, world, pos, e);
         }
     }
+
 }

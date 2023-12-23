@@ -16,27 +16,23 @@ import javax.annotation.Nullable;
 
 /**
  * Wrapper to trigger EMP calls on ItemStack contained inside of {@link EntityItem}
- *
- *
+ * <p>
+ * <p>
  * Created by Dark(DarkGuardsman, Robert) on 3/12/2018.
  */
-public class CapabilityEmpEntityItem implements IEMPReceiver, ICapabilityProvider
-{
+public class CapabilityEmpEntityItem implements IEMPReceiver, ICapabilityProvider {
+
     public final EntityItem entityItem;
 
-    public CapabilityEmpEntityItem(EntityItem entityItem)
-    {
+    public CapabilityEmpEntityItem(EntityItem entityItem) {
         this.entityItem = entityItem;
     }
 
     @Override
-    public float applyEmpAction(World world, double x, double y, double z, IBlast emp_blast, float power, boolean doAction)
-    {
-        if (ConfigEMP.ALLOW_GROUND_ITEMS)
-        {
+    public float applyEmpAction(World world, double x, double y, double z, IBlast emp_blast, float power, boolean doAction) {
+        if (ConfigEMP.ALLOW_GROUND_ITEMS) {
             ItemStack stack = entityItem.getItem();
-            if (!stack.isEmpty())
-            {
+            if (!stack.isEmpty()) {
                 //Copy to prevent changes on real item
                 stack = stack.copy();
 
@@ -44,8 +40,7 @@ public class CapabilityEmpEntityItem implements IEMPReceiver, ICapabilityProvide
                 power = CapabilityEmpInventory.empItemStack(stack, world, x, y, z, entityItem, emp_blast, power, doAction);
 
                 //Check for delta
-                if (doAction && !InventoryUtility.stacksMatchExact(stack, entityItem.getItem()))
-                {
+                if (doAction && !InventoryUtility.stacksMatchExact(stack, entityItem.getItem())) {
                     entityItem.setItem(stack);
                 }
             }
@@ -54,15 +49,14 @@ public class CapabilityEmpEntityItem implements IEMPReceiver, ICapabilityProvide
     }
 
     @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
-    {
+    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
         return capability == CapabilityEMP.EMP;
     }
 
     @Nullable
     @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
-    {
+    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         return capability == CapabilityEMP.EMP ? (T) this : null;
     }
+
 }

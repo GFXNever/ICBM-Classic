@@ -35,16 +35,13 @@ public class CLauncherCapability extends LauncherBaseCapability {
     @Override
     public IActionStatus getStatus() {
         // Min power check
-        if(!host.energyStorage.consumePower(host.getFiringCost(), true)) {
+        if (!host.energyStorage.consumePower(host.getFiringCost(), true)) {
             return LauncherStatus.ERROR_POWER;
-        }
-        else if(host.getFiringPackage() != null && !getHost().isAimed()) {
+        } else if (host.getFiringPackage() != null && !getHost().isAimed()) {
             return LauncherStatus.FIRING_AIMING;
-        }
-        else if(host.getFiringPackage() != null && host.getFiringPackage().getCountDown() > 0) {
+        } else if (host.getFiringPackage() != null && host.getFiringPackage().getCountDown() > 0) {
             return new FiringWithDelay(host.getFiringPackage().getCountDown());
-        }
-        else if(!host.canLaunch()) { //TODO break down into detailed feedback and make consistent with base launcher
+        } else if (!host.canLaunch()) { //TODO break down into detailed feedback and make consistent with base launcher
             return LauncherStatus.ERROR_GENERIC;
         }
 
@@ -63,10 +60,9 @@ public class CLauncherCapability extends LauncherBaseCapability {
 
         // Do pre-checks
         final IActionStatus preCheck = preCheckLaunch(target, cause);
-        if(preCheck.shouldBlockInteraction()) {
+        if (preCheck.shouldBlockInteraction()) {
             return preCheck;
-        }
-        else if(simulate) { //TODO handle better by checking if we are already aimed
+        } else if (simulate) { //TODO handle better by checking if we are already aimed
             return LauncherStatus.FIRING_AIMING;
         }
 
@@ -74,24 +70,26 @@ public class CLauncherCapability extends LauncherBaseCapability {
         host.setTarget(target.getPosition()); // TODO store IMissileTarget
 
         // If not aimed, wait for aim and fire
-        if(!host.isAimed()) {
+        if (!host.isAimed()) {
             host.setFiringPackage(new FiringPackage(target, cause, 0));
             return LauncherStatus.FIRING_AIMING; // TODO return aiming status, with callback to check if did fire
         }
 
         final BlockCause selfCause = new BlockCause(host.getWorld(), host.getPos(), host.getBlockState());
         selfCause.setPreviousCause(cause);
-        final IMissileSource missileSource = new MissileSource(getHost().getWorld(), new Vec3d(host.getPos().getX() + 0.5, host.getPos().getY() + TileCruiseLauncher.MISSILE__HOLDER_Y, host.getPos().getZ() + 0.5), selfCause);
+        final IMissileSource missileSource = new MissileSource(getHost().getWorld(),
+            new Vec3d(host.getPos().getX() + 0.5, host.getPos().getY() + TileCruiseLauncher.MISSILE__HOLDER_Y, host.getPos().getZ() + 0.5),
+            selfCause);
 
         if (host.canLaunch()) //TODO update to mirror launch pad better
         {
             final ItemStack inventoryStack = host.missileHolder.getMissileStack();
 
-            if(inventoryStack.hasCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null)) {
+            if (inventoryStack.hasCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null)) {
                 final ICapabilityMissileStack capabilityMissileStack = inventoryStack.getCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null);
-                if(capabilityMissileStack != null) {
+                if (capabilityMissileStack != null) {
 
-                    if(host.isServer()) {
+                    if (host.isServer()) {
                         final IMissile missile = capabilityMissileStack.newMissile(host.getWorld());
                         final Entity entity = missile.getMissileEntity();
                         entity.setPosition(missileSource.getPosition().x, missileSource.getPosition().y, missileSource.getPosition().z);
@@ -102,7 +100,7 @@ public class CLauncherCapability extends LauncherBaseCapability {
                         }
 
                         // Check power again, with firing delay things could change
-                        if(!host.energyStorage.consumePower(host.getFiringCost(), true)) {
+                        if (!host.energyStorage.consumePower(host.getFiringCost(), true)) {
                             return LauncherStatus.ERROR_POWER;
                         }
                         host.energyStorage.consumePower(host.getFiringCost(), false);
@@ -123,4 +121,5 @@ public class CLauncherCapability extends LauncherBaseCapability {
         }
         return LauncherStatus.ERROR_GENERIC;
     }
+
 }

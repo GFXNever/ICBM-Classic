@@ -8,17 +8,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.datafix.IFixableData;
 
-public class TileExplosivesDataFixer implements IFixableData
-{
+public class TileExplosivesDataFixer implements IFixableData {
+
     private static final String TILE_ID = ICBMConstants.PREFIX + "explosive";
     private static final String EXPLOSIVE_ID = "explosiveID";
+
     @Override
-    public NBTTagCompound fixTagCompound(NBTTagCompound existingSave)
-    {
-        if (existingSave.hasKey("id") && existingSave.getString("id").equalsIgnoreCase(TILE_ID))
-        {
+    public NBTTagCompound fixTagCompound(NBTTagCompound existingSave) {
+        if (existingSave.hasKey("id") && existingSave.getString("id").equalsIgnoreCase(TILE_ID)) {
             // Migrate old int explosive system to capability
-            if(existingSave.hasKey(EXPLOSIVE_ID)) {
+            if (existingSave.hasKey(EXPLOSIVE_ID)) {
 
                 int explosiveID = existingSave.getInteger(EXPLOSIVE_ID);
 
@@ -37,11 +36,11 @@ public class TileExplosivesDataFixer implements IFixableData
             }
 
             // Move hypersonc to sonic
-            else if(existingSave.hasKey(TileEntityExplosive.NBT_EXPLOSIVE_STACK)) {
+            else if (existingSave.hasKey(TileEntityExplosive.NBT_EXPLOSIVE_STACK)) {
                 final NBTTagCompound stackSave = existingSave.getCompoundTag(TileEntityExplosive.NBT_EXPLOSIVE_STACK);
                 final int damage = stackSave.getInteger("Damage");
 
-                if(damage == ICBMExplosives.HYPERSONIC.getRegistryID()) {
+                if (damage == ICBMExplosives.HYPERSONIC.getRegistryID()) {
 
                     // Change to sonic id
                     stackSave.setInteger("Damage", ICBMExplosives.SONIC.getRegistryID());
@@ -58,8 +57,8 @@ public class TileExplosivesDataFixer implements IFixableData
     }
 
     @Override
-    public int getFixVersion()
-    {
+    public int getFixVersion() {
         return 1;
     }
+
 }

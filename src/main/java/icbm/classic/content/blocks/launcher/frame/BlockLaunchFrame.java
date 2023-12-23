@@ -23,30 +23,25 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robin) on 1/16/2018.
  */
-public class BlockLaunchFrame extends BlockICBM
-{
+public class BlockLaunchFrame extends BlockICBM {
+
     public static final PropertyFrameState FRAME_STATE = new PropertyFrameState();
 
-    public BlockLaunchFrame()
-    {
+    public BlockLaunchFrame() {
         super("launcherframe");
     }
 
     @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
         final boolean frameAbove = isConnection(worldIn, pos.offset(EnumFacing.UP));
         final boolean frameUnder = isConnection(worldIn, pos.offset(EnumFacing.DOWN));
-        if(frameAbove && frameUnder) {
+        if (frameAbove && frameUnder) {
             return state.withProperty(FRAME_STATE, EnumFrameState.MIDDLE);
-        }
-        else if(frameUnder) {
+        } else if (frameUnder) {
             return state.withProperty(FRAME_STATE, EnumFrameState.TOP);
-        }
-        else if(frameAbove) {
+        } else if (frameAbove) {
             return state.withProperty(FRAME_STATE, EnumFrameState.BOTTOM);
         }
         return state.withProperty(FRAME_STATE, EnumFrameState.MIDDLE);
@@ -58,13 +53,12 @@ public class BlockLaunchFrame extends BlockICBM
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing,
+                                    float hitX, float hitY, float hitZ) {
         final TileEntity tile = worldIn.getTileEntity(pos);
-        if (tile instanceof TileLauncherFrame)
-        {
-            if(playerIn.getHeldItem(hand).getItem() == Items.STONE_AXE) {
-                if(!worldIn.isRemote) {
+        if (tile instanceof TileLauncherFrame) {
+            if (playerIn.getHeldItem(hand).getItem() == Items.STONE_AXE) {
+                if (!worldIn.isRemote) {
                     final LauncherNetwork network = ((TileLauncherFrame) tile).getNetworkNode().getNetwork();
                     playerIn.sendMessage(new TextComponentString("Network: " + network));
                     playerIn.sendMessage(new TextComponentString("L: " + network.getLaunchers().size()));
@@ -76,45 +70,39 @@ public class BlockLaunchFrame extends BlockICBM
     }
 
     @Deprecated
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @Override
-    protected BlockStateContainer createBlockState()
-    {
+    protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, ROTATION_PROP, FRAME_STATE);
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
+    public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer()
-    {
+    public BlockRenderLayer getBlockLayer() {
         return BlockRenderLayer.CUTOUT;
     }
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta)
-    {
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileLauncherFrame();
     }
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state)
-    {
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
         final TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof ILauncherComponent)
-        {
+        if (tile instanceof ILauncherComponent) {
             ((ILauncherComponent) tile).getNetworkNode().onTileRemoved();
         }
         super.breakBlock(world, pos, state);
     }
+
 }

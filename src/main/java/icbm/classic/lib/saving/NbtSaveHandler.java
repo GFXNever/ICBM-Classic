@@ -7,19 +7,19 @@ import java.util.List;
 
 /**
  * Handles logic for saving/loading without needing to duplicate logic or checks
- *
+ * <p>
  * Each content entry should have a single save handler. However, some cases might want a different save
  * handler for game save, packets, spawn data, or other useful cases.
- *
+ * <p>
  * To use the handler create a new instance. Then call {@link #addRoot(String)} to create new save groups.
  * Groups are a great way to organize the save for players/admins editing saves. Such as grouping `flags` under
  * a `flag` root or grouping all player settings under `settings`
- *
+ * <p>
  * To add things to save group chain nodes and end with a call to {@link NbtSaveRoot#base()} to return to this level.
- *
+ * <p>
  * Using {@link #mainRoot()} can allow saving directly to the base save. This is useful for basic content or saving
  * data that doesn't need to be grouped. Works the same as a save group but will direct all nodes to the base save.
- *
+ * <p>
  * Example:
  *
  * <pre>
@@ -50,12 +50,10 @@ import java.util.List;
  *     }
  * </pre>
  *
- *
- *
  * @param <E> type of object to save
  */
-public class NbtSaveHandler<E>
-{
+public class NbtSaveHandler<E> {
+
     private static final String ROOT_KEY = "root";
 
     private final List<NbtSaveRoot<E>> roots = new LinkedList<NbtSaveRoot<E>>();
@@ -70,18 +68,18 @@ public class NbtSaveHandler<E>
     public NBTTagCompound save(E objectToSave) {
         return save(objectToSave, new NBTTagCompound());
     }
+
     /**
      * Called to save data
      *
      * @param objectToSave to pull data from
-     * @param save to push data into
+     * @param save         to push data into
      * @return save object
      */
-    public NBTTagCompound save(E objectToSave, NBTTagCompound save)
-    {
+    public NBTTagCompound save(E objectToSave, NBTTagCompound save) {
         roots.forEach(root -> {
             final NBTTagCompound saveData = root.save(objectToSave);
-            if(saveData != null && !saveData.hasNoTags()) {
+            if (saveData != null && !saveData.hasNoTags()) {
                 save.setTag(root.getSaveKey(), saveData);
             }
         });
@@ -93,15 +91,12 @@ public class NbtSaveHandler<E>
      * Called to load save data
      *
      * @param objectToLoad to push data back into
-     * @param save from minecraft
+     * @param save         from minecraft
      */
-    public void load(E objectToLoad, NBTTagCompound save)
-    {
-        if (save != null && !save.hasNoTags())
-        {
+    public void load(E objectToLoad, NBTTagCompound save) {
+        if (save != null && !save.hasNoTags()) {
             roots.forEach(root -> {
-                if(save.hasKey(root.getSaveKey()))
-                {
+                if (save.hasKey(root.getSaveKey())) {
                     root.load(objectToLoad, save.getCompoundTag(root.getSaveKey()));
                 }
             });
@@ -111,6 +106,7 @@ public class NbtSaveHandler<E>
 
     /**
      * Adds a new parent root for saving against
+     *
      * @param name of the root, can't be "root"
      * @return root created, used .base() to exit back up a layer
      */
@@ -128,4 +124,5 @@ public class NbtSaveHandler<E>
     public NbtSaveRoot<E> mainRoot() {
         return mainRoot;
     }
+
 }

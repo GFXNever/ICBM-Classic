@@ -63,57 +63,105 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILauncherComponent, IMachineInfo, IPlayerUsing
-{
-    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "cruiseLauncher");
+public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILauncherComponent, IMachineInfo, IPlayerUsing {
 
+    public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "cruiseLauncher");
+    public static final double MISSILE__HOLDER_Y = 2.0;
+    public static final PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher> PACKET_DESCRIPTION =
+        (PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>) new PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>(REGISTRY_NAME,
+            "description")
+            .fromServer()
+            .nodeItemStack((t) -> t.missileHolder.getMissileStack(), (t, f) -> t.cachedMissileStack = f)
+            .nodeVec3d(TileCruiseLauncher::getTarget, TileCruiseLauncher::setTarget)
+            .nodeDouble(t -> t.currentAim.yaw(), (t, f) -> t.currentAim.setYaw(f))
+            .nodeDouble(t -> t.currentAim.pitch(), (t, f) -> t.currentAim.setPitch(f));
+    public static final PacketCodexTile<TileCruiseLauncher, RadioCruise> PACKET_RADIO_HZ =
+        (PacketCodexTile<TileCruiseLauncher, RadioCruise>) new PacketCodexTile<TileCruiseLauncher, RadioCruise>(REGISTRY_NAME, "radio.frequency",
+            (t) -> t.radio)
+            .fromClient()
+            .nodeString(RadioCruise::getChannel, RadioCruise::setChannel)
+            .onFinished((r, t, p) -> r.markDirty());
+    public static final PacketCodexTile<TileCruiseLauncher, RadioCruise> PACKET_RADIO_DISABLE =
+        (PacketCodexTile<TileCruiseLauncher, RadioCruise>) new PacketCodexTile<TileCruiseLauncher, RadioCruise>(REGISTRY_NAME, "radio.disable",
+            (t) -> t.radio)
+            .fromClient()
+            .toggleBoolean(RadioCruise::isDisabled, RadioCruise::setDisabled)
+            .onFinished((r, t, p) -> r.markDirty());
+    public static final PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher> PACKET_TARGET =
+        (PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>) new PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>(REGISTRY_NAME, "target")
+            .fromClient()
+            .nodeVec3d(TileCruiseLauncher::getTarget, TileCruiseLauncher::setTarget)
+            .onFinished((r, t, p) -> r.markDirty());
+        //TODO change UI to only have yaw and pitch, drop xyz but still allow tools to auto fill from xyz
+    public static final PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher> PACKET_GUI =
+        (PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>) new PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>(REGISTRY_NAME, "gui")
+            .fromClient()
+            .nodeInt((t) -> t.energyStorage.getEnergyStored(), (t, i) -> t.energyStorage.setEnergyStored(i))
+            .nodeString((t) -> t.radio.getChannel(), (t, s) -> t.radio.setChannel(s))
+            .nodeBoolean((t) -> t.radio.isDisabled(), (t, b) -> t.radio.setDisabled(b))
+            .nodeVec3d(TileCruiseLauncher::getTarget, TileCruiseLauncher::setTarget);
+    public static final PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher> PACKET_LAUNCH =
+        (PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>) new PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>(REGISTRY_NAME, "launch")
+            .fromClient()
+            .onFinished((tile, target, player) -> {
+                final EntityCause cause = new EntityCause(player); // TODO note was UI interaction
+                tile.getLauncher()
+                    .launch(new BasicTargetData(tile.getTarget()), cause, false); // TODO send feedback to UI as part of a event list or history
+                tile.markDirty();
+            });
     private static final int REDSTONE_CHECK_RATE = 1;
     private static final double ROTATION_SPEED = 10.0;
-
-    public static final double MISSILE__HOLDER_Y = 2.0;
-
-    /** Target position of the launcher */
-    private Vec3d _targetPos = Vec3d.ZERO;
-
-    /** Desired aim angle, updated every tick if target != null */
+    private static final NbtSaveHandler<TileCruiseLauncher> SAVE_LOGIC = new NbtSaveHandler<TileCruiseLauncher>()
+        .mainRoot()
+        /* */.nodeINBTSerializable(NBTConstants.INVENTORY, launcher -> launcher.inventory)
+        /* */.nodeINBTSerializable("radio", launcher -> launcher.radio)
+        /* */.nodeVec3d(NBTConstants.TARGET, launcher -> launcher._targetPos, (launcher, pos) -> launcher._targetPos = pos)
+        /* */.nodeEulerAngle(NBTConstants.CURRENT_AIM, launcher -> launcher.currentAim, (launcher, pos) -> launcher.currentAim.set(pos))
+        /* */.nodeINBTSerializable("firing_package", launcher -> launcher.firingPackage)
+        /* */.nodeInteger("energy", tile -> tile.energyStorage.getEnergyStored(), (tile, i) -> tile.energyStorage.setEnergyStored(i))
+        /* */.nodeINBTSerializable("launcher", launcher -> launcher.launcher)
+        .base();
+    public final RadioCruise radio = new RadioCruise(this);
+    /**
+     * Desired aim angle, updated every tick if target != null
+     */
     @Getter
-    protected final EulerAngle aim = new EulerAngle(0, 0, 0); //TODO change UI to only have yaw and pitch, drop xyz but still allow tools to auto fill from xyz
-
-    /** Current aim angle, updated each tick */
+    protected final EulerAngle aim = new EulerAngle(0, 0, 0);
+    /**
+     * Current aim angle, updated each tick
+     */
     @Getter
     protected final EulerAngle currentAim = new EulerAngle(0, 0, 0);
-
-    /** Last time rotation was updated, used in {@link EulerAngle#lerp(EulerAngle, double)} function for smooth rotation */
-    protected long lastRotationUpdate = System.nanoTime();
-
-    /** Percent of time that passed since last tick, should be 1.0 on a stable server */
-    protected double deltaTime;
-
-    protected ItemStack cachedMissileStack = ItemStack.EMPTY;
-
+    @Getter
+    protected final CLauncherCapability launcher = new CLauncherCapability(this);
+    private final LauncherNode launcherNode = new LauncherNode(this, true);
+    private final TickDoOnce descriptionPacketSender = new TickDoOnce((t) -> PACKET_DESCRIPTION.sendToAllAround(this));
     public final EnergyBuffer energyStorage = new EnergyBuffer(() -> ConfigLauncher.POWER_CAPACITY)
-        .withOnChange((p,c,s) -> this.markDirty());
+        .withOnChange((p, c, s) -> this.markDirty());
     public final InventoryWithSlots inventory = new InventoryWithSlots(2)
         .withChangeCallback((s, i) -> markDirty())
         .withSlot(new InventorySlot(0, ICBMClassicHelpers::isMissile).withChangeCallback((stack) -> this.markDirty()))
         .withSlot(new InventorySlot(1, EnergySystem::isEnergyItem).withTick(this.energyStorage::dischargeItem));
-
     @Getter
     protected final CapabilityMissileHolder missileHolder = new CapabilityMissileHolder(inventory, 0);
-
-    @Getter
-    protected final CLauncherCapability launcher = new CLauncherCapability(this);
-
-    @Getter @Setter
-    protected FiringPackage firingPackage;
-
-    private final LauncherNode launcherNode = new LauncherNode(this, true);
-    public final RadioCruise radio = new RadioCruise(this);
-
-    private final TickDoOnce descriptionPacketSender = new TickDoOnce((t) -> PACKET_DESCRIPTION.sendToAllAround(this));
-
     @Getter
     private final List<EntityPlayer> playersUsing = new LinkedList<>();
+    /**
+     * Last time rotation was updated, used in {@link EulerAngle#lerp(EulerAngle, double)} function for smooth rotation
+     */
+    protected long lastRotationUpdate = System.nanoTime();
+    /**
+     * Percent of time that passed since last tick, should be 1.0 on a stable server
+     */
+    protected double deltaTime;
+    protected ItemStack cachedMissileStack = ItemStack.EMPTY;
+    @Getter
+    @Setter
+    protected FiringPackage firingPackage;
+    /**
+     * Target position of the launcher
+     */
+    private Vec3d _targetPos = Vec3d.ZERO;
 
     public TileCruiseLauncher() {
         tickActions.add(descriptionPacketSender);
@@ -124,11 +172,15 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
         tickActions.add(inventory);
     }
 
+    public static void register() {
+        GameRegistry.registerTileEntity(TileCruiseLauncher.class, REGISTRY_NAME);
+        PacketCodexReg.register(PACKET_DESCRIPTION, PACKET_RADIO_HZ, PACKET_RADIO_DISABLE, PACKET_TARGET, PACKET_GUI, PACKET_LAUNCH);
+    }
+
     @Override
-    public void markDirty()
-    {
+    public void markDirty() {
         super.markDirty();
-        if(isServer()) {
+        if (isServer()) {
             descriptionPacketSender.doNext();
         }
     }
@@ -144,19 +196,16 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
     }
 
     @Override
-    public void onLoad()
-    {
+    public void onLoad() {
         super.onLoad();
         launcherNode.connectToTiles();
-        if (isServer())
-        {
+        if (isServer()) {
             RadioRegistry.add(radio);
         }
     }
 
     @Override
-    public void invalidate()
-    {
+    public void invalidate() {
         if (isServer()) {
             RadioRegistry.remove(radio);
         }
@@ -174,27 +223,18 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
      *
      * @return The string to be displayed
      */
-    public ITextComponent getStatusTranslation()
-    {
-        if (!hasChargeToFire())
-        {
+    public ITextComponent getStatusTranslation() {
+        if (!hasChargeToFire()) {
             return new TextComponentTranslation(LauncherLangs.ERROR_NO_POWER);
         }
         // Checks for empty slot
-        else if (!missileHolder.hasMissile())
-        {
+        else if (!missileHolder.hasMissile()) {
             return new TextComponentTranslation(LauncherLangs.ERROR_MISSILE_NONE);
-        }
-        else if (!hasTarget())
-        {
+        } else if (!hasTarget()) {
             return new TextComponentTranslation(LauncherLangs.ERROR_TARGET_NONE);
-        }
-        else if (this.isTooClose(getTarget()))
-        {
-           return new TextComponentTranslation(LauncherLangs.ERROR_TARGET_MIN);
-        }
-        else if (!canSpawnMissileWithNoCollision())
-        {
+        } else if (this.isTooClose(getTarget())) {
+            return new TextComponentTranslation(LauncherLangs.ERROR_TARGET_MIN);
+        } else if (!canSpawnMissileWithNoCollision()) {
             return new TextComponentTranslation(LauncherLangs.ERROR_MISSILE_SPACE);
         }
 
@@ -204,8 +244,7 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
     }
 
     @Override
-    public void update()
-    {
+    public void update() {
         super.update();
 
         //TODO add a per tick energy consumption or at least while aiming
@@ -214,8 +253,7 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
         lastRotationUpdate = System.nanoTime();
 
 
-
-        if(isServer()) {
+        if (isServer()) {
 
             // Update current aim
             currentAim.moveTowards(aim, ROTATION_SPEED, deltaTime).clampTo360();
@@ -223,13 +261,14 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
             // Check redstone
             if (this.ticks % REDSTONE_CHECK_RATE == 0) { // TODO fix to check on block update instead of every tick
                 if (this.world.isBlockPowered(this.pos)) {
-                    firingPackage = new FiringPackage(new BasicTargetData(getTarget()), new RedstoneCause(getWorld(), getPos(), getBlockState(), null), 0);
+                    firingPackage =
+                        new FiringPackage(new BasicTargetData(getTarget()), new RedstoneCause(getWorld(), getPos(), getBlockState(), null), 0);
                 }
             }
 
-            if(firingPackage != null && isAimed()) {
+            if (firingPackage != null && isAimed()) {
                 firingPackage.setCountDown(firingPackage.getCountDown() - 1);
-                if(firingPackage.getCountDown() <= 0) {
+                if (firingPackage.getCountDown() <= 0) {
                     firingPackage.launch(launcher);
                     firingPackage = null;
                 }
@@ -237,48 +276,22 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
         }
     }
 
-
-    public void setTarget(Vec3d target)
-    {
-        if(!Objects.equals(target, this._targetPos)) {
-
-            // Only fire packet server side to avoid description packet triggering events
-            if(isServer()) {
-                final LauncherSetTargetEvent event = new LauncherSetTargetEvent(world, getPos(), target);
-
-                if (!MinecraftForge.EVENT_BUS.post(event)) {
-                    this._targetPos = event.target == null ? Vec3d.ZERO : event.target;
-                    this.markDirty();
-                }
-            }
-            else {
-                this._targetPos = target;
-            }
-            updateAimAngle();
-        }
-    }
-
     public boolean isAimed() {
         return currentAim.isWithin(aim, 0.01);
     }
 
-    protected void updateAimAngle()
-    {
-        if (hasTarget())
-        {
+    protected void updateAimAngle() {
+        if (hasTarget()) {
             final Vec3d aimPoint = getTarget();
             final Pos center = new Pos(this).add(0.5, MISSILE__HOLDER_Y, 0.5);
             aim.set(center.toEulerAngle(aimPoint).clampTo360());
             aim.setYaw(EulerAngle.clampPos360(aim.yaw()));
-        }
-        else
-        {
+        } else {
             aim.set(0, 0, 0);
         }
     }
 
-    protected void initFromLoad()
-    {
+    protected void initFromLoad() {
         cachedMissileStack = inventory.getStackInSlot(0);
         updateAimAngle();
         currentAim.set(aim);
@@ -286,79 +299,69 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
-    {
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         super.onDataPacket(net, pkt);
         initFromLoad();
     }
 
     //@Override
-    public boolean canLaunch()
-    {
+    public boolean canLaunch() {
         return hasTarget()
-                && isAimed()
-                && missileHolder.hasMissile()
-                && hasChargeToFire()
-                && !this.isTooClose(this.getTarget())
-                && canSpawnMissileWithNoCollision();
+            && isAimed()
+            && missileHolder.hasMissile()
+            && hasChargeToFire()
+            && !this.isTooClose(this.getTarget())
+            && canSpawnMissileWithNoCollision();
     }
 
-    protected boolean hasTarget()
-    {
+    protected boolean hasTarget() {
         return getTarget() != null && getTarget() != Vec3d.ZERO;
     }
 
-    protected boolean hasChargeToFire()
-    {
+    protected boolean hasChargeToFire() {
         return this.energyStorage.consumePower(getFiringCost(), true);
     }
 
-    protected boolean canSpawnMissileWithNoCollision()
-    {
+    protected boolean canSpawnMissileWithNoCollision() {
         //Make sure there is noting above us to hit when spawning the missile
         // TODO use raytrace to detect collision so we can fire out of holes
-         for (int y = 1; y <= 2; y++) {
-             for (int x = -1; x < 2; x++) {
-                 for (int z = -1; z < 2; z++) {
-                     final BlockPos pos = getPos().add(x, y, z);
-                     final IBlockState state = world.getBlockState(pos);
-                     Block block = state.getBlock();
-                     if (!block.isAir(state, world, pos)) {
-                         return false;
-                     }
-                 }
-             }
-         }
+        for (int y = 1; y <= 2; y++) {
+            for (int x = -1; x < 2; x++) {
+                for (int z = -1; z < 2; z++) {
+                    final BlockPos pos = getPos().add(x, y, z);
+                    final IBlockState state = world.getBlockState(pos);
+                    Block block = state.getBlock();
+                    if (!block.isAir(state, world, pos)) {
+                        return false;
+                    }
+                }
+            }
+        }
         return true;
     }
 
     // Is the target too close?
-    public boolean isTooClose(Vec3d target)
-    {
+    public boolean isTooClose(Vec3d target) {
         return new Pos(getPos()).add(0.5).distance(target) < 20; //TODO remove pos usage
     }
 
     @Override
-    public AxisAlignedBB getRenderBoundingBox()
-    {
+    public AxisAlignedBB getRenderBoundingBox() {
         return new AxisAlignedBB(getPos().add(-2, 0, -2), getPos().add(2, 3, 2));
     }
 
     @Override
-    public Object getServerGuiElement(int id, EntityPlayer player)
-    {
+    public Object getServerGuiElement(int id, EntityPlayer player) {
         return new ContainerCruiseLauncher(player, this);
     }
 
     @Override
-    public Object getClientGuiElement(int id, EntityPlayer player)
-    {
+    public Object getClientGuiElement(int id, EntityPlayer player) {
         return new GuiCruiseLauncher(player, this);
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
-    {
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
         return super.hasCapability(capability, facing)
             || capability == CapabilityEnergy.ENERGY && ConfigMain.REQUIRES_POWER
             || capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
@@ -369,105 +372,61 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
 
     @Override
     @Nullable
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
-    {
-        if(capability == CapabilityEnergy.ENERGY) {
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capability == CapabilityEnergy.ENERGY) {
             return (T) energyStorage;
-        }
-        else if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-        {
+        } else if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             return (T) inventory;
-        } else if (capability == ICBMClassicAPI.MISSILE_HOLDER_CAPABILITY)
-        {
+        } else if (capability == ICBMClassicAPI.MISSILE_HOLDER_CAPABILITY) {
             return (T) missileHolder;
-        }
-        else if(capability == ICBMClassicAPI.MISSILE_LAUNCHER_CAPABILITY) {
+        } else if (capability == ICBMClassicAPI.MISSILE_LAUNCHER_CAPABILITY) {
             return (T) launcher;
-        }
-        else if(capability == ICBMClassicAPI.RADIO_CAPABILITY)
-        {
+        } else if (capability == ICBMClassicAPI.RADIO_CAPABILITY) {
             return (T) radio;
         }
         return super.getCapability(capability, facing);
     }
 
-    public Vec3d getTarget()
-    {
-        if (this._targetPos == null)
-        {
+    public Vec3d getTarget() {
+        if (this._targetPos == null) {
             this._targetPos = Vec3d.ZERO;
         }
         return this._targetPos;
     }
 
+    public void setTarget(Vec3d target) {
+        if (!Objects.equals(target, this._targetPos)) {
+
+            // Only fire packet server side to avoid description packet triggering events
+            if (isServer()) {
+                final LauncherSetTargetEvent event = new LauncherSetTargetEvent(world, getPos(), target);
+
+                if (!MinecraftForge.EVENT_BUS.post(event)) {
+                    this._targetPos = event.target == null ? Vec3d.ZERO : event.target;
+                    this.markDirty();
+                }
+            } else {
+                this._targetPos = target;
+            }
+            updateAimAngle();
+        }
+    }
+    ;
+
     @Override
-    public void readFromNBT(NBTTagCompound nbt)
-    {
+    public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         SAVE_LOGIC.load(this, nbt);
-        if(nbt.hasKey(NBTConstants.FREQUENCY)) {
+        if (nbt.hasKey(NBTConstants.FREQUENCY)) {
             this.radio.setChannel(Integer.toString(nbt.getInteger(NBTConstants.FREQUENCY)));
         }
         initFromLoad();
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-    {
+    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         SAVE_LOGIC.save(this, nbt);
         return super.writeToNBT(nbt);
     }
 
-    private static final NbtSaveHandler<TileCruiseLauncher> SAVE_LOGIC = new NbtSaveHandler<TileCruiseLauncher>()
-        .mainRoot()
-        /* */.nodeINBTSerializable(NBTConstants.INVENTORY, launcher -> launcher.inventory)
-        /* */.nodeINBTSerializable("radio", launcher -> launcher.radio)
-        /* */.nodeVec3d(NBTConstants.TARGET, launcher -> launcher._targetPos, (launcher, pos) -> launcher._targetPos = pos)
-        /* */.nodeEulerAngle(NBTConstants.CURRENT_AIM, launcher -> launcher.currentAim, (launcher, pos) -> launcher.currentAim.set(pos))
-        /* */.nodeINBTSerializable("firing_package", launcher -> launcher.firingPackage)
-        /* */.nodeInteger("energy", tile -> tile.energyStorage.getEnergyStored(), (tile, i) -> tile.energyStorage.setEnergyStored(i))
-        /* */.nodeINBTSerializable("launcher", launcher -> launcher.launcher)
-        .base();
-
-    public static void register() {
-        GameRegistry.registerTileEntity(TileCruiseLauncher.class, REGISTRY_NAME);
-        PacketCodexReg.register(PACKET_DESCRIPTION, PACKET_RADIO_HZ, PACKET_RADIO_DISABLE, PACKET_TARGET, PACKET_GUI, PACKET_LAUNCH);
-    }
-
-    public static final PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher> PACKET_DESCRIPTION = (PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>) new PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>(REGISTRY_NAME, "description")
-        .fromServer()
-        .nodeItemStack((t) -> t.missileHolder.getMissileStack(), (t, f) -> t.cachedMissileStack = f)
-        .nodeVec3d(TileCruiseLauncher::getTarget, TileCruiseLauncher::setTarget)
-        .nodeDouble(t -> t.currentAim.yaw(), (t, f) -> t.currentAim.setYaw(f))
-        .nodeDouble(t -> t.currentAim.pitch(), (t, f) -> t.currentAim.setPitch(f));
-
-    public static final PacketCodexTile<TileCruiseLauncher, RadioCruise> PACKET_RADIO_HZ = (PacketCodexTile<TileCruiseLauncher, RadioCruise>) new PacketCodexTile<TileCruiseLauncher, RadioCruise>(REGISTRY_NAME, "radio.frequency", (t) -> t.radio)
-        .fromClient()
-        .nodeString(RadioCruise::getChannel, RadioCruise::setChannel)
-        .onFinished((r, t, p) -> r.markDirty());
-
-    public static final PacketCodexTile<TileCruiseLauncher, RadioCruise> PACKET_RADIO_DISABLE = (PacketCodexTile<TileCruiseLauncher, RadioCruise>) new PacketCodexTile<TileCruiseLauncher, RadioCruise>(REGISTRY_NAME, "radio.disable", (t) -> t.radio)
-        .fromClient()
-        .toggleBoolean(RadioCruise::isDisabled, RadioCruise::setDisabled)
-        .onFinished((r, t, p) -> r.markDirty());
-
-    public static final PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher> PACKET_TARGET = (PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>) new PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>(REGISTRY_NAME, "target")
-        .fromClient()
-        .nodeVec3d(TileCruiseLauncher::getTarget, TileCruiseLauncher::setTarget)
-        .onFinished((r, t, p) -> r.markDirty());;
-
-    public static final PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher> PACKET_GUI = (PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>) new PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>(REGISTRY_NAME, "gui")
-        .fromClient()
-        .nodeInt((t) -> t.energyStorage.getEnergyStored(), (t, i) -> t.energyStorage.setEnergyStored(i))
-        .nodeString((t) -> t.radio.getChannel(), (t, s) -> t.radio.setChannel(s))
-        .nodeBoolean((t) -> t.radio.isDisabled(), (t, b) -> t.radio.setDisabled(b))
-        .nodeVec3d(TileCruiseLauncher::getTarget, TileCruiseLauncher::setTarget);
-
-    public static final PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher> PACKET_LAUNCH = (PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>) new PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>(REGISTRY_NAME, "launch")
-        .fromClient()
-        .onFinished((tile, target, player) -> {
-            final EntityCause cause = new EntityCause(player); // TODO note was UI interaction
-            tile.getLauncher().launch(new BasicTargetData(tile.getTarget()), cause, false); // TODO send feedback to UI as part of a event list or history
-            tile.markDirty();
-        });
 }

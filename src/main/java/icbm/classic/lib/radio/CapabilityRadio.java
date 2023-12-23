@@ -13,6 +13,22 @@ import javax.annotation.Nullable;
 
 public class CapabilityRadio implements IRadio {
 
+    public static void register() {
+        CapabilityManager.INSTANCE.register(IRadio.class, new Capability.IStorage<IRadio>() {
+                @Nullable
+                @Override
+                public NBTBase writeNBT(Capability<IRadio> capability, IRadio instance, EnumFacing side) {
+                    return null;
+                }
+
+                @Override
+                public void readNBT(Capability<IRadio> capability, IRadio instance, EnumFacing side, NBTBase nbt) {
+
+                }
+            },
+            CapabilityRadio::new);
+    }
+
     @Override
     public BlockPos getBlockPos() {
         return null;
@@ -28,21 +44,4 @@ public class CapabilityRadio implements IRadio {
         return null;
     }
 
-    public static void register()
-    {
-        CapabilityManager.INSTANCE.register(IRadio.class, new Capability.IStorage<IRadio>()
-            {
-                @Nullable
-                @Override
-                public NBTBase writeNBT(Capability<IRadio> capability, IRadio instance, EnumFacing side) {
-                    return null;
-                }
-
-                @Override
-                public void readNBT(Capability<IRadio> capability, IRadio instance, EnumFacing side, NBTBase nbt) {
-
-                }
-            },
-            CapabilityRadio::new);
-    }
 }

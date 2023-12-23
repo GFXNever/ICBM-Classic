@@ -21,19 +21,23 @@ public interface IMissileTarget extends IBuildableObject {
 
     /**
      * Getter for x position, assume this is not cached and can change
+     *
      * @return double or NaN if no target is set
      */
     double getX();
 
     /**
      * Getter for y position, assume this is not cached and can change
+     *
      * @return double or NaN if no target is set
      */
     double getY();
 
     /**
      * Getter for z position, assume this is not cached and can change
+     *
      * @return double or NaN if no target is set
      */
     double getZ();
+
 }

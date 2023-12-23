@@ -34,44 +34,15 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
  * <p>
  * Created by Dark(DarkGuardsman, Robert) on 3/12/2018.
  */
-public final class ICBMClassicAPI
-{
+public final class ICBMClassicAPI {
 
     //=========================
     //=== Registry ============
     //=========================
-    /**
-     * Main handler for explosives, do not override as this will break the mod
-     */
-    public static IExplosiveRegistry EXPLOSIVE_REGISTRY;
-
-    public static IExMissileRegistry EX_MISSILE_REGISTRY;
-    public static IExGrenadeRegistry EX_GRENADE_REGISTRY;
-    public static IExBlockRegistry EX_BLOCK_REGISTRY;
-    public static IExMinecartRegistry EX_MINECART_REGISTRY;
-
-    /** Registry for target data save/load in missiles */
-    public static IBuilderRegistry<IMissileTarget> MISSILE_TARGET_DATA_REGISTRY;
-    /** Registry for flight logic save/load in missiles */
-    public static IBuilderRegistry<IMissileFlightLogic> MISSILE_FLIGHT_LOGIC_REGISTRY;
-    /** Registry for missile cause save/load in missiles */
-    public static IBuilderRegistry<IMissileCause> MISSILE_CAUSE_REGISTRY;
-    /** Registry for status messages produced by machines, items, and entities in the mod */
-    public static IBuilderRegistry<IActionStatus> ACTION_STATUS_REGISTRY;
-    /** Registry for explosive customizations */
-    public static IBuilderRegistry<IExplosiveCustomization> EXPLOSIVE_CUSTOMIZATION_REGISTRY;
-    /** Registry for projectile information */
-    public static IProjectileDataRegistry PROJECTILE_DATA_REGISTRY;
-
-    //TODO create missile builder handler that will allow API driven calls to create and spawn missiles in world
-
-
     //=========================
     //=== References ==========
     //=========================
     public static final String ID = "icbmclassic";
-
-
     //=========================
     //=== Content keys ========
     //=========================
@@ -79,7 +50,40 @@ public final class ICBMClassicAPI
     public static final ResourceLocation EX_GRENADE = new ResourceLocation(ID, "grenade");
     public static final ResourceLocation EX_BLOCK = new ResourceLocation(ID, "block");
     public static final ResourceLocation EX_MINECART = new ResourceLocation(ID, "minecart");
+    /**
+     * Main handler for explosives, do not override as this will break the mod
+     */
+    public static IExplosiveRegistry EXPLOSIVE_REGISTRY;
+    public static IExMissileRegistry EX_MISSILE_REGISTRY;
+    public static IExGrenadeRegistry EX_GRENADE_REGISTRY;
+    public static IExBlockRegistry EX_BLOCK_REGISTRY;
+    public static IExMinecartRegistry EX_MINECART_REGISTRY;
+    /**
+     * Registry for target data save/load in missiles
+     */
+    public static IBuilderRegistry<IMissileTarget> MISSILE_TARGET_DATA_REGISTRY;
 
+    //TODO create missile builder handler that will allow API driven calls to create and spawn missiles in world
+    /**
+     * Registry for flight logic save/load in missiles
+     */
+    public static IBuilderRegistry<IMissileFlightLogic> MISSILE_FLIGHT_LOGIC_REGISTRY;
+    /**
+     * Registry for missile cause save/load in missiles
+     */
+    public static IBuilderRegistry<IMissileCause> MISSILE_CAUSE_REGISTRY;
+    /**
+     * Registry for status messages produced by machines, items, and entities in the mod
+     */
+    public static IBuilderRegistry<IActionStatus> ACTION_STATUS_REGISTRY;
+    /**
+     * Registry for explosive customizations
+     */
+    public static IBuilderRegistry<IExplosiveCustomization> EXPLOSIVE_CUSTOMIZATION_REGISTRY;
+    /**
+     * Registry for projectile information
+     */
+    public static IProjectileDataRegistry PROJECTILE_DATA_REGISTRY;
     //=========================
     //=== Capabilities ========
     //=========================
@@ -89,11 +93,15 @@ public final class ICBMClassicAPI
     @CapabilityInject(IExplosive.class)
     public static Capability<IExplosive> EXPLOSIVE_CAPABILITY = null;
 
-    /** Only applies to entities */
+    /**
+     * Only applies to entities
+     */
     @CapabilityInject(IMissile.class)
     public static Capability<IMissile> MISSILE_CAPABILITY = null;
 
-    /** Only applies to ItemStack */
+    /**
+     * Only applies to ItemStack
+     */
     @Deprecated
     @CapabilityInject(ICapabilityMissileStack.class)
     public static Capability<ICapabilityMissileStack> MISSILE_STACK_CAPABILITY = null;
@@ -129,8 +137,7 @@ public final class ICBMClassicAPI
      * @param receiver - receiver
      */
     @Deprecated //Will be placed in a registry/handler
-    public void registerBlockEmpHandler(Block block, IEMPReceiver receiver)
-    {
+    public void registerBlockEmpHandler(Block block, IEMPReceiver receiver) {
         //TODO implement
     }
 

@@ -21,10 +21,8 @@ public class RadarComponent implements IGuiComponent {
     private final TileRadarStation tile;
     private final int x;
     private final int y;
-
-    private GuiContainerBase container;
-
     int meterSpacing = 0;
+    private GuiContainerBase container;
 
     public RadarComponent(TileRadarStation tile, int x, int y) {
         this.tile = tile;
@@ -39,7 +37,7 @@ public class RadarComponent implements IGuiComponent {
 
     @Override
     public void onUpdate() {
-        meterSpacing = (int)Math.floor((this.tile.getDetectionRange() / (float)100) * 40); //TODO consider center grid to chunk bounds
+        meterSpacing = (int) Math.floor((this.tile.getDetectionRange() / (float) 100) * 40); //TODO consider center grid to chunk bounds
     }
 
     @Override
@@ -48,8 +46,10 @@ public class RadarComponent implements IGuiComponent {
         final List<RadarRenderDot> dots = this.tile.getRadarRenderData().getDots();
 
         container.drawString(container.mc.fontRenderer, String.format("%dm", meterSpacing), x + 56, y + 46, MARKER_COLOR);
-        container.drawString(container.mc.fontRenderer, String.format("%d", dots.stream().filter(d -> d.getType() == RadarDotType.HOSTILE).count()), x + 56, y + 2, HOSTILE_COLOR);
-        container.drawString(container.mc.fontRenderer, String.format("%d", dots.stream().filter(d -> d.getType() == RadarDotType.INCOMING).count()), x + 56, y + 14, INCOMING_COLOR);
+        container.drawString(container.mc.fontRenderer, String.format("%d", dots.stream().filter(d -> d.getType() == RadarDotType.HOSTILE).count()),
+            x + 56, y + 2, HOSTILE_COLOR);
+        container.drawString(container.mc.fontRenderer, String.format("%d", dots.stream().filter(d -> d.getType() == RadarDotType.INCOMING).count()),
+            x + 56, y + 14, INCOMING_COLOR);
     }
 
     @Override
@@ -67,30 +67,30 @@ public class RadarComponent implements IGuiComponent {
         final int gy = top + halfUV;
 
         // Grid lines
-        int lineCount = (int) Math.floor(this.tile.getDetectionRange() / (float)meterSpacing) * 2 + 1;
-        float lineSpacing = (meterSpacing / (float)this.tile.getDetectionRange()) * halfUV;
+        int lineCount = (int) Math.floor(this.tile.getDetectionRange() / (float) meterSpacing) * 2 + 1;
+        float lineSpacing = (meterSpacing / (float) this.tile.getDetectionRange()) * halfUV;
 
-        final int lx = gx - (int)((lineCount / 2) * lineSpacing);
-        final int ly = gy - (int)((lineCount / 2) * lineSpacing);
+        final int lx = gx - (int) ((lineCount / 2) * lineSpacing);
+        final int ly = gy - (int) ((lineCount / 2) * lineSpacing);
 
-        for(int i = 0; i < lineCount; i++) {
-            final int x = lx + (int)Math.floor(i * lineSpacing);
+        for (int i = 0; i < lineCount; i++) {
+            final int x = lx + (int) Math.floor(i * lineSpacing);
             Gui.drawRect(x, gy + halfUV, x + 1, gy - halfUV, MARKER_COLOR);
         }
 
-        for(int i = 0; i < lineCount; i++) {
-            final int y = ly + (int)Math.floor(i * lineSpacing);
+        for (int i = 0; i < lineCount; i++) {
+            final int y = ly + (int) Math.floor(i * lineSpacing);
             Gui.drawRect(gx + halfUV, y, gx - halfUV, y + 1, MARKER_COLOR);
         }
 
         // Trigger area
-        int triggerRange = (int)Math.ceil((this.tile.getTriggerRange() / (float)this.tile.getDetectionRange()) * halfUV);
+        int triggerRange = (int) Math.ceil((this.tile.getTriggerRange() / (float) this.tile.getDetectionRange()) * halfUV);
 
         // Trigger bottom line
         Gui.drawRect(gx - triggerRange, gy + triggerRange, gx + triggerRange, gy + triggerRange + 1, TRIGGER_RANGE);
 
         // Trigger top line
-        Gui.drawRect(gx - triggerRange, gy - triggerRange -1, gx + triggerRange, gy - triggerRange, TRIGGER_RANGE);
+        Gui.drawRect(gx - triggerRange, gy - triggerRange - 1, gx + triggerRange, gy - triggerRange, TRIGGER_RANGE);
 
         // Trigger left line
         Gui.drawRect(gx - triggerRange - 1, gy - triggerRange, gx - triggerRange, gy + triggerRange, TRIGGER_RANGE);
@@ -100,20 +100,19 @@ public class RadarComponent implements IGuiComponent {
 
         // Target data
 
-        for(int i = 0 ; i < tile.getRadarRenderData().getDots().size(); i++) {
+        for (int i = 0; i < tile.getRadarRenderData().getDots().size(); i++) {
             final RadarRenderDot dot = tile.getRadarRenderData().getDots().get(i);
 
             final int x = gx + dot.getX();
             final int y = gy + dot.getY();
-            if(dot.getType() == RadarDotType.MARKER) {
+            if (dot.getType() == RadarDotType.MARKER) {
                 Gui.drawRect(x, y, x + 1, y + 1, MARKER_COLOR);
-            }
-            else if(dot.getType() == RadarDotType.HOSTILE) {
+            } else if (dot.getType() == RadarDotType.HOSTILE) {
                 Gui.drawRect(x, y, x + 2, y + 2, HOSTILE_COLOR);
-            }
-            else if(dot.getType() == RadarDotType.INCOMING) {
+            } else if (dot.getType() == RadarDotType.INCOMING) {
                 Gui.drawRect(x, y, x + 2, y + 2, INCOMING_COLOR);
             }
         }
     }
+
 }

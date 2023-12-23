@@ -9,12 +9,12 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class TickDoOnce implements ITick {
 
-    private boolean doAction = false;
     private final Consumer<Integer> action;
+    private boolean doAction = false;
 
     @Override
     public void update(int tick, boolean isServer) {
-        if(doAction) {
+        if (doAction) {
             this.doAction = false;
             action.accept(tick);
         }
@@ -23,4 +23,5 @@ public class TickDoOnce implements ITick {
     public void doNext() {
         this.doAction = true;
     }
+
 }

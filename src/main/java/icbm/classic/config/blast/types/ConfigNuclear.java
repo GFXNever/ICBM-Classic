@@ -37,4 +37,5 @@ public class ConfigNuclear {
     @Config.Comment("Triggers the secondary mutation blast")
     @Config.RangeDouble(min = 1, max = Integer.MAX_VALUE)
     public boolean useMutationBlast = true;
+
 }

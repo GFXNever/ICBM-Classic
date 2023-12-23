@@ -22,11 +22,15 @@ import net.minecraftforge.common.DimensionManager;
 public class BlockCause extends MissileCause implements IMissileCause.IBlockCause {
 
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "block");
-
+    private static final NbtSaveHandler<BlockCause> SAVE_LOGIC = new NbtSaveHandler<BlockCause>()
+        .mainRoot()
+        /* */.nodeInteger("level", BlockCause::getWorldId, BlockCause::setWorldId)
+        /* */.nodeBlockPos("pos", BlockCause::getBlockPos, BlockCause::setBlockPos)
+        /* */.nodeBlockState("state", BlockCause::getBlockState, BlockCause::setBlockState)
+        .base();
     private World world;
     private BlockPos blockPos;
     private IBlockState blockState;
-
     private int worldId;
 
     public BlockCause(World world, BlockPos pos, IBlockState state) {
@@ -37,7 +41,7 @@ public class BlockCause extends MissileCause implements IMissileCause.IBlockCaus
     }
 
     public World getWorld() {
-        if(world == null) {
+        if (world == null) {
             world = DimensionManager.getWorld(worldId);
         }
         return world;
@@ -59,10 +63,4 @@ public class BlockCause extends MissileCause implements IMissileCause.IBlockCaus
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<BlockCause> SAVE_LOGIC = new NbtSaveHandler<BlockCause>()
-        .mainRoot()
-        /* */.nodeInteger("level", BlockCause::getWorldId, BlockCause::setWorldId)
-        /* */.nodeBlockPos("pos", BlockCause::getBlockPos, BlockCause::setBlockPos)
-        /* */.nodeBlockState("state", BlockCause::getBlockState, BlockCause::setBlockState)
-        .base();
 }

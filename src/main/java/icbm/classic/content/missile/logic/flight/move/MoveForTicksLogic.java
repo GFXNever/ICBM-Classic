@@ -16,10 +16,18 @@ import net.minecraft.util.ResourceLocation;
  * Flight logic to move in a direction matching {@link EnumFacing} until a set distance is meet
  */
 public class MoveForTicksLogic extends AccelerateByFacingLogic {
-    public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "engine.move.ticks");
 
-    /** Distance to cover */
-    @Getter @Setter @Accessors(chain = true)
+    public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "engine.move.ticks");
+    private static final NbtSaveHandler<MoveForTicksLogic> SAVE_LOGIC = new NbtSaveHandler<MoveForTicksLogic>()
+        .mainRoot()
+        /* */.nodeInteger("ticks", MoveForTicksLogic::getTicks, MoveForTicksLogic::setTicks)
+        .base();
+    /**
+     * Distance to cover
+     */
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private int ticks;
 
     @Override
@@ -56,8 +64,4 @@ public class MoveForTicksLogic extends AccelerateByFacingLogic {
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<MoveForTicksLogic> SAVE_LOGIC = new NbtSaveHandler<MoveForTicksLogic>()
-        .mainRoot()
-        /* */.nodeInteger("ticks", MoveForTicksLogic::getTicks, MoveForTicksLogic::setTicks)
-        .base();
 }

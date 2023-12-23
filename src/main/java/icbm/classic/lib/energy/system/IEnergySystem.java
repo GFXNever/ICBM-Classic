@@ -4,12 +4,12 @@ import net.minecraft.util.EnumFacing;
 
 /**
  * Wrapper for energy systems
- *
- *
+ * <p>
+ * <p>
  * Created by Dark(DarkGuardsman, Robert) on 3/13/2018.
  */
-public interface IEnergySystem
-{
+public interface IEnergySystem {
+
     /**
      * Can this power system support the object
      *
@@ -80,4 +80,5 @@ public interface IEnergySystem
      * @return energy removed
      */
     int removeEnergy(Object object, EnumFacing side, int energyToRemove, boolean simulate);
+
 }

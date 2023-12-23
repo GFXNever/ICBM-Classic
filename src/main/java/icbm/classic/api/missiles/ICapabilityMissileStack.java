@@ -8,8 +8,7 @@ import net.minecraft.item.ItemStack;
  * Items can either be the missile directly or a container of missile(s)
  */
 @Deprecated // Will be replaced by IProjectileStack
-public interface ICapabilityMissileStack extends ICapabilityMissileBuilder
-{
+public interface ICapabilityMissileStack extends ICapabilityMissileBuilder {
 
     /**
      * Called when a missile is built and
@@ -17,8 +16,8 @@ public interface ICapabilityMissileStack extends ICapabilityMissileBuilder
      *
      * @return stack to return to inventory
      */
-    default ItemStack consumeMissile()
-    {
+    default ItemStack consumeMissile() {
         return ItemStack.EMPTY;
     }
+
 }

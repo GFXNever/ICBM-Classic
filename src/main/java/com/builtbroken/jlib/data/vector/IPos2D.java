@@ -5,29 +5,26 @@ package com.builtbroken.jlib.data.vector;
  *
  * @author DarkGuardsman
  */
-public interface IPos2D
-{
+public interface IPos2D {
+
     double x();
 
     double y();
 
-    default int xi()
-    {
+    default int xi() {
         return (int) Math.floor(x());
     }
 
-    default int yi()
-    {
+    default int yi() {
         return (int) Math.floor(y());
     }
 
-    default float xf()
-    {
+    default float xf() {
         return (float) x();
     }
 
-    default float yf()
-    {
+    default float yf() {
         return (float) y();
     }
+
 }

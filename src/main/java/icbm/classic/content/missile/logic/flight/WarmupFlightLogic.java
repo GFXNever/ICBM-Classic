@@ -20,9 +20,16 @@ import java.util.function.Consumer;
 public class WarmupFlightLogic extends FlightLogic {
 
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "engine.warmup");
-
-    /** Timer for missile to wait on pad before climbing */
-    @Getter @Setter @Accessors(chain = true)
+    private static final NbtSaveHandler<WarmupFlightLogic> SAVE_LOGIC = new NbtSaveHandler<WarmupFlightLogic>()
+        .mainRoot()
+        /* */.nodeInteger("timer", (bl) -> null, (bl, data) -> bl.timer = data)
+        .base();
+    /**
+     * Timer for missile to wait on pad before climbing
+     */
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private int timer = 0;
 
     @Override
@@ -46,8 +53,7 @@ public class WarmupFlightLogic extends FlightLogic {
     }
 
     @Override
-    public boolean shouldDecreaseMotion(Entity entity)
-    {
+    public boolean shouldDecreaseMotion(Entity entity) {
         //Disable gravity and friction
         return timer < 0 && getNextStep() == null;
     }
@@ -78,8 +84,4 @@ public class WarmupFlightLogic extends FlightLogic {
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<WarmupFlightLogic> SAVE_LOGIC = new NbtSaveHandler<WarmupFlightLogic>()
-        .mainRoot()
-            /* */.nodeInteger("timer", (bl) -> null, (bl, data) -> bl.timer = data)
-        .base();
 }

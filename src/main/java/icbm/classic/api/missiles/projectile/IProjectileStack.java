@@ -2,15 +2,14 @@ package icbm.classic.api.missiles.projectile;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 
 /**
  * Version of capability to apply specific to ItemStacks for additional features
  * <p>
  * Items can either be the projectile directly or a container of missile(s)
  */
-public interface IProjectileStack<E extends Entity>
-{
+public interface IProjectileStack<E extends Entity> {
+
     /**
      * Gets data for the projectile
      *
@@ -23,14 +22,13 @@ public interface IProjectileStack<E extends Entity>
      * Called to consume the projectile from the
      * stack. Usually called after the projectile is built
      * and spawned into the world.
-     *
+     * <p>
      * If this is a single projectile then return empty. If not
      * then return the container.
      *
      * @return stack to return to inventory
      */
-    default ItemStack consumeProjectile(int count)
-    {
+    default ItemStack consumeProjectile(int count) {
         return ItemStack.EMPTY;
     }
 
@@ -42,4 +40,5 @@ public interface IProjectileStack<E extends Entity>
     default int getProjectiles() {
         return 1;
     }
+
 }

@@ -17,16 +17,14 @@ import java.util.function.Consumer;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 10/8/2018.
  */
-public abstract class BlastThreaded extends Blast
-{
+public abstract class BlastThreaded extends Blast {
+
     private boolean hasThreadStarted = false;
 
-    public BlastThreaded()
-    {
+    public BlastThreaded() {
     }
 
-    protected IThreadWork getWorkerTask()
-    {
+    protected IThreadWork getWorkerTask() {
         return new ThreadWorkBlast(this::doRun, this::onWorkerThreadComplete);
     }
 
@@ -42,13 +40,11 @@ public abstract class BlastThreaded extends Blast
      *
      * @return
      */
-    protected Comparator<BlockPos> buildSorter()
-    {
+    protected Comparator<BlockPos> buildSorter() {
         return new PosDistanceSorter(location, false, PosDistanceSorter.Sort.SQ);
     }
 
-    protected void onPostThreadJoinWorld()
-    {
+    protected void onPostThreadJoinWorld() {
         doExplode(-1);
         onBlastCompleted();
     }
@@ -58,22 +54,17 @@ public abstract class BlastThreaded extends Blast
      *
      * @param edits
      */
-    protected void onWorkerThreadComplete(List<BlockPos> edits)
-    {
-        if (world instanceof WorldServer)
-        {
+    protected void onWorkerThreadComplete(List<BlockPos> edits) {
+        if (world instanceof WorldServer) {
             //Sort distance
             edits.sort(buildSorter());
 
             //Schedule edits to run in the world
             ((WorldServer) world).addScheduledTask(() -> {
 
-                if (skipQueue())
-                {
+                if (skipQueue()) {
                     edits.forEach(blockPos -> destroyBlock(blockPos));
-                }
-                else
-                {
+                } else {
                     //Queue edits
                     BlockEditHandler.queue(world, edits, blockPos -> destroyBlock(blockPos));
                 }
@@ -84,16 +75,13 @@ public abstract class BlastThreaded extends Blast
         }
     }
 
-    protected boolean skipQueue()
-    {
+    protected boolean skipQueue() {
         return false;
     }
 
     @Override
-    protected boolean doExplode(int callCount)
-    {
-        if (!hasThreadStarted)
-        {
+    protected boolean doExplode(int callCount) {
+        if (!hasThreadStarted) {
             hasThreadStarted = true;
             WorkerThreadManager.INSTANCE.addWork(getWorkerTask());
         }
@@ -101,16 +89,13 @@ public abstract class BlastThreaded extends Blast
     }
 
     @Override
-    protected void onBlastCompleted()
-    {
+    protected void onBlastCompleted() {
 
     }
 
-    public void destroyBlock(BlockPos pos)
-    {
+    public void destroyBlock(BlockPos pos) {
         IBlockState state = this.world().getBlockState(pos);
-        if (!state.getBlock().isAir(state, world(), pos))
-        {
+        if (!state.getBlock().isAir(state, world(), pos)) {
             state.getBlock().onBlockExploded(this.world(), pos, this);
         }
     }

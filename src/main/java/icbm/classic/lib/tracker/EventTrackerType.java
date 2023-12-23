@@ -21,39 +21,34 @@ import java.util.function.Supplier;
  * Event type, used to encode/decode information about the event.
  */
 public class EventTrackerType {
-    /**
-     * Unique id of the tracker
-     */
-    @Setter(value = AccessLevel.PACKAGE)
-    @Getter
-    private int id;
 
     /**
      * Registry name of the type
      */
     @Getter
     private final ResourceLocation name;
-
     @Getter
     @Accessors(fluent = true)
     private final boolean isError;
-
     @Getter
     @Accessors(fluent = true)
     private final boolean isWarn;
-
     /**
      * Column data for the event
      */
     private final List<EventTrackerField> fields;
-
     @Getter
     private final List<ListenerEntry> listeners;
-
     /**
      * key to value map for column data
      */
     private final HashMap<ResourceLocation, EventTrackerField> keyToField = new HashMap();
+    /**
+     * Unique id of the tracker
+     */
+    @Setter(value = AccessLevel.PACKAGE)
+    @Getter
+    private int id;
 
     private EventTrackerType(ResourceLocation name, boolean isError, boolean isWarn, List<EventTrackerField> fields, List<ListenerEntry> listeners) {
         this.name = name;
@@ -97,6 +92,7 @@ public class EventTrackerType {
     }
 
     public static final class Builder {
+
         private final ResourceLocation name;
         private boolean isError = false;
         private boolean isWarn = false;
@@ -189,5 +185,7 @@ public class EventTrackerType {
             //TODO fire event to allow adding custom columns and listeners
             return type;
         }
+
     }
+
 }

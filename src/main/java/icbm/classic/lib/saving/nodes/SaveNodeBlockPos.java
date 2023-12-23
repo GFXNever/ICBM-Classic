@@ -7,14 +7,13 @@ import net.minecraft.util.math.BlockPos;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class SaveNodeBlockPos<E> extends NbtSaveNode<E, NBTTagCompound>
-{
+public class SaveNodeBlockPos<E> extends NbtSaveNode<E, NBTTagCompound> {
+
     public SaveNodeBlockPos(final String name, Function<E, BlockPos> save, BiConsumer<E, BlockPos> load) {
         super(name,
             (obj) -> {
                 final BlockPos pos = save.apply(obj);
-                if (pos != null)
-                {
+                if (pos != null) {
                     final NBTTagCompound compound = new NBTTagCompound();
                     compound.setInteger("x", pos.getX());
                     compound.setInteger("y", pos.getY());
@@ -33,4 +32,5 @@ public class SaveNodeBlockPos<E> extends NbtSaveNode<E, NBTTagCompound>
             }
         );
     }
+
 }

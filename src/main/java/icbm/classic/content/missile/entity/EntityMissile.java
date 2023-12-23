@@ -50,22 +50,40 @@ import java.util.Optional;
  * Created by Robin Seifert on 12/12/2021.
  */
 public abstract class EntityMissile<E extends EntityMissile<E>> extends EntityProjectile<E> implements IEntityAdditionalSpawnData, IPacketIDReceiver {
+
+    private static final NbtSaveHandler<EntityMissile> SAVE_LOGIC = new NbtSaveHandler<EntityMissile>()
+        .mainRoot()
+        /* */.node(new NbtSaveNode<EntityMissile, NBTTagCompound>("missile",
+            (missile) -> missile.getMissileCapability().serializeNBT(),
+            (missile, data) -> missile.getMissileCapability().deserializeNBT(data)
+        ))
+        .base();
+    public static final PacketCodexEntity<EntityMissile, EntityMissile> PACKET_DESC =
+        (PacketCodexEntity<EntityMissile, EntityMissile>) new PacketCodexEntity<EntityMissile, EntityMissile>(
+            new ResourceLocation(ICBMConstants.DOMAIN, "missile"), "description")
+            .nodeNbtCompound(SAVE_LOGIC::save, SAVE_LOGIC::load);
+
+    static {
+        PacketCodexReg.register(PACKET_DESC);
+    }
+
     // Generic shared missile data
     private final HashSet<Entity> collisionIgnoreList = new HashSet<Entity>();
-
-    private CapabilityMissile missileCapability; //TODO refactor to use interface so parts can be better customized
-    private final IEMPReceiver empCapability = new CapabilityEmpMissile(getMissileCapability());
-
     /**
      * Toggle to note the missile has impacted something and already triggered impact logic
      */
     protected boolean hasImpacted = false;
-
     protected boolean syncClient = false;
+    private CapabilityMissile missileCapability; //TODO refactor to use interface so parts can be better customized
+    private final IEMPReceiver empCapability = new CapabilityEmpMissile(getMissileCapability());
 
     public EntityMissile(World world) {
         super(world);
         this.hasHealth = true;
+    }
+
+    public static boolean hasPlayerRiding(Entity entity) {
+        return entity.getPassengers().stream().anyMatch(e -> e instanceof EntityPlayer || hasPlayerRiding(e));
     }
 
     @Override
@@ -124,7 +142,8 @@ public abstract class EntityMissile<E extends EntityMissile<E>> extends EntityPr
 
                 if (logic.shouldRunEngineEffects(this)) {
                     ICBMClassic.proxy.spawnMissileSmoke(this, logic, ticksInAir);
-                    ICBMSounds.MISSILE_ENGINE.play(world, posX, posY, posZ, Math.min(1, ticksInAir / 40F), (1.0F + CalculationHelpers.randFloatRange(this.world.rand, 0.2F)) * 0.7F, true);
+                    ICBMSounds.MISSILE_ENGINE.play(world, posX, posY, posZ, Math.min(1, ticksInAir / 40F),
+                        (1.0F + CalculationHelpers.randFloatRange(this.world.rand, 0.2F)) * 0.7F, true);
                 }
             });
 
@@ -213,7 +232,8 @@ public abstract class EntityMissile<E extends EntityMissile<E>> extends EntityPr
     @Override
     public boolean processInitialInteract(@Nonnull EntityPlayer player, @Nonnull EnumHand hand) {
         //Handle player riding missile
-        if (!this.world.isRemote && (this.getRidingEntity() == null || this.getRidingEntity() == player) && !MinecraftForge.EVENT_BUS.post(new MissileRideEvent.Start(getMissileCapability(), player))) {
+        if (!this.world.isRemote && (this.getRidingEntity() == null || this.getRidingEntity() == player) && !MinecraftForge.EVENT_BUS.post(
+            new MissileRideEvent.Start(getMissileCapability(), player))) {
             player.startRiding(this);
             return true;
         }
@@ -254,10 +274,6 @@ public abstract class EntityMissile<E extends EntityMissile<E>> extends EntityPr
 
     public boolean hasPlayerRiding() {
         return hasPlayerRiding(this);
-    }
-
-    public static boolean hasPlayerRiding(Entity entity) {
-        return entity.getPassengers().stream().anyMatch(e -> e instanceof EntityPlayer || hasPlayerRiding(e));
     }
 
     @Override
@@ -330,20 +346,6 @@ public abstract class EntityMissile<E extends EntityMissile<E>> extends EntityPr
         SAVE_LOGIC.save(this, nbt);
     }
 
-    private static final NbtSaveHandler<EntityMissile> SAVE_LOGIC = new NbtSaveHandler<EntityMissile>()
-        .mainRoot()
-        /* */.node(new NbtSaveNode<EntityMissile, NBTTagCompound>("missile",
-            (missile) -> missile.getMissileCapability().serializeNBT(),
-            (missile, data) -> missile.getMissileCapability().deserializeNBT(data)
-        ))
-        .base();
-
-    public static final PacketCodexEntity<EntityMissile, EntityMissile> PACKET_DESC = (PacketCodexEntity<EntityMissile, EntityMissile>) new PacketCodexEntity<EntityMissile, EntityMissile>(new ResourceLocation(ICBMConstants.DOMAIN, "missile"), "description")
-        .nodeNbtCompound(SAVE_LOGIC::save, SAVE_LOGIC::load);
-
-    static {
-        PacketCodexReg.register(PACKET_DESC);
-    }
-
     public abstract ItemStack toStack();
+
 }

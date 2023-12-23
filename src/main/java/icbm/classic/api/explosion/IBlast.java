@@ -13,11 +13,11 @@ import javax.annotation.Nullable;
  *
  * @author Calclavia, Darkguardsman
  */
-public interface IBlast extends IWorldPosition
-{
+public interface IBlast extends IWorldPosition {
+
     /**
      * Gets the radius/size of the effect of the blast.
-     *
+     * <p>
      * This not always the full effect range of the blast.
      * Rather is used more as a scale factor
      *
@@ -75,8 +75,7 @@ public interface IBlast extends IWorldPosition
      * @return controller
      */
     @Nullable
-    default Entity getEntity()
-    {
+    default Entity getEntity() {
         return null;
     }
 
@@ -86,8 +85,7 @@ public interface IBlast extends IWorldPosition
      * @return entity, can be null
      */
     @Nullable
-    default Entity getBlastSource()
-    {
+    default Entity getBlastSource() {
         return getEntity();
     }
 
@@ -96,4 +94,5 @@ public interface IBlast extends IWorldPosition
      * should only be used by server utilities and commands.
      */
     void clearBlast();
+
 }

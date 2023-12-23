@@ -11,12 +11,16 @@ import java.util.UUID;
 
 public abstract class LauncherBaseCapability implements IMissileLauncher, INBTSerializable<NBTTagCompound> {
 
+    private static final NbtSaveHandler<LauncherBaseCapability> SAVE_LOGIC = new NbtSaveHandler<LauncherBaseCapability>()
+        .mainRoot()
+        /* */.nodeUUID("uniqueId", LauncherBaseCapability::getUniqueId, LauncherBaseCapability::setUniqueId)
+        .base();
     @Setter(value = AccessLevel.PRIVATE)
     private UUID uniqueId;
 
     @Override
     public UUID getUniqueId() {
-        if(uniqueId == null) {
+        if (uniqueId == null) {
             uniqueId = UUID.randomUUID();
         }
         return uniqueId;
@@ -29,11 +33,7 @@ public abstract class LauncherBaseCapability implements IMissileLauncher, INBTSe
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
-       SAVE_LOGIC.load(this, nbt);
+        SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<LauncherBaseCapability> SAVE_LOGIC = new NbtSaveHandler<LauncherBaseCapability>()
-        .mainRoot()
-        /* */.nodeUUID("uniqueId", LauncherBaseCapability::getUniqueId, LauncherBaseCapability::setUniqueId)
-        .base();
 }

@@ -7,40 +7,10 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 
 @Deprecated //We don't want to have a master file for data that is not exposed as an API
-public class NBTConstants
-{
-    /* Verifies that the nbt tag constants are distinct (only exist once).
-     * This ensures that save files don't get corrupted. (Imagine writing a byte-array and an integer with the
-     * same name and then trying to load that again)
-     *
-     * FAILING THIS CHECK WILL RESULT IN A CRASH!
-     *
-     */
-    public static void ensureThatAllTagNamesAreDistinct()
-    {
-        Field[] fields = NBTConstants.class.getDeclaredFields(); // grab all fields
-        LinkedList<String> alreadySeen = new LinkedList<>(); // keep track of all already seen fields
-        for (Field field : fields) { // iterate the fields
-            try {
-                String value = (String)field.get(null); // get the field's value
-                if (alreadySeen.contains(value)) { // check if an equal value was seen before
-                    // crash the game to prevent save corruptions
-                    ICBMClassic.logger().log(Level.FATAL, "FAILED AND NBT INIT CHECK! This is a severe problem as it can cause save data to get messed up. Because of this the game is going to crash now. Please report this! Conflicting value: " + value);
-                    throw new RuntimeException( "ICBM Classic failed an nbt init check! Fatal conflict: " + value);
-                }
-                else
-                {
-                    alreadySeen.add(value); // add value to check against it later
-                }
-            } catch (IllegalAccessException ex) {
-                ICBMClassic.logger().log(Level.ERROR, "Illegal access exception thrown while checking nbt tags! Please report this!" + ex.toString());
-            }
-        }
-    }
+public class NBTConstants {
 
     public static final String ACCELERATION = "acceleration";
     public static final String ADDITIONAL_MISSILE_DATA = "additionalMissileData";
-
     public static final String BLAST = "blast";
     public static final String BLAST_DATA = "blastData";
     public static final String BLAST_EXPLODER_ENT_ID = "blastExpEntId";
@@ -90,7 +60,6 @@ public class NBTConstants
     public static final String PUSH_TYPE = "pushType";
     public static final String RED = "red";
     public static final String ROLL = "roll";
-
     public static final String SHAKE = "shake";
     public static final String SLOT = "Slot";
     public static final String SPAWNS = "spawns";
@@ -106,6 +75,34 @@ public class NBTConstants
     public static final String TRACKING_ENTITY = "trackingEntity";
     public static final String X = "x";
     public static final String Y = "y";
-    public static final String YAW  = "yaw";
+    public static final String YAW = "yaw";
     public static final String Z = "z";
+
+    /* Verifies that the nbt tag constants are distinct (only exist once).
+     * This ensures that save files don't get corrupted. (Imagine writing a byte-array and an integer with the
+     * same name and then trying to load that again)
+     *
+     * FAILING THIS CHECK WILL RESULT IN A CRASH!
+     *
+     */
+    public static void ensureThatAllTagNamesAreDistinct() {
+        Field[] fields = NBTConstants.class.getDeclaredFields(); // grab all fields
+        LinkedList<String> alreadySeen = new LinkedList<>(); // keep track of all already seen fields
+        for (Field field : fields) { // iterate the fields
+            try {
+                String value = (String) field.get(null); // get the field's value
+                if (alreadySeen.contains(value)) { // check if an equal value was seen before
+                    // crash the game to prevent save corruptions
+                    ICBMClassic.logger().log(Level.FATAL,
+                        "FAILED AND NBT INIT CHECK! This is a severe problem as it can cause save data to get messed up. Because of this the game is going to crash now. Please report this! Conflicting value: " + value);
+                    throw new RuntimeException("ICBM Classic failed an nbt init check! Fatal conflict: " + value);
+                } else {
+                    alreadySeen.add(value); // add value to check against it later
+                }
+            } catch (IllegalAccessException ex) {
+                ICBMClassic.logger().log(Level.ERROR, "Illegal access exception thrown while checking nbt tags! Please report this!" + ex.toString());
+            }
+        }
+    }
+
 }

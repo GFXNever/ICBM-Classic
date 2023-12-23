@@ -12,16 +12,16 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  * not activate the affected launcher.
  */
 @Cancelable
-public class RemoteTriggerEvent extends Event
-{
+public class RemoteTriggerEvent extends Event {
+
     public final World world;
     public final EntityPlayer player;
     public final ItemStack stack;
 
-    public RemoteTriggerEvent(World world, EntityPlayer player, ItemStack stack)
-    {
+    public RemoteTriggerEvent(World world, EntityPlayer player, ItemStack stack) {
         this.world = world;
         this.stack = stack;
         this.player = player;
     }
+
 }

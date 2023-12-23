@@ -19,247 +19,9 @@ import net.minecraft.world.World;
 /**
  * Flight path that moves in a ballistic arc from start position to target position
  */
-public class ArcFlightLogic implements IMissileFlightLogic
-{
+public class ArcFlightLogic implements IMissileFlightLogic {
+
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "path.arc");
-
-
-    public boolean hasStartedFlight = false;
-    /**
-     * Tick runtime of flight arc
-     */
-    private int missileFlightTime;
-    /**
-     * Motion Y acceleration for arc to work
-     */
-    private float acceleration;
-
-    /**
-     * Difference in distance from target, used as acceleration
-     */
-    private double deltaPathX, deltaPathY, deltaPathZ;
-    private double startX, startY, startZ;
-    private double endX, endY, endZ;
-
-    private boolean flightUpAlways = false;
-
-    private int ticksFlight = 0;
-
-    private boolean wasSimulationBlocked = false;
-
-    @Override
-    public void calculateFlightPath(final World world, double startX, double startY, double startZ, final IMissileTarget targetData)
-    {
-        //Record start and end position
-        this.startX = startX;
-        this.startY = startY;
-        this.startZ = startZ;
-
-        if(targetData != null)
-        {
-            this.endX = targetData.getX();
-            this.endY = targetData.getY();
-            this.endZ = targetData.getZ();
-        }
-
-        // TODO check if entire path is chunk loaded, if a reasonable chunk count isn't then we should notify the user in the launcher UI and change to a up/down flight path
-        //      This likely will require a static function to run the calculation and show in the GUI. However, should be referenced based on the missile type
-        //      As future version might include different guidance systems based on the item's stored data. Meaning a single function wouldn't work but could
-        //      be referenced in a prediction callback. Something like IMissile#getGuidance().doPrediction()
-    }
-
-    //TODO wire IMissile to connect to ILauncher so we can get launcher source and let the launcher know when we are clear
-    //TODO code launcher to not reload until clear, use the all clear flag from the missile combined with collision checks and dead checks
-
-    protected void calculatePath()
-    {
-        //TODO rebuild to calculate arc up to maxHeight and move at a fixed speed instead of speed of sound+++++
-        //TODO once it reaches maxHeight have it fly flat to make for a smoother player riding experience
-        //TODO at end of arc if we can't fix the target offset have the missile fly at an angle strait at the target to fix accuracy issues
-
-        // Calculate the distance difference of the missile
-        this.deltaPathX = endX - startX;
-        this.deltaPathY = endY - startY;
-        this.deltaPathZ = endZ - startZ;
-
-        // TODO: Calculate parabola and relative out the targetHeight.
-        // Calculate the power required to reach the target co-ordinates
-        // Ground Displacement
-        final float flatDistance = (float)Math.sqrt(deltaPathX * deltaPathX + deltaPathZ * deltaPathZ);
-
-        if(flatDistance < 200) {
-
-            //Path constants
-            final float ticksPerMeterFlat = 2f;
-            final float heightToDistanceScale = flatDistance > 1000 ? 3f : 1f;
-            final float maxHeight = 1000f;
-            final float initialArcHeight = flatDistance > 100 ? 160f : 0;
-
-            // Parabolic Height
-            // Ballistic flight vars
-            final float arcHeightMax = Math.min(maxHeight, initialArcHeight + (flatDistance * heightToDistanceScale));
-
-            // Flight time
-            missileFlightTime = (int) Math.ceil(ticksPerMeterFlat * flatDistance);
-
-            // Acceleration
-            double heightToDistance = arcHeightMax / flatDistance;
-            double heightToTime = arcHeightMax / missileFlightTime;
-            double timeToDistance = missileFlightTime / flatDistance;
-            this.acceleration = (float) (((arcHeightMax - heightToDistance) * heightToDistance) / (missileFlightTime / timeToDistance) / (heightToTime * flatDistance));
-        }
-        // If over 200 assume we will missile simulate rather than arc
-        else {
-            flightUpAlways = true;
-        }
-    }
-
-    @Override
-    public void onEntityTick(Entity entity, IMissile missile, int ticksInAir)
-    {
-        //Starts the missile into normal flight
-        if (!hasStartedFlight) {
-
-            hasStartedFlight = true;
-
-            this.startX = entity.posX;
-            this.startY = entity.posY;
-            this.startZ = entity.posZ;
-
-            calculatePath();
-
-            if(!flightUpAlways) {
-
-                entity.motionY = this.acceleration * ((float) missileFlightTime / 2f);
-
-                entity.motionX = this.deltaPathX / missileFlightTime;
-                entity.motionZ = this.deltaPathZ / missileFlightTime;
-            }
-            else {
-                final float flatDistance = (float)Math.sqrt(deltaPathX * deltaPathX + deltaPathZ * deltaPathZ);
-                final float hortSpeed = 0.05f;
-                final float vertSpeed = 2f;
-                entity.motionX = (this.deltaPathX / flatDistance) * hortSpeed;
-                entity.motionZ = (this.deltaPathZ / flatDistance) * hortSpeed;
-                entity.motionY = vertSpeed;
-            }
-        }
-        //Normal path logic
-        else {
-            runFlightLogic(entity, ticksInAir);
-        }
-    }
-
-    protected void runFlightLogic(Entity entity, int ticksInAir)
-    {
-        ticksFlight++;
-
-        if (!entity.world.isRemote)
-        {
-            // Apply gravity
-            if(!flightUpAlways) {
-                entity.motionY -= this.acceleration;
-            }
-
-            // Cut off x-z motion to prevent missing target
-            if(Math.abs(entity.posX - endX) <= 0.1f && Math.abs(entity.posZ - endZ) <= 0.1f) {
-                entity.motionX = 0;
-                entity.motionZ = 0;
-            }
-
-            // Update animate rotations
-            alignWithMotion(entity);
-
-            // Sim system
-            if (entity instanceof EntityExplosiveMissile && shouldSimulate(entity))
-            {
-                wasSimulationBlocked = !MissileTrackerHandler.simulateMissile((EntityExplosiveMissile) entity); //TODO add ability to simulate any entity
-            }
-        }
-    }
-
-    @Override
-    public boolean canSafelyExitLogic() {
-        return hasStartedFlight;
-    }
-
-    protected void alignWithMotion(Entity entity)
-    {
-        entity.rotationPitch = (float) (Math.atan(entity.motionY / (Math.sqrt(entity.motionX * entity.motionX + entity.motionZ * entity.motionZ))) * 180 / Math.PI);
-        // Look at the next point
-        entity.rotationYaw = (float) (Math.atan2(entity.motionX, entity.motionZ) * 180 / Math.PI);
-    }
-
-    @Override
-    public boolean shouldRunEngineEffects(Entity entity) {
-        return hasStartedFlight;
-    }
-
-    protected boolean shouldSimulate(Entity entity)
-    {
-        if (wasSimulationBlocked || EntityMissile.hasPlayerRiding(entity))
-        {
-            return false;
-        }
-        else if (entity.posY >= ConfigMissile.SIMULATION_START_HEIGHT)
-        {
-            return true;
-        }
-
-        // TODO predict if the missile only needed a few more chunks to hit... if so chunk load or let get stuck in board to prevent changing arc path
-
-        final BlockPos futurePos = predictPosition(entity, BlockPos::new, 2);
-
-        //About to enter an unloaded chunk
-        return !entity.world.isAreaLoaded(entity.getPosition(), futurePos);
-    }
-
-    @Override
-    public <V> V predictPosition(Entity entity, VecBuilderFunc<V> builder, int ticks)
-    {
-        double x = entity.posX;
-        double y = entity.posY;
-        double z = entity.posZ;
-
-        double motionY = entity.motionY;
-
-        while (ticks-- > 0)
-        {
-            motionY -= this.acceleration;
-
-            x += entity.motionX;
-            y += motionY;
-            z += entity.motionZ;
-        }
-
-        return builder.apply(x, y, z);
-    }
-
-    @Override
-    public ResourceLocation getRegistryName()
-    {
-        return REG_NAME;
-    }
-
-    @Override
-    public NBTTagCompound serializeNBT()
-    {
-        return SAVE_LOGIC.save(this, new NBTTagCompound());
-    }
-
-    @Override
-    public void deserializeNBT(NBTTagCompound nbt)
-    {
-        SAVE_LOGIC.load(this, nbt);
-    }
-
-    @Override
-    public boolean shouldDecreaseMotion(Entity entity)
-    {
-        //Disable gravity and friction
-        return false;
-    }
-
     private static final NbtSaveHandler<ArcFlightLogic> SAVE_LOGIC = new NbtSaveHandler<ArcFlightLogic>()
         //Stuck in ground data
         .addRoot("flags")
@@ -284,5 +46,220 @@ public class ArcFlightLogic implements IMissileFlightLogic
         .addRoot("timers")
         /* */.nodeInteger("flight", (bl) -> bl.ticksFlight, (bl, i) -> bl.ticksFlight = i)
         .base();
+    public boolean hasStartedFlight = false;
+    /**
+     * Tick runtime of flight arc
+     */
+    private int missileFlightTime;
+    /**
+     * Motion Y acceleration for arc to work
+     */
+    private float acceleration;
+    /**
+     * Difference in distance from target, used as acceleration
+     */
+    private double deltaPathX, deltaPathY, deltaPathZ;
+    private double startX, startY, startZ;
+    private double endX, endY, endZ;
+    private boolean flightUpAlways = false;
+    private int ticksFlight = 0;
+    private boolean wasSimulationBlocked = false;
+
+    //TODO wire IMissile to connect to ILauncher so we can get launcher source and let the launcher know when we are clear
+    //TODO code launcher to not reload until clear, use the all clear flag from the missile combined with collision checks and dead checks
+
+    @Override
+    public void calculateFlightPath(final World world, double startX, double startY, double startZ, final IMissileTarget targetData) {
+        //Record start and end position
+        this.startX = startX;
+        this.startY = startY;
+        this.startZ = startZ;
+
+        if (targetData != null) {
+            this.endX = targetData.getX();
+            this.endY = targetData.getY();
+            this.endZ = targetData.getZ();
+        }
+
+        // TODO check if entire path is chunk loaded, if a reasonable chunk count isn't then we should notify the user in the launcher UI and change to a up/down flight path
+        //      This likely will require a static function to run the calculation and show in the GUI. However, should be referenced based on the missile type
+        //      As future version might include different guidance systems based on the item's stored data. Meaning a single function wouldn't work but could
+        //      be referenced in a prediction callback. Something like IMissile#getGuidance().doPrediction()
+    }
+
+    protected void calculatePath() {
+        //TODO rebuild to calculate arc up to maxHeight and move at a fixed speed instead of speed of sound+++++
+        //TODO once it reaches maxHeight have it fly flat to make for a smoother player riding experience
+        //TODO at end of arc if we can't fix the target offset have the missile fly at an angle strait at the target to fix accuracy issues
+
+        // Calculate the distance difference of the missile
+        this.deltaPathX = endX - startX;
+        this.deltaPathY = endY - startY;
+        this.deltaPathZ = endZ - startZ;
+
+        // TODO: Calculate parabola and relative out the targetHeight.
+        // Calculate the power required to reach the target co-ordinates
+        // Ground Displacement
+        final float flatDistance = (float) Math.sqrt(deltaPathX * deltaPathX + deltaPathZ * deltaPathZ);
+
+        if (flatDistance < 200) {
+
+            //Path constants
+            final float ticksPerMeterFlat = 2f;
+            final float heightToDistanceScale = flatDistance > 1000 ? 3f : 1f;
+            final float maxHeight = 1000f;
+            final float initialArcHeight = flatDistance > 100 ? 160f : 0;
+
+            // Parabolic Height
+            // Ballistic flight vars
+            final float arcHeightMax = Math.min(maxHeight, initialArcHeight + (flatDistance * heightToDistanceScale));
+
+            // Flight time
+            missileFlightTime = (int) Math.ceil(ticksPerMeterFlat * flatDistance);
+
+            // Acceleration
+            double heightToDistance = arcHeightMax / flatDistance;
+            double heightToTime = arcHeightMax / missileFlightTime;
+            double timeToDistance = missileFlightTime / flatDistance;
+            this.acceleration =
+                (float) (((arcHeightMax - heightToDistance) * heightToDistance) / (missileFlightTime / timeToDistance) / (heightToTime * flatDistance));
+        }
+        // If over 200 assume we will missile simulate rather than arc
+        else {
+            flightUpAlways = true;
+        }
+    }
+
+    @Override
+    public void onEntityTick(Entity entity, IMissile missile, int ticksInAir) {
+        //Starts the missile into normal flight
+        if (!hasStartedFlight) {
+
+            hasStartedFlight = true;
+
+            this.startX = entity.posX;
+            this.startY = entity.posY;
+            this.startZ = entity.posZ;
+
+            calculatePath();
+
+            if (!flightUpAlways) {
+
+                entity.motionY = this.acceleration * ((float) missileFlightTime / 2f);
+
+                entity.motionX = this.deltaPathX / missileFlightTime;
+                entity.motionZ = this.deltaPathZ / missileFlightTime;
+            } else {
+                final float flatDistance = (float) Math.sqrt(deltaPathX * deltaPathX + deltaPathZ * deltaPathZ);
+                final float hortSpeed = 0.05f;
+                final float vertSpeed = 2f;
+                entity.motionX = (this.deltaPathX / flatDistance) * hortSpeed;
+                entity.motionZ = (this.deltaPathZ / flatDistance) * hortSpeed;
+                entity.motionY = vertSpeed;
+            }
+        }
+        //Normal path logic
+        else {
+            runFlightLogic(entity, ticksInAir);
+        }
+    }
+
+    protected void runFlightLogic(Entity entity, int ticksInAir) {
+        ticksFlight++;
+
+        if (!entity.world.isRemote) {
+            // Apply gravity
+            if (!flightUpAlways) {
+                entity.motionY -= this.acceleration;
+            }
+
+            // Cut off x-z motion to prevent missing target
+            if (Math.abs(entity.posX - endX) <= 0.1f && Math.abs(entity.posZ - endZ) <= 0.1f) {
+                entity.motionX = 0;
+                entity.motionZ = 0;
+            }
+
+            // Update animate rotations
+            alignWithMotion(entity);
+
+            // Sim system
+            if (entity instanceof EntityExplosiveMissile && shouldSimulate(entity)) {
+                wasSimulationBlocked =
+                    !MissileTrackerHandler.simulateMissile((EntityExplosiveMissile) entity); //TODO add ability to simulate any entity
+            }
+        }
+    }
+
+    @Override
+    public boolean canSafelyExitLogic() {
+        return hasStartedFlight;
+    }
+
+    protected void alignWithMotion(Entity entity) {
+        entity.rotationPitch =
+            (float) (Math.atan(entity.motionY / (Math.sqrt(entity.motionX * entity.motionX + entity.motionZ * entity.motionZ))) * 180 / Math.PI);
+        // Look at the next point
+        entity.rotationYaw = (float) (Math.atan2(entity.motionX, entity.motionZ) * 180 / Math.PI);
+    }
+
+    @Override
+    public boolean shouldRunEngineEffects(Entity entity) {
+        return hasStartedFlight;
+    }
+
+    protected boolean shouldSimulate(Entity entity) {
+        if (wasSimulationBlocked || EntityMissile.hasPlayerRiding(entity)) {
+            return false;
+        } else if (entity.posY >= ConfigMissile.SIMULATION_START_HEIGHT) {
+            return true;
+        }
+
+        // TODO predict if the missile only needed a few more chunks to hit... if so chunk load or let get stuck in board to prevent changing arc path
+
+        final BlockPos futurePos = predictPosition(entity, BlockPos::new, 2);
+
+        //About to enter an unloaded chunk
+        return !entity.world.isAreaLoaded(entity.getPosition(), futurePos);
+    }
+
+    @Override
+    public <V> V predictPosition(Entity entity, VecBuilderFunc<V> builder, int ticks) {
+        double x = entity.posX;
+        double y = entity.posY;
+        double z = entity.posZ;
+
+        double motionY = entity.motionY;
+
+        while (ticks-- > 0) {
+            motionY -= this.acceleration;
+
+            x += entity.motionX;
+            y += motionY;
+            z += entity.motionZ;
+        }
+
+        return builder.apply(x, y, z);
+    }
+
+    @Override
+    public ResourceLocation getRegistryName() {
+        return REG_NAME;
+    }
+
+    @Override
+    public NBTTagCompound serializeNBT() {
+        return SAVE_LOGIC.save(this, new NBTTagCompound());
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt) {
+        SAVE_LOGIC.load(this, nbt);
+    }
+
+    @Override
+    public boolean shouldDecreaseMotion(Entity entity) {
+        //Disable gravity and friction
+        return false;
+    }
 
 }

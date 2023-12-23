@@ -14,38 +14,33 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 3/12/2018.
  */
-public class CapabilityEmpCreeper implements IEMPReceiver, ICapabilityProvider
-{
+public class CapabilityEmpCreeper implements IEMPReceiver, ICapabilityProvider {
+
     public final EntityCreeper creeper;
 
-    public CapabilityEmpCreeper(EntityCreeper creeper)
-    {
+    public CapabilityEmpCreeper(EntityCreeper creeper) {
         this.creeper = creeper;
     }
 
     @Override
-    public float applyEmpAction(World world, double x, double y, double z, IBlast emp_blast, float power, boolean doAction)
-    {
-        if (ConfigEMP.ALLOW_LIGHTING_CREEPER)
-        {
+    public float applyEmpAction(World world, double x, double y, double z, IBlast emp_blast, float power, boolean doAction) {
+        if (ConfigEMP.ALLOW_LIGHTING_CREEPER) {
             //Attack creeper with lighting TODO replace with data manager call
             creeper.onStruckByLightning(new EntityLightningBolt(world, creeper.posX, creeper.posY, creeper.posZ, true));
         }
         return power;
     }
+
     @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
-    {
+    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
         return capability == CapabilityEMP.EMP;
     }
 
     @Nullable
     @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
-    {
+    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
         return capability == CapabilityEMP.EMP ? (T) this : null;
     }
 

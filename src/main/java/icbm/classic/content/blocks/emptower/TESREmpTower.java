@@ -16,12 +16,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TESREmpTower extends TileEntitySpecialRenderer<TileEntity>
-{
+public class TESREmpTower extends TileEntitySpecialRenderer<TileEntity> {
+
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(TileEntity tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
-    {
+    public void render(TileEntity tile, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         final BlockRendererDispatcher blockRendererDispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
 
 
@@ -29,18 +28,17 @@ public class TESREmpTower extends TileEntitySpecialRenderer<TileEntity>
         float prevRotation = 0;
         boolean hasPower = false;
 
-        if(tile instanceof TileEMPTower) {
-          rotation = ((TileEMPTower) tile).rotation;
-          prevRotation = ((TileEMPTower) tile).prevRotation;
-          hasPower = ((TileEMPTower) tile).getChargePercentage() > 0.2;
-        }
-        else if(tile instanceof TileEmpTowerFake && ((TileEmpTowerFake) tile).getHost() != null) {
+        if (tile instanceof TileEMPTower) {
+            rotation = ((TileEMPTower) tile).rotation;
+            prevRotation = ((TileEMPTower) tile).prevRotation;
+            hasPower = ((TileEMPTower) tile).getChargePercentage() > 0.2;
+        } else if (tile instanceof TileEmpTowerFake && ((TileEmpTowerFake) tile).getHost() != null) {
             rotation = ((TileEmpTowerFake) tile).getHost().rotation;
             prevRotation = ((TileEmpTowerFake) tile).getHost().prevRotation;
-            hasPower =  ((TileEmpTowerFake) tile).getHost().getChargePercentage() > 0.2;
+            hasPower = ((TileEmpTowerFake) tile).getHost().getChargePercentage() > 0.2;
 
             int height = tile.getPos().getY() - ((TileEmpTowerFake) tile).getHost().getPos().getY();
-            if(height % 2 == 1) {
+            if (height % 2 == 1) {
                 rotation += 45;
                 prevRotation += 45;
             }
@@ -63,7 +61,7 @@ public class TESREmpTower extends TileEntitySpecialRenderer<TileEntity>
 
         GlStateManager.popMatrix();
 
-        if(hasPower) {
+        if (hasPower) {
             GlStateManager.pushMatrix();
             GlStateManager.translate((float) x + 0.5, (float) y + 0.5, (float) z + 0.5);
 
@@ -89,16 +87,16 @@ public class TESREmpTower extends TileEntitySpecialRenderer<TileEntity>
         final float brightness = 1f;
 
         int i = blockModelRenderer.blockColors.colorMultiplier(state, world, pos, 0);
-        if (EntityRenderer.anaglyphEnable)
-        {
+        if (EntityRenderer.anaglyphEnable) {
             i = TextureUtil.anaglyphColor(i);
         }
 
-        float red = (float)(i >> 16 & 255) / 255.0F;
-        float green = (float)(i >> 8 & 255) / 255.0F;
-        float blue = (float)(i & 255) / 255.0F;
+        float red = (float) (i >> 16 & 255) / 255.0F;
+        float green = (float) (i >> 8 & 255) / 255.0F;
+        float blue = (float) (i & 255) / 255.0F;
 
         GlStateManager.color(brightness, brightness, brightness, 0.5F);
         blockModelRenderer.renderModelBrightnessColor(state, model, brightness, red, green, blue);
     }
+
 }

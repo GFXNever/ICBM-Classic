@@ -9,14 +9,13 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable;
 
 /**
  * Base class for any event fired by the EMP system
- *
- *
+ * <p>
+ * <p>
  * Created by Dark(DarkGuardsman, Robert) on 3/12/2018.
  */
-public abstract class EmpEvent extends BlastEvent
-{
-    public EmpEvent(IBlast blast)
-    {
+public abstract class EmpEvent extends BlastEvent {
+
+    public EmpEvent(IBlast blast) {
         super(blast);
     }
 
@@ -27,30 +26,30 @@ public abstract class EmpEvent extends BlastEvent
      * mutating some entities, apply some effects, and adding EMP effects to items.
      */
     @Cancelable
-    public static class EntityPre extends EmpEvent
-    {
+    public static class EntityPre extends EmpEvent {
+
         public final Entity target;
 
-        public EntityPre(IBlast emp, Entity target)
-        {
+        public EntityPre(IBlast emp, Entity target) {
             super(emp);
             this.target = target;
         }
+
     }
 
     /**
      * Called after EMP effects have been applied to the entity. This includes several different
      * effects and EMP effects on items.
      */
-    public static class EntityPost extends EmpEvent
-    {
+    public static class EntityPost extends EmpEvent {
+
         public final Entity target;
 
-        public EntityPost(IBlast emp, Entity target)
-        {
+        public EntityPost(IBlast emp, Entity target) {
             super(emp);
             this.target = target;
         }
+
     }
 
     /**
@@ -60,37 +59,38 @@ public abstract class EmpEvent extends BlastEvent
      * mutating some entities, apply some effects, and adding EMP effects to items.
      */
     @Cancelable
-    public static class BlockPre extends EmpEvent
-    {
+    public static class BlockPre extends EmpEvent {
+
         public final World world;
         public final BlockPos blockPos;
         public final IBlockState state;
 
-        public BlockPre(IBlast emp, World world, BlockPos pos, IBlockState state)
-        {
+        public BlockPre(IBlast emp, World world, BlockPos pos, IBlockState state) {
             super(emp);
             this.world = world;
             this.blockPos = pos;
             this.state = state;
         }
+
     }
 
     /**
      * Called after EMP effects have been applied to the entity. This includes several different
      * effects and EMP effects on items.
      */
-    public static class BlockPost extends EmpEvent
-    {
+    public static class BlockPost extends EmpEvent {
+
         public final World world;
         public final BlockPos blockPos;
         public final IBlockState state;
 
-        public BlockPost(IBlast emp, World world, BlockPos pos, IBlockState state)
-        {
+        public BlockPost(IBlast emp, World world, BlockPos pos, IBlockState state) {
             super(emp);
             this.world = world;
             this.blockPos = pos;
             this.state = state;
         }
+
     }
+
 }

@@ -16,18 +16,16 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 
 public class GuiEMPTower extends GuiContainerBase {
+
+    // Texture
+    public static final ResourceLocation TEXTURE = new ResourceLocation(ICBMConstants.DOMAIN, ICBMConstants.GUI_DIRECTORY + "gui_emp_tower.png");
     // Localizations
     private static final String LANG_KEY = "gui.icbmclassic:empTower";
+    public static final ITextComponent TRANSLATION_TOOLTIP_RANGE = new TextComponentTranslation(LANG_KEY + ".range");
     private static final String GUI_NAME = LANG_KEY + ".name";
     private static final String POWER_NEEDED = LANG_KEY + ".power";
     private static final String COOLING_NEEDED = LANG_KEY + ".cooling";
     private static final String READY = LANG_KEY + ".ready";
-
-    public static final ITextComponent TRANSLATION_TOOLTIP_RANGE = new TextComponentTranslation(LANG_KEY + ".range");
-
-    // Texture
-    public static final ResourceLocation TEXTURE = new ResourceLocation(ICBMConstants.DOMAIN, ICBMConstants.GUI_DIRECTORY + "gui_emp_tower.png");
-
     private final TileEMPTower tileEntity;
 
     public GuiEMPTower(EntityPlayer player, TileEMPTower tileEntity) {
@@ -99,4 +97,5 @@ public class GuiEMPTower extends GuiContainerBase {
         // Goes last so tooltips render above our UI elements
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
     }
+
 }

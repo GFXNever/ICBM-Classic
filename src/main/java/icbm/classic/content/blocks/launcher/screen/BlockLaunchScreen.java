@@ -22,45 +22,36 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 1/16/2018.
  */
-public class BlockLaunchScreen extends BlockICBM
-{
-    public BlockLaunchScreen()
-    {
+public class BlockLaunchScreen extends BlockICBM {
+
+    public BlockLaunchScreen() {
         super("launcherscreen");
         this.dropInventory = true;
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
+    public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
-        if (!world.isRemote)
-        {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX,
+                                    float hitY, float hitZ) {
+        if (!world.isRemote) {
             final TileEntity tileEntity = world.getTileEntity(pos);
-            if(tileEntity instanceof TileLauncherScreen)
-            {
+            if (tileEntity instanceof TileLauncherScreen) {
                 final TileLauncherScreen screen = (TileLauncherScreen) tileEntity;
                 final ItemStack stack = player.getHeldItem(hand);
                 final IGPSData gpsData = ICBMClassicHelpers.getGPSData(stack);
-                if (GPSDataHelpers.handlePlayerInteraction(gpsData, player, screen::setTarget))
-                {
+                if (GPSDataHelpers.handlePlayerInteraction(gpsData, player, screen::setTarget)) {
                     return true;
-                }
-                else if(stack.getItem() == Items.STONE_AXE) {
+                } else if (stack.getItem() == Items.STONE_AXE) {
                     final LauncherNetwork network = screen.getNetworkNode().getNetwork();
                     player.sendMessage(new TextComponentString("Network: " + network));
                     player.sendMessage(new TextComponentString("L: " + network.getLaunchers().size()));
-                }
-                else
-                {
+                } else {
                     player.openGui(ICBMClassic.INSTANCE, 0, world, pos.getX(), pos.getY(), pos.getZ());
                 }
             }
@@ -70,19 +61,17 @@ public class BlockLaunchScreen extends BlockICBM
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta)
-    {
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileLauncherScreen();
     }
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state)
-    {
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
         TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof ILauncherComponent)
-        {
+        if (tile instanceof ILauncherComponent) {
             ((ILauncherComponent) tile).getNetworkNode().onTileRemoved();
         }
         super.breakBlock(world, pos, state);
     }
+
 }

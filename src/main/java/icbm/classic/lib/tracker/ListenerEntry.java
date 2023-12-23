@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 @Data
 public class ListenerEntry implements IEventTrackerListener {
+
     public final ResourceLocation name;
     public final IEventTrackerListener listener;
     public final Supplier<Boolean> conditional;
@@ -28,8 +29,7 @@ public class ListenerEntry implements IEventTrackerListener {
     public void accept(EventTrackerEntry entry) {
         try {
             listener.accept(entry);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             ICBMClassic.logger().error(String.format("Listener(%s): error while handling entry(%s)", name, entry.getType()));
         }
     }
@@ -38,4 +38,5 @@ public class ListenerEntry implements IEventTrackerListener {
     public boolean consumes(EventTrackerType type) {
         return conditional.get() && listener.consumes(type);
     }
+
 }

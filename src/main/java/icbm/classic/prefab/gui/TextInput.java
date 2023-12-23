@@ -21,29 +21,23 @@ import java.util.function.Supplier;
 public class TextInput<Output> extends GuiTextFieldBase implements IToolTip, IGuiComponent {
 
     private final static int ERROR_COLOR = ColorHelper.toARGB(255, 1, 1, 255);
-
+    @Deprecated
+    private final Rectangle boundBox;
     // Selection change handling
     @Setter
     private Consumer<Boolean> focusChangedCallback;
-
     // Output to text handling
     @Setter
     private Function<Output, String> parseOutput;
-
     // Error handling
     private ITextComponent errorFeedback = null;
-
     // Data watcher to know when we update our display text
     @Setter
     private Supplier<Output> sourceWatcher;
     @Setter
     private Consumer<Output> onSourceChange;
     private Output previousData;
-
     private String previousText;
-
-    @Deprecated
-    private final Rectangle boundBox;
 
     public TextInput(int componentId, FontRenderer fontrendererObj, int x, int y, int width, int height) {
         super(componentId, fontrendererObj, x, y, width, height);
@@ -80,13 +74,13 @@ public class TextInput<Output> extends GuiTextFieldBase implements IToolTip, IGu
 
     @Override
     public void onUpdate() {
-        if(!isFocused() && sourceWatcher != null) {
+        if (!isFocused() && sourceWatcher != null) {
             detectForChange();
 
             // Handle string changes, but source didn't change... reset to source
             //  this likely happens when user inputs data but the source didn't take it
             //  examples of this could be numeric values greater than allowed
-            if(!Objects.equals(previousText, getText())) {
+            if (!Objects.equals(previousText, getText())) {
                 setTextFromWatcher();
             }
         }
@@ -94,7 +88,7 @@ public class TextInput<Output> extends GuiTextFieldBase implements IToolTip, IGu
 
     protected boolean detectForChange() {
         final Output output = sourceWatcher.get();
-        if(!Objects.equals(output, previousData)) {
+        if (!Objects.equals(output, previousData)) {
             previousData = output;
             return true;
         }
@@ -102,10 +96,9 @@ public class TextInput<Output> extends GuiTextFieldBase implements IToolTip, IGu
     }
 
     protected void setTextFromWatcher() {
-        if(parseOutput != null) {
+        if (parseOutput != null) {
             previousText = parseOutput.apply(previousData);
-        }
-        else {
+        } else {
             previousText = Optional.ofNullable(previousData).map(Object::toString).orElse("");
         }
         setText(previousText);
@@ -116,7 +109,7 @@ public class TextInput<Output> extends GuiTextFieldBase implements IToolTip, IGu
         super.setFocused(isFocusedIn);
 
         // Reset error feedback when we de-select
-        if(!isFocusedIn) {
+        if (!isFocusedIn) {
             errorFeedback = null;
         }
 
@@ -128,7 +121,7 @@ public class TextInput<Output> extends GuiTextFieldBase implements IToolTip, IGu
         }
 
         // Handle source change caused by user
-        if(!isFocusedIn && detectForChange() && onSourceChange != null) {
+        if (!isFocusedIn && detectForChange() && onSourceChange != null) {
             // Notify systems of the change, this often triggers network calls
             onSourceChange.accept(previousData);
         }
@@ -137,10 +130,10 @@ public class TextInput<Output> extends GuiTextFieldBase implements IToolTip, IGu
     public TextInput<Output> simpleHandler(Supplier<Output> getter, Consumer<Output> setter, BiFunction<String, Consumer<Output>, String> validator) {
         sourceWatcher = getter;
         focusChangedCallback = (state) -> {
-            if(!state) {
+            if (!state) {
                 // Parse input from user and store into tile client side
                 final String error = validator.apply(getText(), setter);
-                if(error != null) {
+                if (error != null) {
                     errorFeedback = new TextComponentTranslation(error);
                 }
             }
@@ -151,7 +144,7 @@ public class TextInput<Output> extends GuiTextFieldBase implements IToolTip, IGu
     public TextInput<String> stringHandler(Supplier<String> getter, Consumer<String> setter) {
         sourceWatcher = (Supplier<Output>) getter;
         focusChangedCallback = (state) -> {
-            if(!state) {
+            if (!state) {
                 setter.accept(getText());
             }
         };
@@ -187,4 +180,5 @@ public class TextInput<Output> extends GuiTextFieldBase implements IToolTip, IGu
     public boolean isErrored() {
         return errorFeedback != null;
     }
+
 }

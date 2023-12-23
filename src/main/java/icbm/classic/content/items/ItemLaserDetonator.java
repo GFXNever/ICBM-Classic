@@ -29,19 +29,17 @@ import net.minecraftforge.common.MinecraftForge;
 
 /**
  * Extended version of {@link ItemRemoteDetonator} that can target blocks in a line of sight.
- *
- *
+ * <p>
+ * <p>
  * Created by Dark(DarkGuardsman, Robert) on 3/26/2016.
  */
-public class ItemLaserDetonator extends ItemRadio implements IPacketIDReceiver
-{
+public class ItemLaserDetonator extends ItemRadio implements IPacketIDReceiver {
+
+    public static final int RANGE = 200;
     private static final int COOLDOWN = 20;
     private int clientCooldownTicks = 0;
 
-    public static final int RANGE = 200;
-
-    public ItemLaserDetonator()
-    {
+    public ItemLaserDetonator() {
         this.setName("laserDetonator");
         this.setCreativeTab(ICBMClassic.CREATIVE_TAB);
         this.setHasSubtypes(true);
@@ -50,18 +48,15 @@ public class ItemLaserDetonator extends ItemRadio implements IPacketIDReceiver
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand handIn)
-    {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand handIn) {
         final ItemStack stack = player.getHeldItem(handIn);
-        if (world.isRemote && clientCooldownTicks <= 0)
-        {
+        if (world.isRemote && clientCooldownTicks <= 0) {
             clientCooldownTicks = COOLDOWN;
             RayTraceResult objectMouseOver = player.rayTrace(RANGE, 1);
             if (objectMouseOver.typeOfHit != RayTraceResult.Type.MISS) // ignore failed raytraces
             {
                 TileEntity tileEntity = world.getTileEntity(objectMouseOver.getBlockPos());
-                if (!(ICBMClassicHelpers.isLauncher(tileEntity, null)))
-                {
+                if (!(ICBMClassicHelpers.isLauncher(tileEntity, null))) {
                     ICBMClassic.packetHandler.sendToServer(new PacketPlayerItem(player).addData(objectMouseOver.hitVec));
                 }
             }// TODO else: add message stating that the raytrace failed
@@ -89,11 +84,9 @@ public class ItemLaserDetonator extends ItemRadio implements IPacketIDReceiver
     }
 
     @Override
-    public boolean read(ByteBuf buf, int id, EntityPlayer player, IPacket packet)
-    {
+    public boolean read(ByteBuf buf, int id, EntityPlayer player, IPacket packet) {
         final ItemStack stack = player.inventory.getCurrentItem();
-        if (stack.getItem() == this && !player.world.isRemote)
-        {
+        if (stack.getItem() == this && !player.world.isRemote) {
             final double x = buf.readDouble();
             final double y = buf.readDouble();
             final double z = buf.readDouble();
@@ -111,12 +104,11 @@ public class ItemLaserDetonator extends ItemRadio implements IPacketIDReceiver
                         formatNumber(event.getPos().z)
                     ), false);
 
-                    RadioRegistry.popMessage(player.world, new FakeRadioSender(player, stack, null), new TriggerActionTargetMessage(getRadioChannel(stack), event.getPos()));
-                }
-                else if(event.cancelReason != null) {
+                    RadioRegistry.popMessage(player.world, new FakeRadioSender(player, stack, null),
+                        new TriggerActionTargetMessage(getRadioChannel(stack), event.getPos()));
+                } else if (event.cancelReason != null) {
                     player.sendStatusMessage(new TextComponentTranslation(event.cancelReason), true);
-                }
-                else {
+                } else {
                     player.sendStatusMessage(new TextComponentTranslation(getUnlocalizedName(stack) + ".laser.canceled"), false);
                 }
             });
@@ -129,8 +121,8 @@ public class ItemLaserDetonator extends ItemRadio implements IPacketIDReceiver
     }
 
     @Override
-    public boolean doesSneakBypassUse(ItemStack stack, net.minecraft.world.IBlockAccess world, BlockPos pos, EntityPlayer player)
-    {
+    public boolean doesSneakBypassUse(ItemStack stack, net.minecraft.world.IBlockAccess world, BlockPos pos, EntityPlayer player) {
         return true;
     }
+
 }

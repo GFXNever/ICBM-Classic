@@ -19,58 +19,49 @@ import java.util.function.Consumer;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 1/7/19.
  */
-public class ExMissileContentReg extends ExplosiveContentRegistry implements IExMissileRegistry
-{
+public class ExMissileContentReg extends ExplosiveContentRegistry implements IExMissileRegistry {
 
-    public ExMissileContentReg()
-    {
+    public ExMissileContentReg() {
         super(ICBMClassicAPI.EX_MISSILE);
     }
 
     @Override
-    public void setLaunchListener(ResourceLocation exName, Consumer<IMissile> eventCallback)
-    {
+    public void setLaunchListener(ResourceLocation exName, Consumer<IMissile> eventCallback) {
 
     }
 
     @Override
-    public void setMissileUpdateListener(ResourceLocation exName, Consumer<IMissile> eventCallback)
-    {
+    public void setMissileUpdateListener(ResourceLocation exName, Consumer<IMissile> eventCallback) {
 
     }
 
     @Override
-    public void setInteractionListener(ResourceLocation exName, EntityInteractionFunction function)
-    {
+    public void setInteractionListener(ResourceLocation exName, EntityInteractionFunction function) {
 
     }
 
     @Override
-    public void triggerLaunch(IMissile missile)
-    {
+    public void triggerLaunch(IMissile missile) {
         MinecraftForge.EVENT_BUS.post(new MissileEvent.PostLaunch(missile, missile.getMissileEntity()));
     }
 
     @Override
-    public void triggerFlightUpdate(IMissile missile)
-    {
+    public void triggerFlightUpdate(IMissile missile) {
 
     }
 
     @Override
-    public boolean onInteraction(Entity entity, EntityPlayer player, EnumHand hand)
-    {
+    public boolean onInteraction(Entity entity, EntityPlayer player, EnumHand hand) {
         return false;
     }
 
     @Override
-    public ItemStack getDeviceStack(ResourceLocation regName)
-    {
+    public ItemStack getDeviceStack(ResourceLocation regName) {
         IExplosiveData ex = getExplosive(regName);
-        if(ex != null)
-        {
+        if (ex != null) {
             return new ItemStack(ItemReg.itemExplosiveMissile, 1, ex.getRegistryID());
         }
         return null;
     }
+
 }

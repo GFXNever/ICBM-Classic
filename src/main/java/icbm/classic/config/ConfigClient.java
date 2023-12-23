@@ -8,8 +8,8 @@ import net.minecraftforge.common.config.Config;
  */
 @Config(modid = ICBMConstants.DOMAIN, name = "icbmclassic/client")
 @Config.LangKey("config.icbmclassic:client.title")
-public class ConfigClient
-{
+public class ConfigClient {
+
     @Config.Name("missile_engine_smoke")
     @Config.Comment("Enables engine smoke effect for missiles")
     public static boolean MISSILE_ENGINE_SMOKE = true;
@@ -17,4 +17,5 @@ public class ConfigClient
     @Config.Name("missile_launch_smoke")
     @Config.Comment("Enables smoke effect for launched missiles")
     public static boolean MISSILE_LAUNCH_SMOKE = true;
+
 }

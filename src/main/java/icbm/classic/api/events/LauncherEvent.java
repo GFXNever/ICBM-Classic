@@ -11,17 +11,22 @@ import net.minecraftforge.fml.common.eventhandler.Event;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 1/9/19.
  */
-public abstract class LauncherEvent extends Event
-{
-    /** Starting point of the missile */
+public abstract class LauncherEvent extends Event {
+
+    /**
+     * Starting point of the missile
+     */
     public final IMissileSource source;
-    /** Launcher capability, can be used to relaunch missile with edits */
+    /**
+     * Launcher capability, can be used to relaunch missile with edits
+     */
     public final IMissileLauncher launcher;
-    /** Missile inventory */
+    /**
+     * Missile inventory
+     */
     public final IMissileHolder holder;
 
-    public LauncherEvent(IMissileSource source, IMissileLauncher launcher, IMissileHolder holder)
-    {
+    public LauncherEvent(IMissileSource source, IMissileLauncher launcher, IMissileHolder holder) {
         this.source = source;
         this.launcher = launcher;
         this.holder = holder;
@@ -35,22 +40,29 @@ public abstract class LauncherEvent extends Event
      * Called before {@link MissileEvent.PostLaunch}
      */
     @Cancelable
-    public static class PreLaunch extends LauncherEvent
-    {
-        /** Target of launcher, doesn't account for offsets or inaccuracy */
+    public static class PreLaunch extends LauncherEvent {
+
+        /**
+         * Target of launcher, doesn't account for offsets or inaccuracy
+         */
         public final IMissileTarget target;
 
-        /** True if launch was simulated */
+        /**
+         * True if launch was simulated
+         */
         public final boolean simulate;
 
-        /** Optional reason for event being canceled, defaults to 'launcher.status.icbmclassic:message.canceled' */
+        /**
+         * Optional reason for event being canceled, defaults to 'launcher.status.icbmclassic:message.canceled'
+         */
         public IActionStatus cancelReason;
 
-        public PreLaunch(IMissileSource source, IMissileLauncher launcher, IMissileHolder holder, IMissileTarget target, boolean simulate)
-        {
+        public PreLaunch(IMissileSource source, IMissileLauncher launcher, IMissileHolder holder, IMissileTarget target, boolean simulate) {
             super(source, launcher, holder);
             this.target = target;
             this.simulate = simulate;
         }
+
     }
+
 }

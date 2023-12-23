@@ -12,10 +12,9 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockReinforcedGlass extends Block
-{
-    public BlockReinforcedGlass()
-    {
+public class BlockReinforcedGlass extends Block {
+
+    public BlockReinforcedGlass() {
         super(Material.GLASS);
         this.setRegistryName(ICBMConstants.PREFIX + "reinforcedGlass");
         this.setUnlocalizedName(ICBMConstants.PREFIX + "reinforcedGlass");
@@ -25,47 +24,41 @@ public class BlockReinforcedGlass extends Block
     }
 
     @Override
-    protected boolean canSilkHarvest()
-    {
+    protected boolean canSilkHarvest() {
         return true;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer()
-    {
+    public BlockRenderLayer getBlockLayer() {
         return BlockRenderLayer.CUTOUT;
     }
 
     @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side)
-    {
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         IBlockState iblockstate = blockAccess.getBlockState(pos.offset(side));
         Block block = iblockstate.getBlock();
 
-        if (blockState != iblockstate)
-        {
+        if (blockState != iblockstate) {
             return true;
         }
 
-        if (block == this)
-        {
+        if (block == this) {
             return false;
         }
 
         return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
     }
+
 }

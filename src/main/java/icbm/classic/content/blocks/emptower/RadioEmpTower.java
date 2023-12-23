@@ -22,11 +22,12 @@ public class RadioEmpTower extends RadioTile<TileEMPTower> implements IRadioRece
         if (canReceive(sender, packet)) {
 
             // Fire emp tower
-            if(packet instanceof ITriggerActionMessage) {
-                if(host.fire()) {
+            if (packet instanceof ITriggerActionMessage) {
+                if (host.fire()) {
                     sender.onMessageCallback(this, new TextMessage(getChannel(), SUCCESS));
                 }
             }
         }
     }
+
 }

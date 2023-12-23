@@ -18,22 +18,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 @SideOnly(Side.CLIENT)
-public class RenderBombDroplet extends Render<EntityBombDroplet>
-{
+public class RenderBombDroplet extends Render<EntityBombDroplet> {
+
     public static final ResourceLocation TEXTURE = new ResourceLocation(ICBMConstants.DOMAIN, "textures/entity/fragments/fragment.png");
 
     private final EntityItem entityItem;
     private final RenderEntityItem2 renderEntityItem;
-    public RenderBombDroplet(RenderManager renderManager)
-    {
+
+    public RenderBombDroplet(RenderManager renderManager) {
         super(renderManager);
         entityItem = new EntityItem(null);
         renderEntityItem = new RenderEntityItem2(renderManager, Minecraft.getMinecraft().getRenderItem(), ItemCameraTransforms.TransformType.NONE);
     }
 
     @Override
-    public void doRender(EntityBombDroplet entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
+    public void doRender(EntityBombDroplet entity, double x, double y, double z, float entityYaw, float partialTicks) {
         this.bindEntityTexture(entity);
 
         //Setup
@@ -64,8 +63,7 @@ public class RenderBombDroplet extends Render<EntityBombDroplet>
     }
 
     public void renderMissile(ItemStack missileStack, World world, double wx, double wy, double wz,
-                              double x, double y, double z, float entityYaw, float partialTicks)
-    {
+                              double x, double y, double z, float entityYaw, float partialTicks) {
         //Set data for fake entity
         entityItem.setWorld(world);
         entityItem.rotationYaw = 0;
@@ -78,8 +76,8 @@ public class RenderBombDroplet extends Render<EntityBombDroplet>
 
     @Nullable
     @Override
-    protected ResourceLocation getEntityTexture(EntityBombDroplet entity)
-    {
+    protected ResourceLocation getEntityTexture(EntityBombDroplet entity) {
         return TEXTURE;
     }
+
 }

@@ -14,19 +14,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.util.glu.Sphere;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 1/10/2017.
  */
-public class TESRCruiseLauncher extends TileEntitySpecialRenderer<TileCruiseLauncher>
-{
+public class TESRCruiseLauncher extends TileEntitySpecialRenderer<TileCruiseLauncher> {
+
     public static final ResourceLocation TEXTURE_FILE = new ResourceLocation(ICBMConstants.DOMAIN, "textures/models/cruise_launcher_top.png");
 
     public static final CruiseLauncherTopModel model = new CruiseLauncherTopModel();
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void render(TileCruiseLauncher launcher, double x, double y, double z, float partialTicks, int destroyStage, float alpha)
-    {
+    public void render(TileCruiseLauncher launcher, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         float yaw = (float) launcher.currentAim.yaw();
         float pitch = (float) launcher.currentAim.pitch();
 
@@ -36,7 +34,7 @@ public class TESRCruiseLauncher extends TileEntitySpecialRenderer<TileCruiseLaun
         FMLClientHandler.instance().getClient().renderEngine.bindTexture(TEXTURE_FILE);
 
         GlStateManager.rotate(180F, 0.0F, 0.0F, 1.0F);
-        model.render(0.0625f, -(float)Math.toRadians(yaw), -(float)Math.toRadians(pitch));
+        model.render(0.0625f, -(float) Math.toRadians(yaw), -(float) Math.toRadians(pitch));
         GlStateManager.popMatrix();
 
         // Render held missile
@@ -44,7 +42,7 @@ public class TESRCruiseLauncher extends TileEntitySpecialRenderer<TileCruiseLaun
 
             GlStateManager.pushMatrix();
             GlStateManager.translate(x + 0.5f, (float) y + 2, z + 0.5f);
-            GlStateManager.rotate(yaw , 0F, 1F, 0F);
+            GlStateManager.rotate(yaw, 0F, 1F, 0F);
             GlStateManager.rotate(pitch - 90, 1F, 0F, 0F);
 
             try {
@@ -56,12 +54,11 @@ public class TESRCruiseLauncher extends TileEntitySpecialRenderer<TileCruiseLaun
         }
     }
 
-    public void debugMissileRotations(TileCruiseLauncher launcher, double x, double y, double z, float partialTicks)
-    {
+    public void debugMissileRotations(TileCruiseLauncher launcher, double x, double y, double z, float partialTicks) {
         final int missilesToRender = 8;
 
-        for(int ry = 0; ry < missilesToRender; ry++) {
-            for(int py = 0; py < missilesToRender; py++) {
+        for (int ry = 0; ry < missilesToRender; ry++) {
+            for (int py = 0; py < missilesToRender; py++) {
                 float yu = ry * (360f / missilesToRender);
                 float pu = py * (360f / missilesToRender);
                 float radius = 4f;
@@ -108,4 +105,5 @@ public class TESRCruiseLauncher extends TileEntitySpecialRenderer<TileCruiseLaun
             }
         }
     }
+
 }

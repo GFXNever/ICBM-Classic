@@ -4,7 +4,10 @@ import icbm.classic.ICBMClassic;
 import icbm.classic.lib.transform.vector.Pos;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.*;
+import net.minecraft.entity.monster.AbstractSkeleton;
+import net.minecraft.entity.monster.EntityPigZombie;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.EntityZombieVillager;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.passive.EntitySkeletonHorse;
 import net.minecraft.entity.passive.EntityVillager;
@@ -20,8 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class PoisonContagion extends CustomPotion
-{
+public class PoisonContagion extends CustomPotion {
+
     public static Potion INSTANCE;
     public static int TRIGGER_RATE = 20 * 2; //TODO config
     public static int SPREAD_RANGE = 13;
@@ -34,26 +37,23 @@ public class PoisonContagion extends CustomPotion
         DISABLE_LIST.add((e) -> e instanceof EntitySkeletonHorse);
     }
 
-    public PoisonContagion(boolean isBadEffect, int color, int id, String name)
-    {
+    public PoisonContagion(boolean isBadEffect, int color, int id, String name) {
         super(isBadEffect, color, id, name);
         this.setIconIndex(6, 0);
     }
 
     @Override
-    public void performEffect(EntityLivingBase entityLiving, int amplifier)
-    {
+    public void performEffect(EntityLivingBase entityLiving, int amplifier) {
         final World world = entityLiving.world;
 
         // Allow removing the effect
-        if(!ENABLED || DISABLE_LIST.stream().anyMatch(f -> f.apply(entityLiving))) {
+        if (!ENABLED || DISABLE_LIST.stream().anyMatch(f -> f.apply(entityLiving))) {
             entityLiving.removePotionEffect(this);
             return;
         }
 
         // Undead can't be harmed by the illness
-        if (!(entityLiving instanceof EntityZombie))
-        {
+        if (!(entityLiving instanceof EntityZombie)) {
             entityLiving.attackEntityFrom(DamageSource.MAGIC, 1); //TODO add custom damage source
         }
 
@@ -65,29 +65,22 @@ public class PoisonContagion extends CustomPotion
             );
             List<EntityLivingBase> entities = entityLiving.world.getEntitiesWithinAABB(EntityLivingBase.class, entitySurroundings);
 
-            for (EntityLivingBase entity : entities)
-            {
-                if (entity != null && entity != entityLiving)
-                {
+            for (EntityLivingBase entity : entities) {
+                if (entity != null && entity != entityLiving) {
                     // TODO add custom zombie
                     // TODO add zombie mobs like sheeps
                     // TODO add custom creeper that can explode to spread at greater distances
                     // TODO consider adding most of this via an addon and keeping this simple?
-                    if (entity instanceof EntityPig)
-                    {
+                    if (entity instanceof EntityPig) {
                         entity = new EntityPigZombie(entity.world);
                         entity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
 
-                        if (!world.isRemote)
-                        {
+                        if (!world.isRemote) {
                             world.spawnEntity(entity);
                         }
                         entity.setDead();
-                    }
-                    else if (entity instanceof EntityVillager)
-                    {
-                        if ((world.getDifficulty() == EnumDifficulty.NORMAL || world.getDifficulty() == EnumDifficulty.HARD))
-                        {
+                    } else if (entity instanceof EntityVillager) {
+                        if ((world.getDifficulty() == EnumDifficulty.NORMAL || world.getDifficulty() == EnumDifficulty.HARD)) {
 
                             final EntityVillager entityvillager = (EntityVillager) entity;
 
@@ -101,8 +94,7 @@ public class PoisonContagion extends CustomPotion
                             entityzombievillager.setChild(entityvillager.isChild());
                             entityzombievillager.setNoAI(entityvillager.isAIDisabled());
 
-                            if (entityvillager.hasCustomName())
-                            {
+                            if (entityvillager.hasCustomName()) {
                                 entityzombievillager.setCustomNameTag(entityvillager.getCustomNameTag());
                                 entityzombievillager.setAlwaysRenderNameTag(entityvillager.getAlwaysRenderNameTag());
                             }
@@ -120,8 +112,8 @@ public class PoisonContagion extends CustomPotion
     }
 
     @Override
-    public boolean isReady(int duration, int amplifier)
-    {
+    public boolean isReady(int duration, int amplifier) {
         return duration % TRIGGER_RATE == 0;
     }
+
 }

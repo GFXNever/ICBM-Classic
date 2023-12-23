@@ -9,4 +9,5 @@ import net.minecraft.util.math.Vec3d;
 public interface ITargetMessage extends IRadioMessage {
 
     Vec3d getTarget();
+
 }

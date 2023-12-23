@@ -28,7 +28,7 @@
       "ore": "paper"
     },
     "R": {
-      "item" :"minecraft:redstone",
+      "item": "minecraft:redstone",
       "data": 0
     }
   }

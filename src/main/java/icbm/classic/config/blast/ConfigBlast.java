@@ -7,13 +7,12 @@ import icbm.classic.config.blast.types.ConfigRedmatter;
 import net.minecraftforge.common.config.Config;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 2/22/2018.
  */
 @Config(modid = ICBMConstants.DOMAIN, name = "icbmclassic/blast")
 @Config.LangKey("config.icbmclassic:blast.title")
-public class ConfigBlast
-{
+public class ConfigBlast {
+
     @Config.LangKey("config.icbmclassic:blast.condensed.title")
     @Config.Comment("Settings for condensed explosive")
     public static ConfigExBasics condensed = new ConfigExBasics(6);
@@ -104,7 +103,8 @@ public class ConfigBlast
 
     @Deprecated //Move to sub-config
     @Config.Name("antimatter_break_unbreakable")
-    @Config.Comment({"Should antimatter ignore hardness checks for unbreakable, allows destroying bedrock and warded stone.", "This config option does nothing if 'antimatter_break_blocks' is set to false."})
+    @Config.Comment({"Should antimatter ignore hardness checks for unbreakable, allows destroying bedrock and warded stone.",
+        "This config option does nothing if 'antimatter_break_blocks' is set to false."})
     public static boolean ANTIMATTER_DESTROY_UNBREAKABLE_BLOCKS = true;
 
     @Deprecated //Move to sub-config

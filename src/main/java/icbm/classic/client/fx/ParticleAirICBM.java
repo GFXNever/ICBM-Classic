@@ -9,27 +9,23 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * Same as normal smoke, but doesn't move upwards on its own
  */
 @SideOnly(Side.CLIENT)
-public class ParticleAirICBM extends ParticleSmokeNormal
-{
-    public ParticleAirICBM(World worldIn, double x, double y, double z, double vx, double vy, double vz, float scale)
-    {
+public class ParticleAirICBM extends ParticleSmokeNormal {
+
+    public ParticleAirICBM(World worldIn, double x, double y, double z, double vx, double vy, double vz, float scale) {
         super(worldIn, x, y, z, vx, vy, vz, scale);
     }
 
-    public ParticleAirICBM setAge(int age)
-    {
+    public ParticleAirICBM setAge(int age) {
         this.particleMaxAge = age;
         return this;
     }
 
-    public ParticleAirICBM setColor(float r, float g, float b, boolean addColorVariant)
-    {
+    public ParticleAirICBM setColor(float r, float g, float b, boolean addColorVariant) {
         this.particleRed = r;
         this.particleGreen = g;
         this.particleBlue = b;
 
-        if (addColorVariant)
-        {
+        if (addColorVariant) {
             float colorVariant = (float) (Math.random() * 0.90000001192092896D);
             this.particleRed *= colorVariant;
             this.particleBlue *= colorVariant;
@@ -45,16 +41,14 @@ public class ParticleAirICBM extends ParticleSmokeNormal
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
 
-        if (this.particleAge++ >= this.particleMaxAge)
-        {
+        if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();
         }
 
         this.setParticleTextureIndex(7 - this.particleAge * 8 / this.particleMaxAge);
         this.move(this.motionX, this.motionY, this.motionZ);
 
-        if (this.posY == this.prevPosY)
-        {
+        if (this.posY == this.prevPosY) {
             this.motionX *= 1.1D;
             this.motionZ *= 1.1D;
         }
@@ -63,10 +57,10 @@ public class ParticleAirICBM extends ParticleSmokeNormal
         this.motionY *= 0.95999999D;
         this.motionZ *= 0.95999999D;
 
-        if (this.onGround)
-        {
+        if (this.onGround) {
             this.motionX *= 0.699999988079071D;
             this.motionZ *= 0.699999988079071D;
         }
     }
+
 }

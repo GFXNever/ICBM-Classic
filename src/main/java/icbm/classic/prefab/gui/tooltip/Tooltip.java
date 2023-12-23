@@ -23,4 +23,5 @@ public class Tooltip extends TooltipBase {
     protected ITextComponent getActualTooltip() {
         return tooltip.get();
     }
+
 }

@@ -23,6 +23,7 @@ public class PacketCodexTile<R extends TileEntity, T> extends PacketCodex<R, T> 
     public PacketCodexTile(ResourceLocation parent, String name, Function<R, T> converter) {
         this(parent, new ResourceLocation(ICBMConstants.DOMAIN, name), converter);
     }
+
     public PacketCodexTile(ResourceLocation parent, ResourceLocation name, Function<R, T> converter) {
         super(parent, name, converter);
     }
@@ -30,14 +31,15 @@ public class PacketCodexTile<R extends TileEntity, T> extends PacketCodex<R, T> 
     public PacketCodexTile(ResourceLocation parent, ResourceLocation name) {
         this(parent, name, (tile) -> (T) tile);
     }
+
     public PacketCodexTile(ResourceLocation parent, String name) {
         this(parent, new ResourceLocation(parent.getResourceDomain(), name));
     }
 
-    public void sendToAllAround(R tile){
+    public void sendToAllAround(R tile) {
         double range = 64;
         // TODO consider getting player's chunk map instead
-        if(tile.getWorld() instanceof WorldServer) {
+        if (tile.getWorld() instanceof WorldServer) {
             final WorldServer worldServer = (WorldServer) tile.getWorld();
             range = Optional.ofNullable(worldServer.getMinecraftServer())
                 .map(MinecraftServer::getPlayerList)
@@ -48,7 +50,7 @@ public class PacketCodexTile<R extends TileEntity, T> extends PacketCodex<R, T> 
         this.sendToAllAround(tile, range);
     }
 
-    public void sendToAllAround(R tile, double range){
+    public void sendToAllAround(R tile, double range) {
         super.sendToAllAround(tile, new NetworkRegistry.TargetPoint(
             tile.getWorld().provider.getDimension(),
             tile.getPos().getX(),
@@ -66,4 +68,5 @@ public class PacketCodexTile<R extends TileEntity, T> extends PacketCodex<R, T> 
     public PacketLambdaTile<T> build(R tile) {
         return new PacketLambdaTile<T>(this, tile, getConverter().apply(tile));
     }
+
 }

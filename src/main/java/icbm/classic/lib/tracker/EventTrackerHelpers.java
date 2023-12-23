@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class EventTrackerHelpers {
+
     public static final ResourceLocation TILE_POS = new ResourceLocation(ICBMConstants.DOMAIN, "tile.pos");
     public static final ResourceLocation TILE_POS_X = new ResourceLocation(ICBMConstants.DOMAIN, "tile.pos.x");
     public static final ResourceLocation TILE_POS_Y = new ResourceLocation(ICBMConstants.DOMAIN, "tile.pos.y");
@@ -41,4 +42,5 @@ public class EventTrackerHelpers {
     public static String getSide(World world) {
         return Optional.ofNullable(world).map((w) -> w.isRemote ? SIDE_CLIENT : SIDE_SERVER).orElse(null);
     }
+
 }

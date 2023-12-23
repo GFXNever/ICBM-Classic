@@ -16,9 +16,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class BlastCluster extends BlastBase {
@@ -154,7 +152,8 @@ public class BlastCluster extends BlastBase {
                     }
 
                     // set position to slightly next to missile body
-                    final Vec3d stackVector = RotationHelper.rotateY(RotationHelper.rotateX(SOUTH_VEC, sourcePitch - 180), sourceYaw); //offset from disc, if facing down this is y++
+                    final Vec3d stackVector = RotationHelper.rotateY(RotationHelper.rotateX(SOUTH_VEC, sourcePitch - 180),
+                        sourceYaw); //offset from disc, if facing down this is y++
                     double x = (sourceVec.x * offsetScale) + (stackVector.x * stackScale * discIndex);
                     double y = (sourceVec.y * offsetScale) + (stackVector.y * stackScale * discIndex);
                     double z = (sourceVec.z * offsetScale) + (stackVector.z * stackScale * discIndex);
@@ -210,4 +209,5 @@ public class BlastCluster extends BlastBase {
             0f, 0.03f);
         return world().spawnEntity(bomblet);
     }
+
 }

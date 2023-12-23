@@ -21,4 +21,5 @@ public interface IMissileTargetDelayed extends IMissileTarget {
      * @return new copy with all settings but delay
      */
     IMissileTarget cloneWithoutDelay();
+
 }

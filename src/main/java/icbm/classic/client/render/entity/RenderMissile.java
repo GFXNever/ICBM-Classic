@@ -25,24 +25,20 @@ import javax.annotation.Nullable;
  *
  * @author Calclavia, DarkCow
  * */
-public class RenderMissile extends Render<EntityMissile>
-{
+public class RenderMissile extends Render<EntityMissile> {
 
+    public static RenderMissile INSTANCE;
     private final EntityItem entityItem;
     private final RenderEntityItem2 renderEntityItem;
 
-    public static RenderMissile INSTANCE;
-
-    public RenderMissile(RenderManager renderManager)
-    {
+    public RenderMissile(RenderManager renderManager) {
         super(renderManager);
         entityItem = new EntityItem(null);
         renderEntityItem = new RenderEntityItem2(renderManager, Minecraft.getMinecraft().getRenderItem(), ItemCameraTransforms.TransformType.NONE);
     }
 
     @Override
-    public void doRender(EntityMissile entityMissile, double x, double y, double z, float entityYaw, float partialTicks)
-    {
+    public void doRender(EntityMissile entityMissile, double x, double y, double z, float entityYaw, float partialTicks) {
         //Setup
         GlStateManager.pushMatrix();
 
@@ -60,8 +56,8 @@ public class RenderMissile extends Render<EntityMissile>
 
         //Render missile
         renderMissile(entityMissile.toStack(),
-                entityMissile.world, entityMissile.posX, entityMissile.posY, entityMissile.posZ,
-                0, 0, 0, entityYaw, partialTicks);
+            entityMissile.world, entityMissile.posX, entityMissile.posY, entityMissile.posZ,
+            0, 0, 0, entityYaw, partialTicks);
 
         //Reset
         GlStateManager.popMatrix();
@@ -74,7 +70,8 @@ public class RenderMissile extends Render<EntityMissile>
             BufferBuilder bufferbuilder = tessellator.getBuffer();
             bufferbuilder.begin(3, DefaultVertexFormats.POSITION_COLOR);
             bufferbuilder.pos(x, y, z).color(0, 255, 0, 255).endVertex();
-            bufferbuilder.pos(x + entityMissile.motionX * 2.0D, y + entityMissile.motionY * 2.0D, z + entityMissile.motionZ * 2.0D).color(0, 255, 0, 2555).endVertex();
+            bufferbuilder.pos(x + entityMissile.motionX * 2.0D, y + entityMissile.motionY * 2.0D, z + entityMissile.motionZ * 2.0D)
+                .color(0, 255, 0, 2555).endVertex();
             tessellator.draw();
             GlStateManager.enableTexture2D();
             GlStateManager.enableLighting();
@@ -86,23 +83,20 @@ public class RenderMissile extends Render<EntityMissile>
 
     @Nullable
     @Override
-    protected ResourceLocation getEntityTexture(EntityMissile entity)
-    {
+    protected ResourceLocation getEntityTexture(EntityMissile entity) {
         return null;
     }
 
     public void renderMissile(ItemStack missileStack, TileEntity tileEntity,
-                              double x, double y, double z, float entityYaw, float partialTicks)
-    {
+                              double x, double y, double z, float entityYaw, float partialTicks) {
         renderMissile(missileStack,
-                tileEntity.getWorld(),
-                tileEntity.getPos().getX() + 0.5, tileEntity.getPos().getY() + 0.5, tileEntity.getPos().getZ() + 0.5,
-                x, y, z, entityYaw, partialTicks);
+            tileEntity.getWorld(),
+            tileEntity.getPos().getX() + 0.5, tileEntity.getPos().getY() + 0.5, tileEntity.getPos().getZ() + 0.5,
+            x, y, z, entityYaw, partialTicks);
     }
 
     public void renderMissile(ItemStack missileStack, World world, double wx, double wy, double wz,
-                              double x, double y, double z, float entityYaw, float partialTicks)
-    {
+                              double x, double y, double z, float entityYaw, float partialTicks) {
         //Set data for fake entity
         entityItem.setWorld(world);
         entityItem.rotationYaw = 0;
@@ -112,4 +106,5 @@ public class RenderMissile extends Render<EntityMissile>
         //render entity item
         renderEntityItem.doRender(entityItem, x, y, z, entityYaw, partialTicks);
     }
+
 }

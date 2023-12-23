@@ -5,11 +5,9 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.text.TextFormatting;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 1/31/2018.
  */
-public enum EnumTier implements IStringSerializable
-{
+public enum EnumTier implements IStringSerializable {
     ONE(TextFormatting.GREEN),
     TWO(TextFormatting.YELLOW),
     THREE(TextFormatting.GOLD),
@@ -18,39 +16,32 @@ public enum EnumTier implements IStringSerializable
 
     private TextFormatting tooltipColor;
 
-    EnumTier(TextFormatting tooltipColor)
-    {
+    EnumTier(TextFormatting tooltipColor) {
         this.tooltipColor = tooltipColor;
     }
 
-    public TextFormatting getTooltipColor()
-    {
+    public static EnumTier get(int itemDamage) {
+        if (itemDamage > 0 && itemDamage < values().length) {
+            return values()[itemDamage];
+        }
+        return ONE;
+    }
+
+    public TextFormatting getTooltipColor() {
         return tooltipColor;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return this.getName();
     }
 
-    public String getLocalizedName()
-    {
+    public String getLocalizedName() {
         return LanguageUtility.getLocal("tier.icbmclassic." + getName());
     }
 
     @Override
-    public String getName()
-    {
+    public String getName() {
         return name().toLowerCase();
-    }
-
-    public static EnumTier get(int itemDamage)
-    {
-        if (itemDamage > 0 && itemDamage < values().length)
-        {
-            return values()[itemDamage];
-        }
-        return ONE;
     }
 }

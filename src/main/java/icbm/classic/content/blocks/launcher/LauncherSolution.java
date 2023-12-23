@@ -28,4 +28,5 @@ public class LauncherSolution implements ILauncherSolution {
     public IMissileTarget getTarget(IMissileLauncher launcher) {
         return target;
     }
+
 }

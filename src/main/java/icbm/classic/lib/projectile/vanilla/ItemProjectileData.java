@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntityTippedArrow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
@@ -16,7 +14,9 @@ public class ItemProjectileData implements IProjectileData<EntityItem> {
 
     public static final ResourceLocation NAME = new ResourceLocation("minecraft", "item");
 
-    @Getter @Setter @Accessors(chain = true)
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private ItemStack itemStack = ItemStack.EMPTY;
 
     @Override
@@ -28,7 +28,7 @@ public class ItemProjectileData implements IProjectileData<EntityItem> {
     public EntityItem newEntity(World world, boolean allowItemPickup) {
         final EntityItem entityItem = new EntityItem(world);
         entityItem.setItem(itemStack);
-        if(!allowItemPickup) {
+        if (!allowItemPickup) {
             entityItem.setInfinitePickupDelay();
         }
         return entityItem;
@@ -45,4 +45,5 @@ public class ItemProjectileData implements IProjectileData<EntityItem> {
     public void deserializeNBT(NBTTagCompound nbt) {
         itemStack = new ItemStack(nbt.getCompoundTag("item"));
     }
+
 }

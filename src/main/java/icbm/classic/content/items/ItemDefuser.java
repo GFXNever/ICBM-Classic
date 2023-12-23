@@ -17,12 +17,11 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.MinecraftForge;
 
 //Explosive Defuser
-public class ItemDefuser extends ItemICBMElectrical
-{
+public class ItemDefuser extends ItemICBMElectrical {
+
     private static final int ENERGY_COST = 2000;
 
-    public ItemDefuser()
-    {
+    public ItemDefuser() {
         super("defuser");
     }
 
@@ -36,19 +35,13 @@ public class ItemDefuser extends ItemICBMElectrical
      * @return True to cancel the rest of the interaction.
      */
     @Override
-    public boolean onLeftClickEntity(ItemStack itemStack, EntityPlayer player, Entity entity)
-    {
-        if (this.getEnergy(itemStack) >= ENERGY_COST)
-        {
-            if (ICBMClassicHelpers.isExplosive(entity))
-            {
-                if (!entity.world.isRemote)
-                {
+    public boolean onLeftClickEntity(ItemStack itemStack, EntityPlayer player, Entity entity) {
+        if (this.getEnergy(itemStack) >= ENERGY_COST) {
+            if (ICBMClassicHelpers.isExplosive(entity)) {
+                if (!entity.world.isRemote) {
                     final IExplosive explosive = ICBMClassicHelpers.getExplosive(entity);
-                    if (explosive != null)
-                    {
-                        if (MinecraftForge.EVENT_BUS.post(new ExplosiveDefuseEvent.ICBMExplosive(player, entity, explosive)))
-                        {
+                    if (explosive != null) {
+                        if (MinecraftForge.EVENT_BUS.post(new ExplosiveDefuseEvent.ICBMExplosive(player, entity, explosive))) {
                             return false;
                         }
 
@@ -56,24 +49,17 @@ public class ItemDefuser extends ItemICBMElectrical
                     }
                     entity.setDead();
                 }
-            }
-            else if (entity instanceof EntityTNTPrimed)
-            {
-                if (MinecraftForge.EVENT_BUS.post(new ExplosiveDefuseEvent.TNTExplosive(player, entity)))
-                {
+            } else if (entity instanceof EntityTNTPrimed) {
+                if (MinecraftForge.EVENT_BUS.post(new ExplosiveDefuseEvent.TNTExplosive(player, entity))) {
                     return false;
                 }
 
-                if (!entity.world.isRemote)
-                {
+                if (!entity.world.isRemote) {
                     entity.world.spawnEntity(new EntityItem(entity.world, entity.posX, entity.posY, entity.posZ, new ItemStack(Blocks.TNT)));
                 }
                 entity.setDead();
-            }
-            else if (entity instanceof EntityBombCart)
-            {
-                if (MinecraftForge.EVENT_BUS.post(new ExplosiveDefuseEvent.ICBMBombCart(player, entity)))
-                {
+            } else if (entity instanceof EntityBombCart) {
+                if (MinecraftForge.EVENT_BUS.post(new ExplosiveDefuseEvent.ICBMBombCart(player, entity))) {
                     return false;
                 }
 
@@ -82,12 +68,11 @@ public class ItemDefuser extends ItemICBMElectrical
 
             this.discharge(itemStack, ENERGY_COST, true);
             return true;
-        }
-        else
-        {
+        } else {
             player.sendMessage(new TextComponentString(LanguageUtility.getLocal("message.defuser.nopower")));
         }
 
         return false;
     }
+
 }

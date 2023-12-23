@@ -32,7 +32,7 @@ public class FiringWithDelay implements IActionStatus {
 
     @Override
     public ITextComponent message() {
-        if(message == null) {
+        if (message == null) {
             message = new TextComponentTranslation(LauncherLangs.STATUS_FIRING_DELAYED, delay);
         }
         return message;
@@ -54,4 +54,5 @@ public class FiringWithDelay implements IActionStatus {
     public void deserializeNBT(NBTTagCompound nbt) {
         delay = nbt.getInteger("delay");
     }
+
 }

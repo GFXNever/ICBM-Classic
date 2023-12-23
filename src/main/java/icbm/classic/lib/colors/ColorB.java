@@ -72,4 +72,5 @@ public class ColorB {
     public void set(byte r, byte g, byte b) {
         set(r, g, b, (byte) 255);
     }
+
 }

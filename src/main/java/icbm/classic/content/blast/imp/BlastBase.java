@@ -11,8 +11,8 @@ import javax.annotation.Nonnull;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 4/19/2020.
  */
-public abstract class BlastBase implements IBlastInit
-{
+public abstract class BlastBase implements IBlastInit {
+
     private World world;
     private double x, y, z;
     private boolean locked;
@@ -21,34 +21,29 @@ public abstract class BlastBase implements IBlastInit
     private double blastSize;
 
     @Override
-    public float getBlastRadius()
-    {
+    public float getBlastRadius() {
         return (float) Math.min(blastSize, 1);
     }
 
     @Override
     public IBlastInit setBlastSize(double size) {
-        if(!locked) {
+        if (!locked) {
             this.blastSize = size;
         }
         return this;
     }
 
     @Override
-    public void clearBlast()
-    {
+    public void clearBlast() {
 
     }
 
     @Nonnull
     @Override
-    public BlastResponse runBlast()
-    {
+    public BlastResponse runBlast() {
         final World world = world();
-        if (world != null)
-        {
-            if(!world.isRemote)
-            {
+        if (world != null) {
+            if (!world.isRemote) {
                 return triggerBlast();
             }
             return BlastState.TRIGGERED.genericResponse;
@@ -60,46 +55,38 @@ public abstract class BlastBase implements IBlastInit
 
     //<editor-fold desc="pos-data">
     @Override
-    public World world()
-    {
+    public World world() {
         return world;
     }
 
     @Override
-    public double z()
-    {
+    public double z() {
         return z;
     }
 
     @Override
-    public double x()
-    {
+    public double x() {
         return x;
     }
 
     @Override
-    public double y()
-    {
+    public double y() {
         return y;
     }
     //</editor-fold>
 
     //<editor-fold desc="blast-init">
     @Override
-    public IBlastInit setBlastWorld(World world)
-    {
-        if(!locked)
-        {
+    public IBlastInit setBlastWorld(World world) {
+        if (!locked) {
             this.world = world;
         }
         return this;
     }
 
     @Override
-    public IBlastInit setBlastPosition(double x, double y, double z)
-    {
-        if(!locked)
-        {
+    public IBlastInit setBlastPosition(double x, double y, double z) {
+        if (!locked) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -108,8 +95,7 @@ public abstract class BlastBase implements IBlastInit
     }
 
     @Override
-    public IBlastInit buildBlast()
-    {
+    public IBlastInit buildBlast() {
         locked = true;
         return this;
     }

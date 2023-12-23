@@ -12,19 +12,17 @@ import net.minecraft.util.math.MathHelper;
  * Flight computer that does nothing, acts as a placeholder for when we fire missiles like an arrow or are using
  * raw motion setting logic in another system.
  */
-public class DeadFlightLogic implements IMissileFlightLogic
-{
+public class DeadFlightLogic implements IMissileFlightLogic {
+
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "dead");
 
     public int fuelTicks = 0;
 
-    public DeadFlightLogic()
-    {
+    public DeadFlightLogic() {
         //for save/load logic
     }
 
-    public DeadFlightLogic(int fuelTicks)
-    {
+    public DeadFlightLogic(int fuelTicks) {
         this.fuelTicks = fuelTicks;
     }
 
@@ -38,11 +36,10 @@ public class DeadFlightLogic implements IMissileFlightLogic
     }
 
     @Override
-    public void onEntityTick(Entity entity, IMissile missile, int ticksInAir)
-    {
+    public void onEntityTick(Entity entity, IMissile missile, int ticksInAir) {
         fuelTicks--;
 
-        if(hasFuel(entity)) {
+        if (hasFuel(entity)) {
             float f3 = MathHelper.sqrt(entity.motionX * entity.motionX + entity.motionZ * entity.motionZ);
             entity.prevRotationYaw = entity.rotationYaw = (float) (Math.atan2(entity.motionX, entity.motionZ) * 180.0D / Math.PI);
             entity.prevRotationPitch = entity.rotationPitch = (float) (Math.atan2(entity.motionY, (double) f3) * 180.0D / Math.PI);
@@ -55,24 +52,21 @@ public class DeadFlightLogic implements IMissileFlightLogic
     }
 
     @Override
-    public NBTTagCompound serializeNBT()
-    {
+    public NBTTagCompound serializeNBT() {
         final NBTTagCompound tagCompound = new NBTTagCompound();
         tagCompound.setInteger("fuel", fuelTicks);
         return tagCompound;
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound save)
-    {
-        if(save.hasKey("fuel")) {
+    public void deserializeNBT(NBTTagCompound save) {
+        if (save.hasKey("fuel")) {
             fuelTicks = save.getInteger("fuel");
         }
     }
 
     @Override
-    public <V> V predictPosition(Entity entity, VecBuilderFunc<V> builder, int ticks)
-    {
+    public <V> V predictPosition(Entity entity, VecBuilderFunc<V> builder, int ticks) {
         return builder.apply(
             entity.posX + entity.motionX * ticks, //TODO add gravity
             entity.posY + entity.motionY * ticks,
@@ -81,22 +75,21 @@ public class DeadFlightLogic implements IMissileFlightLogic
     }
 
     @Override
-    public ResourceLocation getRegistryName()
-    {
+    public ResourceLocation getRegistryName() {
         return REG_NAME;
     }
 
     @Override
-    public boolean shouldDecreaseMotion(Entity entity)
-    {
+    public boolean shouldDecreaseMotion(Entity entity) {
         return !hasFuel(entity);
     }
 
     @Override
     public boolean equals(Object other) {
-        if(other instanceof DeadFlightLogic) {
+        if (other instanceof DeadFlightLogic) {
             return fuelTicks == ((DeadFlightLogic) other).fuelTicks && getRegistryName() == ((DeadFlightLogic) other).getRegistryName();
         }
         return false;
     }
+
 }

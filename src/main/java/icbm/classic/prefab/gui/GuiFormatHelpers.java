@@ -20,29 +20,26 @@ public class GuiFormatHelpers {
      * Processes a vector from a string
      *
      * @param inputText matching the format "x,y,z" with x/y/z being a numeric value
-     * @param setter to pass back the vector
+     * @param setter    to pass back the vector
      * @return error feedback, null for no errors
      */
     public static String parseVec3d(String inputText, Consumer<Vec3d> setter) {
-        if(inputText != null) {
+        if (inputText != null) {
             final String[] split = inputText.split(",");
-            if(split.length == 3) {
+            if (split.length == 3) {
                 try {
                     final double x = Double.parseDouble(split[0].trim());
                     final double y = Double.parseDouble(split[1].trim());
                     final double z = Double.parseDouble(split[2].trim());
                     setter.accept(new Vec3d(x, y, z)); //TODO use a builder
                     return null;
-                }
-                catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     return ERROR_FORMAT_V3D;
                 }
-            }
-            else {
+            } else {
                 return ERROR_FORMAT_V3D;
             }
-        }
-        else {
+        } else {
             return ERROR_NULL;
         }
     }
@@ -51,21 +48,20 @@ public class GuiFormatHelpers {
      * Processes a integer from a string
      *
      * @param inputText containing a whole number
-     * @param setter to pass back the int
+     * @param setter    to pass back the int
      * @return error feedback, null for no errors
      */
-    public static String parseInt(String inputText, Consumer<Integer> setter){
-        if(inputText != null) {
+    public static String parseInt(String inputText, Consumer<Integer> setter) {
+        if (inputText != null) {
             try {
                 setter.accept(Integer.parseInt(inputText.trim()));
                 return null;
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 return ERROR_FORMAT_INT;
             }
-        }
-        else {
+        } else {
             return ERROR_NULL;
         }
     }
+
 }

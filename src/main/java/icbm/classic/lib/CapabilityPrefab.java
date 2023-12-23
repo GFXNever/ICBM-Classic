@@ -11,23 +11,19 @@ import javax.annotation.Nullable;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 1/9/19.
  */
-public abstract class CapabilityPrefab implements ICapabilitySerializable<NBTTagCompound>
-{
+public abstract class CapabilityPrefab implements ICapabilitySerializable<NBTTagCompound> {
 
     public abstract boolean isCapability(@Nonnull Capability<?> capability);
 
     @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
-    {
+    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
         return isCapability(capability);
     }
 
     @Nullable
     @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
-    {
-        if (isCapability(capability))
-        {
+    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
+        if (isCapability(capability)) {
             return (T) this;
         }
         return null;
@@ -35,29 +31,25 @@ public abstract class CapabilityPrefab implements ICapabilitySerializable<NBTTag
 
 
     @Override
-    public final NBTTagCompound serializeNBT()
-    {
+    public final NBTTagCompound serializeNBT() {
         NBTTagCompound tagCompound = new NBTTagCompound();
         save(tagCompound);
         return tagCompound;
     }
 
     @Override
-    public final void deserializeNBT(NBTTagCompound nbt)
-    {
-        if (nbt != null && !nbt.hasNoTags())
-        {
+    public final void deserializeNBT(NBTTagCompound nbt) {
+        if (nbt != null && !nbt.hasNoTags()) {
             load(nbt);
         }
     }
 
-    protected void save(NBTTagCompound tag)
-    {
+    protected void save(NBTTagCompound tag) {
 
     }
 
-    protected void load(NBTTagCompound tag)
-    {
+    protected void load(NBTTagCompound tag) {
 
     }
+
 }

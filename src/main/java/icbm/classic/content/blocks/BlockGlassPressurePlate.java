@@ -10,10 +10,9 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockGlassPressurePlate extends BlockPressurePlate
-{
-    public BlockGlassPressurePlate()
-    {
+public class BlockGlassPressurePlate extends BlockPressurePlate {
+
+    public BlockGlassPressurePlate() {
         super(Material.GLASS, Sensitivity.EVERYTHING);
         this.setTickRandomly(true);
         this.setResistance(1F);
@@ -27,14 +26,13 @@ public class BlockGlassPressurePlate extends BlockPressurePlate
 
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer()
-    {
+    public BlockRenderLayer getBlockLayer() {
         return BlockRenderLayer.CUTOUT;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
+
 }

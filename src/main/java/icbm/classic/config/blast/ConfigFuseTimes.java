@@ -5,8 +5,8 @@ import net.minecraftforge.common.config.Config;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 2/9/2020.
  */
-public class ConfigFuseTimes
-{
+public class ConfigFuseTimes {
+
     @Config.LangKey("config.icbmclassic:blast.fusetimes.bombcarts.title")
     @Config.Comment("Set fuse times for bomb carts here. The times are written in ticks, where 20 ticks = 1 second.")
     public BombCarts BOMB_CARTS = new BombCarts();
@@ -19,8 +19,8 @@ public class ConfigFuseTimes
     @Config.Comment("Set fuse times for grenades here. The times are written in ticks, where 20 ticks = 1 second.")
     public Grenades GRENADES = new Grenades();
 
-    public class BombCarts
-    {
+    public class BombCarts {
+
         @Config.RangeInt(min = 0, max = Integer.MAX_VALUE)
         public int CONDENSED = 100;
 
@@ -86,10 +86,11 @@ public class ConfigFuseTimes
 
         @Config.RangeInt(min = 0, max = Integer.MAX_VALUE)
         public int REDMATTER = 100;
+
     }
 
-    public class Explosives
-    {
+    public class Explosives {
+
         @Config.RangeInt(min = 0, max = Integer.MAX_VALUE)
         public int CONDENSED = 0;
 
@@ -155,10 +156,11 @@ public class ConfigFuseTimes
 
         @Config.RangeInt(min = 0, max = Integer.MAX_VALUE)
         public int REDMATTER = 100;
+
     }
 
-    public class Grenades
-    {
+    public class Grenades {
+
         @Config.RangeInt(min = 0, max = Integer.MAX_VALUE)
         public int CONVENTIONAL = 100;
 
@@ -182,5 +184,7 @@ public class ConfigFuseTimes
 
         @Config.RangeInt(min = 0, max = Integer.MAX_VALUE)
         public int ATTRACTIVE = 120;
+
     }
+
 }

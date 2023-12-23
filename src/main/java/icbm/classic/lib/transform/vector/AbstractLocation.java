@@ -22,19 +22,19 @@ import net.minecraftforge.common.DimensionManager;
  * Prefab for location data that doesn't implement IWorldPosition
  * Created by robert on 1/13/2015.
  */
-public abstract class AbstractLocation<R extends AbstractLocation> extends AbstractPos<R> implements ILocation
-{
-    /** Minecraft world for this location */
+public abstract class AbstractLocation<R extends AbstractLocation> extends AbstractPos<R> implements ILocation {
+
+    /**
+     * Minecraft world for this location
+     */
     public World world;
 
-    public AbstractLocation(World world, double x, double y, double z)
-    {
+    public AbstractLocation(World world, double x, double y, double z) {
         super(x, y, z);
         this.world = world;
     }
 
-    public AbstractLocation(World world, BlockPos pos)
-    {
+    public AbstractLocation(World world, BlockPos pos) {
         super(pos.getX(), pos.getY(), pos.getZ());
         this.world = world;
     }
@@ -44,9 +44,9 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @param nbt - valid data, can't be null
      */
-    public AbstractLocation(NBTTagCompound nbt)
-    {
-        this(DimensionManager.getWorld(nbt.getInteger(NBTConstants.DIMENSION)), nbt.getDouble(NBTConstants.X), nbt.getDouble(NBTConstants.Y), nbt.getDouble(NBTConstants.Z));
+    public AbstractLocation(NBTTagCompound nbt) {
+        this(DimensionManager.getWorld(nbt.getInteger(NBTConstants.DIMENSION)), nbt.getDouble(NBTConstants.X), nbt.getDouble(NBTConstants.Y),
+            nbt.getDouble(NBTConstants.Z));
     }
 
     /**
@@ -54,8 +54,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @param data - data, should contain int, double, double, double
      */
-    public AbstractLocation(ByteBuf data)
-    {
+    public AbstractLocation(ByteBuf data) {
         this(DimensionManager.getWorld(data.readInt()), data.readDouble(), data.readDouble(), data.readDouble());
     }
 
@@ -64,8 +63,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @param entity - entity in the world, should be valid
      */
-    public AbstractLocation(Entity entity)
-    {
+    public AbstractLocation(Entity entity) {
         this(entity.world, entity.posX, entity.posY, entity.posZ);
     }
 
@@ -74,8 +72,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @param tile - valid tile with a world
      */
-    public AbstractLocation(TileEntity tile)
-    {
+    public AbstractLocation(TileEntity tile) {
         this(tile.getWorld(), tile.getPos());
     }
 
@@ -84,8 +81,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @param vec - valid location
      */
-    public AbstractLocation(IWorldPosition vec)
-    {
+    public AbstractLocation(IWorldPosition vec) {
         this(vec.world(), vec.x(), vec.y(), vec.z());
     }
 
@@ -95,8 +91,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      * @param world  - valid world, can be null but not recommended
      * @param vector - location data, should be valid
      */
-    public AbstractLocation(World world, IPos3D vector)
-    {
+    public AbstractLocation(World world, IPos3D vector) {
         this(world, vector.x(), vector.y(), vector.z());
     }
 
@@ -106,8 +101,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      * @param world - valid world, can be null but not recommended
      * @param vec   - minecraft vector
      */
-    public AbstractLocation(World world, Vec3d vec)
-    {
+    public AbstractLocation(World world, Vec3d vec) {
         this(world, vec.x, vec.y, vec.z);
     }
 
@@ -117,8 +111,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      * @param world  - valid world, can be null but not recommended
      * @param target - miencraft moving object position
      */
-    public AbstractLocation(World world, RayTraceResult target)
-    {
+    public AbstractLocation(World world, RayTraceResult target) {
         this(world, target.hitVec);
     }
 
@@ -127,8 +120,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return a world
      */
-    public World world()
-    {
+    public World world() {
         return world;
     }
 
@@ -137,8 +129,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return a world
      */
-    public World getWorld()
-    {
+    public World getWorld() {
         return world;
     }
 
@@ -146,8 +137,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      * Conversions
      */
     @Override
-    public NBTTagCompound writeNBT(NBTTagCompound nbt)
-    {
+    public NBTTagCompound writeNBT(NBTTagCompound nbt) {
         nbt.setInteger(NBTConstants.DIMENSION, world != null && world.provider != null ? world.provider.getDimension() : 0);
         nbt.setDouble(NBTConstants.X, x());
         nbt.setDouble(NBTConstants.Y, y());
@@ -156,8 +146,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
     }
 
     @Override
-    public ByteBuf writeByteBuf(ByteBuf data)
-    {
+    public ByteBuf writeByteBuf(ByteBuf data) {
         data.writeInt(world != null && world.provider != null ? world.provider.getDimension() : 0);
         data.writeDouble(x());
         data.writeDouble(y());
@@ -169,8 +158,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      * @Depricated use {@link #toPos()}
      */
     @Deprecated
-    public Pos toVector3()
-    {
+    public Pos toVector3() {
         return new Pos(x(), y(), z());
     }
 
@@ -179,8 +167,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return new position from the location data
      */
-    public Pos toPos()
-    {
+    public Pos toPos() {
         return new Pos(x(), y(), z());
     }
 
@@ -190,26 +177,18 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      * @return Block or null if the chunk is not loaded
      */
     @Deprecated //Use getBlockState()
-    public Block getBlock()
-    {
-        if (world != null && world.getChunkProvider().isChunkGeneratedAt(xi() / 16, zi() / 16))
-        {
+    public Block getBlock() {
+        if (world != null && world.getChunkProvider().isChunkGeneratedAt(xi() / 16, zi() / 16)) {
             return super.getBlock(world);
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
 
-    public IBlockState getBlockState()
-    {
-        if (world != null && world.getChunkProvider().isChunkGeneratedAt(xi() / 16, zi() / 16))
-        {
+    public IBlockState getBlockState() {
+        if (world != null && world.getChunkProvider().isChunkGeneratedAt(xi() / 16, zi() / 16)) {
             return super.getBlockState(world);
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
@@ -219,10 +198,8 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return tile entity, can be null
      */
-    public TileEntity getTileEntity()
-    {
-        if (world != null)
-        {
+    public TileEntity getTileEntity() {
+        if (world != null) {
             TileEntity tile = world.getTileEntity(toBlockPos());
             return tile == null || tile.isInvalid() ? null : tile;
         }
@@ -234,8 +211,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return value of resistance
      */
-    public float getHardness()
-    {
+    public float getHardness() {
         return super.getHardness(world);
     }
 
@@ -248,20 +224,18 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      * @param zz    - location of the explosion
      * @return value of resistance to the explosion
      */
-    public float getResistance(Entity cause, double xx, double yy, double zz)
-    {
+    public float getResistance(Entity cause, double xx, double yy, double zz) {
         return super.getResistance(world, cause, xx, yy, zz);
     }
 
     /**
      * Replaces the block at the location with a new block
      *
-     * @param block    - block to place
-     * @param notify   - notification level to use when placing the block
+     * @param block  - block to place
+     * @param notify - notification level to use when placing the block
      * @return true if it was repalced
      */
-    public boolean setBlock(IBlockState block, int notify)
-    {
+    public boolean setBlock(IBlockState block, int notify) {
         return super.setBlock(world, block, notify);
     }
 
@@ -270,8 +244,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return true if it was repalced
      */
-    public boolean setBlock(IBlockState state)
-    {
+    public boolean setBlock(IBlockState state) {
         return super.setBlock(world, state, 3);
     }
 
@@ -281,8 +254,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      * @param block - block to place
      * @return true if it was repalced
      */
-    public boolean setBlock(Block block)
-    {
+    public boolean setBlock(Block block) {
         return super.setBlock(world, block);
     }
 
@@ -291,8 +263,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return true if the block was replaced
      */
-    public boolean setBlockToAir()
-    {
+    public boolean setBlockToAir() {
         return super.setBlockToAir(world);
     }
 
@@ -301,8 +272,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return true if the block is an air block
      */
-    public boolean isAirBlock()
-    {
+    public boolean isAirBlock() {
         return super.isAirBlock(world);
     }
 
@@ -312,8 +282,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      * @param block - block to check
      * @return true if they match
      */
-    public boolean isBlockEqual(Block block)
-    {
+    public boolean isBlockEqual(Block block) {
         return super.isBlockEqual(world, block);
     }
 
@@ -322,8 +291,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return true if the block can be frozen
      */
-    public boolean isBlockFreezable()
-    {
+    public boolean isBlockFreezable() {
         return super.isBlockFreezable(world);
     }
 
@@ -332,8 +300,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return true if it can be replaced
      */
-    public boolean isReplaceable()
-    {
+    public boolean isReplaceable() {
         return super.isReplaceable(world);
     }
 
@@ -342,8 +309,7 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return true if it can see sky, false if not or world is null
      */
-    public boolean canSeeSky()
-    {
+    public boolean canSeeSky() {
         return super.canSeeSky(world);
     }
 
@@ -352,11 +318,9 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return true if the chunk is loaded
      */
-    public boolean isChunkLoaded()
-    {
+    public boolean isChunkLoaded() {
         //For some reason the server has it's own chunk provider that actually checks if the chunk exists
-        if (world instanceof WorldServer)
-        {
+        if (world instanceof WorldServer) {
             return ((WorldServer) world).getChunkProvider().chunkExists(xi() >> 4, zi() >> 4) && getChunk().isLoaded();
         }
         return world.getChunkProvider().isChunkGeneratedAt(xi() >> 4, zi() >> 4) && getChunk().isLoaded();
@@ -367,26 +331,25 @@ public abstract class AbstractLocation<R extends AbstractLocation> extends Abstr
      *
      * @return chunk the location is in
      */
-    public Chunk getChunk()
-    {
+    public Chunk getChunk() {
         return world.getChunkFromBlockCoords(toBlockPos());
     }
 
-    /** Marks a block for update */
-    public void markForUpdate()
-    {
+    /**
+     * Marks a block for update
+     */
+    public void markForUpdate() {
         super.markForUpdate(world);
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         return o instanceof AbstractLocation && this.world == ((AbstractLocation) o).world() && ((AbstractLocation) o).x() == x() && ((AbstractLocation) o).y() == y() && ((AbstractLocation) o).z() == z();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "WorldLocation [" + this.x() + "x," + this.y() + "y," + this.z() + "z," + (this.world == null ? "n" : this.world.provider == null ? "p" : this.world.provider.getDimension()) + "d]";
     }
+
 }

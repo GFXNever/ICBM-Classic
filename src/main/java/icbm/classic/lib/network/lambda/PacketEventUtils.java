@@ -11,11 +11,11 @@ public class PacketEventUtils {
     public static final ResourceLocation ERROR = new ResourceLocation(ICBMConstants.DOMAIN, "packet.error");
 
     public static EventTrackerField<String> fieldCodexKey(int index) {
-        return new EventTrackerField<>(CODEX_KEY, String.class, (entry) -> (String)entry.getData()[index]);
+        return new EventTrackerField<>(CODEX_KEY, String.class, (entry) -> (String) entry.getData()[index]);
     }
 
     public static EventTrackerField<Integer> fieldCodexId(int index) {
-        return new EventTrackerField<>(CODEX_ID, Integer.class, (entry) -> (Integer)entry.getData()[index]);
+        return new EventTrackerField<>(CODEX_ID, Integer.class, (entry) -> (Integer) entry.getData()[index]);
     }
 
     public static EventTrackerField<Exception> fieldError(int index) {
@@ -23,16 +23,17 @@ public class PacketEventUtils {
     }
 
     public static ResourceLocation getPacketName(PacketCodex builder) {
-        if(builder != null) {
+        if (builder != null) {
             return builder.getName();
         }
         return null;
     }
 
     public static Integer getPacketId(PacketCodex builder) {
-        if(builder != null) {
+        if (builder != null) {
             return builder.getId();
         }
         return null;
     }
+
 }

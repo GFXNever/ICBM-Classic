@@ -12,20 +12,18 @@ import icbm.classic.prefab.gui.tooltip.TooltipTranslations;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
-public class GuiCruiseLauncher extends GuiContainerBase
-{
+public class GuiCruiseLauncher extends GuiContainerBase {
+
+    // Texture
+    public static final ResourceLocation TEXTURE =
+        new ResourceLocation(ICBMConstants.DOMAIN, ICBMConstants.GUI_DIRECTORY + "gui_cruise_launcher.png");
     // Localizations
     private static final String LANG_KEY = "gui.launcher.cruise";
     private static final String GUI_NAME = LANG_KEY + ".name";
-
-    // Texture
-    public static final ResourceLocation TEXTURE = new ResourceLocation(ICBMConstants.DOMAIN, ICBMConstants.GUI_DIRECTORY + "gui_cruise_launcher.png");
-
     // Launcher
     private final TileCruiseLauncher tileEntity;
 
-    public GuiCruiseLauncher(EntityPlayer player, TileCruiseLauncher tileEntity)
-    {
+    public GuiCruiseLauncher(EntityPlayer player, TileCruiseLauncher tileEntity) {
         super(new ContainerCruiseLauncher(player, tileEntity));
         this.tileEntity = tileEntity;
         this.height = 166;
@@ -38,8 +36,7 @@ public class GuiCruiseLauncher extends GuiContainerBase
     }
 
     @Override
-    public void initGui()
-    {
+    public void initGui() {
         super.initGui();
 
         int componentID = 0;
@@ -74,10 +71,11 @@ public class GuiCruiseLauncher extends GuiContainerBase
         addComponent(new TooltipTranslations(2, 16, 14, 14, LauncherLangs.TRANSLATION_TOOLTIP_TARGET).withDelay(1));
     }
 
-    /** Draw the foreground layer for the GuiContainer (everything in front of the items) */
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     @Override
-    protected void drawGuiContainerForegroundLayer(int par1, int par2)
-    {
+    protected void drawGuiContainerForegroundLayer(int par1, int par2) {
         // Draw text
         this.fontRenderer.drawString("\u00a77" + LanguageUtility.getLocal(GUI_NAME), 52, 6, 4210752);
         this.fontRenderer.drawString(LanguageUtility.getLocal("container.inventory"), 8, this.ySize - 96 + 4, 4210752);
@@ -85,4 +83,5 @@ public class GuiCruiseLauncher extends GuiContainerBase
         // Goes last so tooltips render above our UI elements
         super.drawGuiContainerForegroundLayer(par1, par2);
     }
+
 }

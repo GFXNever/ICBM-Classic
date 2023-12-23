@@ -17,25 +17,21 @@ import java.util.UUID;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 1/7/19.
  */
-public class CapabilityMissileLauncher implements IMissileLauncher
-{
-    public static void register()
-    {
-        CapabilityManager.INSTANCE.register(IMissileLauncher.class, new Capability.IStorage<IMissileLauncher>()
-        {
-            @Nullable
-            @Override
-            public NBTBase writeNBT(Capability<IMissileLauncher> capability, IMissileLauncher instance, EnumFacing side)
-            {
-                return null;
-            }
+public class CapabilityMissileLauncher implements IMissileLauncher {
 
-            @Override
-            public void readNBT(Capability<IMissileLauncher> capability, IMissileLauncher instance, EnumFacing side, NBTBase nbt)
-            {
+    public static void register() {
+        CapabilityManager.INSTANCE.register(IMissileLauncher.class, new Capability.IStorage<IMissileLauncher>() {
+                @Nullable
+                @Override
+                public NBTBase writeNBT(Capability<IMissileLauncher> capability, IMissileLauncher instance, EnumFacing side) {
+                    return null;
+                }
 
-            }
-        },
+                @Override
+                public void readNBT(Capability<IMissileLauncher> capability, IMissileLauncher instance, EnumFacing side, NBTBase nbt) {
+
+                }
+            },
             CapabilityMissileLauncher::new);
     }
 
@@ -58,4 +54,5 @@ public class CapabilityMissileLauncher implements IMissileLauncher
     public IActionStatus launch(ILauncherSolution firingSolution, @Nullable IMissileCause cause, boolean simulate) {
         return LauncherStatus.ERROR_GENERIC;
     }
+
 }

@@ -28,32 +28,32 @@ public class RadioCruise extends RadioTile<TileCruiseLauncher> implements IRadio
         if (canReceive(sender, packet)) {
 
             // Set target packet, run first as laser-det triggers both (set & fire) from the same packet
-            if(packet instanceof ITargetMessage) {
+            if (packet instanceof ITargetMessage) {
                 final Vec3d target = ((ITargetMessage) packet).getTarget();
-                if(target != null) {
+                if (target != null) {
                     host.setTarget(target);
 
                     // Don't show set message if we are going to fire right away
-                    if(!(packet instanceof ITriggerActionMessage)) {
-                        sender.onMessageCallback(this, new TextMessage(getChannel(), RadioTranslations.RADIO_TARGET_SET, target.x, target.y, target.z));
+                    if (!(packet instanceof ITriggerActionMessage)) {
+                        sender.onMessageCallback(this,
+                            new TextMessage(getChannel(), RadioTranslations.RADIO_TARGET_SET, target.x, target.y, target.z));
                     }
-                }
-                else {
+                } else {
                     sender.onMessageCallback(this, new TextMessage(getChannel(), RadioTranslations.RADIO_TARGET_NULL));
                 }
             }
 
             // Fire missile packet
-            if(packet instanceof ITriggerActionMessage) {
-                if(host.getFiringPackage() != null) {
+            if (packet instanceof ITriggerActionMessage) {
+                if (host.getFiringPackage() != null) {
                     sender.onMessageCallback(this, new TextMessage(getChannel(), LauncherLangs.ERROR_MISSILE_QUEUED));
                     return;
                 }
-                if(sender instanceof FakeRadioSender) {
+                if (sender instanceof FakeRadioSender) {
                     //TODO add radio cause before player, pass in item used
-                    host.setFiringPackage(new FiringPackage(new BasicTargetData(host.getTarget()), new EntityCause(((FakeRadioSender) sender).player), 0));
-                }
-                else {
+                    host.setFiringPackage(
+                        new FiringPackage(new BasicTargetData(host.getTarget()), new EntityCause(((FakeRadioSender) sender).player), 0));
+                } else {
                     // TODO set cause to radio
                     host.setFiringPackage(new FiringPackage(new BasicTargetData(host.getTarget()), null, 0));
                 }
@@ -64,4 +64,5 @@ public class RadioCruise extends RadioTile<TileCruiseLauncher> implements IRadio
             }
         }
     }
+
 }

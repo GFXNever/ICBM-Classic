@@ -9,8 +9,8 @@ import net.minecraft.entity.player.EntityPlayer;
  * Created by Darkguardsman on 8/5/2014.
  */
 @Deprecated
-public interface IPacketIDReceiver
-{
+public interface IPacketIDReceiver {
+
     /**
      * Called to read the packet when received
      *
@@ -32,8 +32,8 @@ public interface IPacketIDReceiver
      *                        world packets without postion data, and null if non-world packets
      * @return true if the packet should be read
      */
-    default boolean shouldReadPacket(EntityPlayer player, IWorldPosition receiveLocation, IPacket packet)
-    {
+    default boolean shouldReadPacket(EntityPlayer player, IWorldPosition receiveLocation, IPacket packet) {
         return true;
     }
+
 }

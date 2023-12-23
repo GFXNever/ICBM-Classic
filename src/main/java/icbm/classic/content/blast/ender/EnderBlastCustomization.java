@@ -25,10 +25,13 @@ import java.util.function.Consumer;
 public class EnderBlastCustomization implements IExplosiveCustomization {
 
     public static final ResourceLocation NAME = new ResourceLocation(ICBMConstants.DOMAIN, "ender");
-
+    private static final NbtSaveHandler<EnderBlastCustomization> SAVE_LOGIC = new NbtSaveHandler<EnderBlastCustomization>()
+        .mainRoot()
+        /* */.nodeVec3d("pos", EnderBlastCustomization::getPos, EnderBlastCustomization::setPos)
+        /* */.nodeInteger("dim", EnderBlastCustomization::getDim, EnderBlastCustomization::setDim)
+        .base();
     private Integer dim;
     private Vec3d pos;
-
     private String posTooltip;
     private String dimTooltip;
 
@@ -38,14 +41,14 @@ public class EnderBlastCustomization implements IExplosiveCustomization {
     }
 
     public void setPos(Vec3d pos) {
-        if(!Objects.equals(pos, this.pos)) {
+        if (!Objects.equals(pos, this.pos)) {
             posTooltip = null;
         }
         this.pos = pos;
     }
 
     public void setDim(Integer dim) {
-        if(!Objects.equals(dim, this.dim)) {
+        if (!Objects.equals(dim, this.dim)) {
             dimTooltip = null;
         }
         this.dim = dim;
@@ -53,15 +56,16 @@ public class EnderBlastCustomization implements IExplosiveCustomization {
 
     @Override
     public void collectCustomizationInformation(Consumer<String> collector) {
-        if(pos != null) {
-            if(posTooltip == null) {
+        if (pos != null) {
+            if (posTooltip == null) {
                 posTooltip = LanguageUtility.buildToolTipString(new TextComponentTranslation("explosive.icbmclassic:ender.pos", pos.x, pos.y, pos.z));
             }
             collector.accept(posTooltip);
         }
-        if(dim != null) {
-            if(dimTooltip == null) {
-                final String worldName = Optional.ofNullable(DimensionManager.getWorld(dim)).map(World::getWorldInfo).map(WorldInfo::getWorldName).orElse("???");
+        if (dim != null) {
+            if (dimTooltip == null) {
+                final String worldName =
+                    Optional.ofNullable(DimensionManager.getWorld(dim)).map(World::getWorldInfo).map(WorldInfo::getWorldName).orElse("???");
                 dimTooltip = LanguageUtility.buildToolTipString(new TextComponentTranslation("explosive.icbmclassic:ender.world", dim, worldName));
             }
             collector.accept(dimTooltip);
@@ -75,7 +79,7 @@ public class EnderBlastCustomization implements IExplosiveCustomization {
 
     @Override
     public void apply(IExplosiveData explosiveData, IBlast blast) {
-        if(blast instanceof BlastEnder) {
+        if (blast instanceof BlastEnder) {
             ((BlastEnder) blast).setTeleportTarget(pos);
         }
     }
@@ -90,9 +94,4 @@ public class EnderBlastCustomization implements IExplosiveCustomization {
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<EnderBlastCustomization> SAVE_LOGIC = new NbtSaveHandler<EnderBlastCustomization>()
-        .mainRoot()
-        /* */.nodeVec3d("pos", EnderBlastCustomization::getPos, EnderBlastCustomization::setPos)
-        /* */.nodeInteger("dim", EnderBlastCustomization::getDim, EnderBlastCustomization::setDim)
-        .base();
 }

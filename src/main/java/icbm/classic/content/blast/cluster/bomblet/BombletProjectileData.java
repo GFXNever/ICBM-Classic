@@ -18,7 +18,9 @@ public class BombletProjectileData implements IProjectileData<EntityBombDroplet>
     public static final ResourceLocation NAME = new ResourceLocation(ICBMConstants.DOMAIN, "bomblet");
     public static final ProjectileType[] TYPES = new ProjectileType[]{ProjectileType.TYPE_BOMB};
 
-    @Setter @Getter @Accessors(chain = true)
+    @Setter
+    @Getter
+    @Accessors(chain = true)
     private ItemStack explosiveStack = ItemStack.EMPTY;
 
     public ProjectileType[] getTypes() {
@@ -48,4 +50,5 @@ public class BombletProjectileData implements IProjectileData<EntityBombDroplet>
     public void deserializeNBT(NBTTagCompound save) {
         explosiveStack = new ItemStack(save.getCompoundTag("explosive"));
     }
+
 }

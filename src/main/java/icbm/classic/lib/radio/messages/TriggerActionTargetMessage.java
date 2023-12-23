@@ -10,4 +10,5 @@ public class TriggerActionTargetMessage implements ITriggerActionMessage, ITarge
 
     private final String channel;
     private final Vec3d target;
+
 }

@@ -20,17 +20,18 @@ import net.minecraft.world.World;
 public class ItemRadio extends ItemBase {
 
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand)
-    {
+    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ,
+                                           EnumHand hand) {
         final ItemStack heldItem = player.getHeldItem(hand);
         final TileEntity tile = world.getTileEntity(pos);
-        if(tile != null && tile.hasCapability(ICBMClassicAPI.RADIO_CAPABILITY, side)) {
-            if(!world.isRemote) {
+        if (tile != null && tile.hasCapability(ICBMClassicAPI.RADIO_CAPABILITY, side)) {
+            if (!world.isRemote) {
                 final IRadio radio = tile.getCapability(ICBMClassicAPI.RADIO_CAPABILITY, side);
-                if(radio instanceof IRadioChannelAccess) {
+                if (radio instanceof IRadioChannelAccess) {
                     final String channel = ((IRadioChannelAccess) radio).getChannel();
                     setRadioChannel(heldItem, channel);
-                    player.sendMessage(new TextComponentString(LanguageUtility.getLocal("chat.launcher.toolFrequencySet").replace("%s", "" + channel)));
+                    player.sendMessage(
+                        new TextComponentString(LanguageUtility.getLocal("chat.launcher.toolFrequencySet").replace("%s", "" + channel)));
                 }
             }
             return EnumActionResult.SUCCESS;
@@ -46,12 +47,10 @@ public class ItemRadio extends ItemBase {
      */
     public String getRadioChannel(ItemStack stack) //TODO move to capability item
     {
-        if (stack.getTagCompound() != null)
-        {
-            if(stack.getTagCompound().hasKey(NBTConstants.HZ)) {
-                return Integer.toString((int)Math.floor(stack.getTagCompound().getFloat(NBTConstants.HZ)));
-            }
-            else if(stack.getTagCompound().hasKey("radio_channel")) {
+        if (stack.getTagCompound() != null) {
+            if (stack.getTagCompound().hasKey(NBTConstants.HZ)) {
+                return Integer.toString((int) Math.floor(stack.getTagCompound().getFloat(NBTConstants.HZ)));
+            } else if (stack.getTagCompound().hasKey("radio_channel")) {
                 return stack.getTagCompound().getString("radio_channel");
             }
         }
@@ -61,18 +60,17 @@ public class ItemRadio extends ItemBase {
     /**
      * Sets the frequency of this item
      *
-     * @param stack - this item
-     * @param channel    - value to set
+     * @param stack   - this item
+     * @param channel - value to set
      */
-    public void setRadioChannel(ItemStack stack, String channel)
-    {
-        if (stack.getTagCompound() == null)
-        {
+    public void setRadioChannel(ItemStack stack, String channel) {
+        if (stack.getTagCompound() == null) {
             stack.setTagCompound(new NBTTagCompound());
         }
-        if(stack.getTagCompound().hasKey(NBTConstants.HZ)) {
+        if (stack.getTagCompound().hasKey(NBTConstants.HZ)) {
             stack.getTagCompound().removeTag(NBTConstants.HZ);
         }
         stack.getTagCompound().setString("radio_channel", channel);
     }
+
 }

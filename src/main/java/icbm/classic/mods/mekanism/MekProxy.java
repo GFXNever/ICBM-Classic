@@ -2,10 +2,10 @@ package icbm.classic.mods.mekanism;
 
 import icbm.classic.ICBMClassic;
 import icbm.classic.lib.network.packet.PacketEntityPos;
+import icbm.classic.lib.projectile.EntityProjectile;
 import icbm.classic.lib.world.IProjectileBlockInteraction;
 import icbm.classic.lib.world.ProjectileBlockInteraction;
 import icbm.classic.mods.ModProxy;
-import icbm.classic.lib.projectile.EntityProjectile;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -20,30 +20,25 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import java.lang.reflect.Method;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 5/22/2018.
  */
-public class MekProxy extends ModProxy
-{
+public class MekProxy extends ModProxy {
+
     public static final MekProxy INSTANCE = new MekProxy();
-
-    private boolean isLoaded = false;
-
     @GameRegistry.ObjectHolder("mekanism:MachineBlock")
     public static Block machineBlock;
-
     @GameRegistry.ObjectHolder("mekanism:BasicBlock")
     public static Block basicBlock;
+    private boolean isLoaded = false;
 
     @Override
     @Optional.Method(modid = "mekanism")
-    public void init()
-    {
+    public void init() {
         this.isLoaded = true;
 
         ICBMClassic.logger().info("Mekanism interaction: " + machineBlock + " " + basicBlock);
 
-        if(machineBlock != null && basicBlock != null) {
+        if (machineBlock != null && basicBlock != null) {
 
             // Teleporter frame is basic block meta 7
             final IBlockState frameState = basicBlock.getStateFromMeta(7);
@@ -53,7 +48,7 @@ public class MekProxy extends ModProxy
             ProjectileBlockInteraction.addBlockStateInteraction(frameState, (world, blockPos, hit, side, state, entity) -> {
                 final BlockPos possiblePortal = blockPos.offset(side);
                 final BlockPos teleporter = findTeleporter(world, possiblePortal);
-                if(teleporter != null) {
+                if (teleporter != null) {
                     teleport(world, teleporter, hit, entity);
                     return IProjectileBlockInteraction.EnumHitReactions.TELEPORTED;
                 }
@@ -65,27 +60,26 @@ public class MekProxy extends ModProxy
     protected BlockPos findTeleporter(World world, BlockPos possiblePortal) {
         final BlockPos optionA = possiblePortal.down();
 
-        if(isTeleporter(world.getBlockState(optionA))) {
+        if (isTeleporter(world.getBlockState(optionA))) {
             return optionA;
         }
 
         final BlockPos optionB = optionA.down();
-        if(isTeleporter(world.getBlockState(optionB))) {
-           return optionB;
+        if (isTeleporter(world.getBlockState(optionB))) {
+            return optionB;
         }
 
         final BlockPos optionC = optionB.down();
-        if(isTeleporter(world.getBlockState(optionC))) {
+        if (isTeleporter(world.getBlockState(optionC))) {
             return optionC;
         }
         return null;
     }
 
     protected void teleport(World world, BlockPos telePos, Vec3d hit, Entity entity) {
-        if(entity instanceof EntityProjectile) {
+        if (entity instanceof EntityProjectile) {
             ((EntityProjectile<?>) entity).moveTowards(hit, -0.5);
-        }
-        else {
+        } else {
             entity.setPosition(telePos.getX() + 0.5, telePos.getY() + 1.5, telePos.getZ() + 0.5);
         }
 
@@ -97,58 +91,56 @@ public class MekProxy extends ModProxy
 
         final TileEntity tile = world.getTileEntity(telePos);
 
-        if(tile != null && "mekanism.common.tile.TileEntityTeleporter".equals(tile.getClass().getTypeName())) {
+        if (tile != null && "mekanism.common.tile.TileEntityTeleporter".equals(tile.getClass().getTypeName())) {
             final Class cls = tile.getClass();
             try {
                 final Method method = cls.getMethod("teleport");
                 method.invoke(tile);
 
                 // Cross dim sets it dead
-                if(entity.isEntityAlive() && entity.world == world) {
+                if (entity.isEntityAlive() && entity.world == world) {
                     final BlockPos possiblePortal = entity.getPosition();
                     final BlockPos teleporter = findTeleporter(world, possiblePortal);
-                    if(teleporter != null) {
+                    if (teleporter != null) {
 
                         // Update rotation to face exit
                         final EnumFacing openSide = getSide(world, possiblePortal);
-                        if(openSide != null) {
+                        if (openSide != null) {
 
                             // Move to outside portal
-                            entity.setPosition(entity.posX + openSide.getFrontOffsetX(), entity.posY + yOffset, entity.posZ + openSide.getFrontOffsetZ());
+                            entity.setPosition(entity.posX + openSide.getFrontOffsetX(), entity.posY + yOffset,
+                                entity.posZ + openSide.getFrontOffsetZ());
 
                             // Update motion vector
                             double motionX = entity.motionX;
                             double motionZ = entity.motionZ;
 
-                            if(facingDirection.getAxis() == EnumFacing.Axis.X && openSide.getAxis() != EnumFacing.Axis.X) {
+                            if (facingDirection.getAxis() == EnumFacing.Axis.X && openSide.getAxis() != EnumFacing.Axis.X) {
                                 entity.motionX = openSide.getFrontOffsetX() * motionZ;
                                 entity.motionZ = motionX;
-                            }
-                            else if(facingDirection.getAxis() == EnumFacing.Axis.Z && openSide.getAxis() != EnumFacing.Axis.Z) {
+                            } else if (facingDirection.getAxis() == EnumFacing.Axis.Z && openSide.getAxis() != EnumFacing.Axis.Z) {
                                 entity.motionX = motionZ;
                                 entity.motionZ = openSide.getFrontOffsetZ() * motionX;
                             }
 
-                            if(entity instanceof EntityProjectile) {
-                                ((EntityProjectile)entity).rotateTowardsMotion(1);
+                            if (entity instanceof EntityProjectile) {
+                                ((EntityProjectile) entity).rotateTowardsMotion(1);
                                 //TODO manually calculate rotation based on directly
                                 //  As some flight logic systems will not allow rotation towards motion
-                            }
-                            else {
+                            } else {
                                 // Update facing
                                 float yawAdjust = getYaw(openSide);
                                 entity.rotationYaw += yawAdjust;
-                                while(entity.rotationYaw > 360) {
+                                while (entity.rotationYaw > 360) {
                                     entity.rotationYaw -= 360;
                                 }
-                                while(entity.rotationYaw < -360) {
+                                while (entity.rotationYaw < -360) {
                                     entity.rotationYaw += 360;
                                 }
                             }
 
                             ICBMClassic.packetHandler.sendToAllAround(new PacketEntityPos(entity), world, entity.posX, entity.posY, entity.posZ, 400);
-                        }
-                        else {
+                        } else {
                             // Update position to mimic enter point
                             entity.setPositionAndUpdate(entity.posX, entity.posY + yOffset, entity.posZ);
                         }
@@ -156,8 +148,7 @@ public class MekProxy extends ModProxy
 
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 ICBMClassic.logger().error("Failed to teleport using mekanism portal", e);
             }
         }
@@ -171,7 +162,7 @@ public class MekProxy extends ModProxy
         for (EnumFacing side : EnumFacing.HORIZONTALS) {
             final BlockPos sidePos = pos.offset(side);
             if (world.isAirBlock(sidePos)) {
-               return side;
+                return side;
             }
         }
         return null;
@@ -196,4 +187,5 @@ public class MekProxy extends ModProxy
     public boolean isMekanismLoaded() {
         return isLoaded;
     }
+
 }

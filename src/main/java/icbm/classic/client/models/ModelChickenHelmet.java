@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 // Made with Blockbench 4.6.4
 // Exported for Minecraft version 1.7 - 1.12
 public class ModelChickenHelmet extends ModelBase {
+
     private final ModelRenderer bone;
 
     public ModelChickenHelmet() {
@@ -35,4 +36,5 @@ public class ModelChickenHelmet extends ModelBase {
             bone.render(scale);
         }
     }
+
 }

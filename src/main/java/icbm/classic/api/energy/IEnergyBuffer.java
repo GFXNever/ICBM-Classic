@@ -6,8 +6,8 @@ package icbm.classic.api.energy;
  * Created by Dark on 8/15/2015.
  */
 @Deprecated
-public interface IEnergyBuffer
-{
+public interface IEnergyBuffer {
+
     /**
      * Added energy to the buffer
      *
@@ -47,4 +47,5 @@ public interface IEnergyBuffer
      * @param energy - energy to set
      */
     void setEnergyStored(int energy);
+
 }

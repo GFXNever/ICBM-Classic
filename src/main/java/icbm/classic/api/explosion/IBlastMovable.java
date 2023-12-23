@@ -6,8 +6,8 @@ package icbm.classic.api.explosion;
  * @deprecated entity that spawns the blast will now control this
  */
 @Deprecated
-public interface IBlastMovable extends IBlast
-{
+public interface IBlastMovable extends IBlast {
+
     /**
      * Can this blast be moved. Used for
      * redmatter like explosives that can
@@ -25,4 +25,5 @@ public interface IBlastMovable extends IBlast
      * @param posZ
      */
     void onPositionUpdate(double posX, double posY, double posZ);
+
 }

@@ -15,8 +15,8 @@ import net.minecraft.util.EnumFacing;
  * Created by Dark on 8/15/2015.
  */
 @Deprecated //Will be replaced by Capability system
-public interface IEnergyBufferProvider
-{
+public interface IEnergyBufferProvider {
+
     /**
      * Gets access to power buffer for the given side
      *
@@ -24,4 +24,5 @@ public interface IEnergyBufferProvider
      * @return energy buffer or null if none provider
      */
     IEnergyBuffer getEnergyBuffer(EnumFacing side);
+
 }

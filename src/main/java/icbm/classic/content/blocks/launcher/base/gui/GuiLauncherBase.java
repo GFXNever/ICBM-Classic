@@ -16,8 +16,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiLauncherBase extends GuiContainerBase
-{
+public class GuiLauncherBase extends GuiContainerBase {
+
     public static final ResourceLocation TEXTURE = new ResourceLocation(ICBMConstants.DOMAIN, ICBMConstants.GUI_DIRECTORY + "gui_silo_base.png");
     public static final ITextComponent LOCK_HEIGHT_TOOLTIP = new TextComponentTranslation("gui.icbmclassic:launcherbase.lock_height");
     public static final ITextComponent GROUP_ID_TOOLTIP = new TextComponentTranslation("gui.icbmclassic:launcherbase.group_id");
@@ -26,8 +26,7 @@ public class GuiLauncherBase extends GuiContainerBase
 
     private final TileLauncherBase tileEntity;
 
-    public GuiLauncherBase(EntityPlayer player, TileLauncherBase tileEntity)
-    {
+    public GuiLauncherBase(EntityPlayer player, TileLauncherBase tileEntity) {
         super(new ContainerLaunchBase(player, tileEntity));
         this.tileEntity = tileEntity;
         ySize = 166;
@@ -38,10 +37,11 @@ public class GuiLauncherBase extends GuiContainerBase
         return TEXTURE;
     }
 
-    /** Adds the buttons (and other controls) to the screen in question. */
+    /**
+     * Adds the buttons (and other controls) to the screen in question.
+     */
     @Override
-    public void initGui()
-    {
+    public void initGui() {
         super.initGui();
 
         int componentID = 0;
@@ -56,13 +56,14 @@ public class GuiLauncherBase extends GuiContainerBase
         addComponent(TextInput.intField(componentID++, fontRenderer, 17, 17 + 16, 30, 12,
             tileEntity::getFiringDelay, tileEntity::setFiringDelay, (o) -> TileLauncherBase.PACKET_FIRING_DELAY.sendToServer(tileEntity)));
 
-        addComponent(new FaceRotationButton(0, guiLeft + 157, guiTop + 3,  tileEntity::getLaunchDirection, tileEntity::getSeatSide, tileEntity::setSeatSide,
-            () -> TileLauncherBase.PACKET_SEAT_ROTATION.sendToServer(tileEntity)));
+        addComponent(
+            new FaceRotationButton(0, guiLeft + 157, guiTop + 3, tileEntity::getLaunchDirection, tileEntity::getSeatSide, tileEntity::setSeatSide,
+                () -> TileLauncherBase.PACKET_SEAT_ROTATION.sendToServer(tileEntity)));
 
         addComponent(new SlotEnergyBar(141, 66,
-            tileEntity.energyStorage::getEnergyStored,
-            tileEntity.energyStorage::getMaxEnergyStored
-           ).withActionCost(tileEntity::getFiringCost)
+                tileEntity.energyStorage::getEnergyStored,
+                tileEntity.energyStorage::getMaxEnergyStored
+            ).withActionCost(tileEntity::getFiringCost)
         );
 
         addComponent(new TooltipTranslations(4, 16, 14, 14, LOCK_HEIGHT_TOOLTIP).withDelay(1));
@@ -71,11 +72,13 @@ public class GuiLauncherBase extends GuiContainerBase
         addComponent(new TooltipTranslations(4, 16 + 16, 14, 14, FIRING_DELAY_TOOLTIP).withDelay(1));
     }
 
-    /** Draw the foreground layer for the GuiContainer (everything in front of the items) */
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
     @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
-    {
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         this.fontRenderer.drawString("\u00a77" + LanguageUtility.getLocal("gui.icbmclassic:launcherbase.name"), 30, 6, 4210752);
         super.drawGuiContainerForegroundLayer(mouseX, mouseY);
     }
+
 }

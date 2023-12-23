@@ -14,12 +14,30 @@ import javax.annotation.Nullable;
 
 public class CapabilityGPSData implements IGPSData, INBTSerializable<NBTTagCompound> {
 
+    private static final NbtSaveHandler<IGPSData> SAVE_LOGIC = new NbtSaveHandler<IGPSData>()
+        .mainRoot()
+        /* */.nodeVec3d("pos", IGPSData::getPosition, IGPSData::setPosition)
+        /* */.nodeInteger("dim", IGPSData::getWorldId, IGPSData::setWorld)
+        .base();
     private Vec3d position;
     private Integer dimension;
 
-    @Override
-    public void setPosition(@Nullable Vec3d position) {
-        this.position = position;
+    public static void register() {
+        CapabilityManager.INSTANCE.register(IGPSData.class, new Capability.IStorage<IGPSData>() {
+                @Nullable
+                @Override
+                public NBTBase writeNBT(Capability<IGPSData> capability, IGPSData instance, EnumFacing side) {
+                    return SAVE_LOGIC.save(instance);
+                }
+
+                @Override
+                public void readNBT(Capability<IGPSData> capability, IGPSData instance, EnumFacing side, NBTBase nbt) {
+                    if (nbt instanceof NBTTagCompound) {
+                        SAVE_LOGIC.load(instance, (NBTTagCompound) nbt);
+                    }
+                }
+            },
+            CapabilityGPSData::new);
     }
 
     @Override
@@ -31,6 +49,11 @@ public class CapabilityGPSData implements IGPSData, INBTSerializable<NBTTagCompo
     @Override
     public Vec3d getPosition() {
         return position;
+    }
+
+    @Override
+    public void setPosition(@Nullable Vec3d position) {
+        this.position = position;
     }
 
     @Nullable
@@ -49,29 +72,4 @@ public class CapabilityGPSData implements IGPSData, INBTSerializable<NBTTagCompo
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<IGPSData> SAVE_LOGIC = new NbtSaveHandler<IGPSData>()
-        .mainRoot()
-        /* */.nodeVec3d("pos", IGPSData::getPosition, IGPSData::setPosition)
-        /* */.nodeInteger("dim", IGPSData::getWorldId, IGPSData::setWorld)
-        .base();
-
-    public static void register()
-    {
-        CapabilityManager.INSTANCE.register(IGPSData.class, new Capability.IStorage<IGPSData>()
-            {
-                @Nullable
-                @Override
-                public NBTBase writeNBT(Capability<IGPSData> capability, IGPSData instance, EnumFacing side) {
-                    return SAVE_LOGIC.save(instance);
-                }
-
-                @Override
-                public void readNBT(Capability<IGPSData> capability, IGPSData instance, EnumFacing side, NBTBase nbt) {
-                    if(nbt instanceof NBTTagCompound) {
-                        SAVE_LOGIC.load(instance, (NBTTagCompound) nbt);
-                    }
-                }
-            },
-            CapabilityGPSData::new);
-    }
 }

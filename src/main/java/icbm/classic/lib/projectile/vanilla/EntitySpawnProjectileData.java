@@ -1,9 +1,7 @@
 package icbm.classic.lib.projectile.vanilla;
 
 import icbm.classic.api.missiles.projectile.IProjectileData;
-import icbm.classic.content.missile.logic.source.MissileSource;
 import icbm.classic.lib.saving.NbtSaveHandler;
-import icbm.classic.lib.saving.NbtSaveRoot;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,12 +19,20 @@ import java.util.UUID;
 public class EntitySpawnProjectileData implements IProjectileData<Entity> {
 
     public static final ResourceLocation NAME = new ResourceLocation("minecraft", "entity");
-
+    private static final NbtSaveHandler<EntitySpawnProjectileData> SAVE_LOGIC = new NbtSaveHandler<EntitySpawnProjectileData>()
+        .mainRoot()
+        /* */.nodeResourceLocation("entity_id", (e) -> e.entityKey, (e, r) -> e.entityKey = r)
+        /* */.nodeString("custom_name", EntitySpawnProjectileData::getDisplayName, EntitySpawnProjectileData::setDisplayName)
+        /* */.nodeCompoundTag("entity_data", EntitySpawnProjectileData::getEntityData, EntitySpawnProjectileData::setEntityData)
+        .base();
     private ResourceLocation entityKey;
-
-    @Getter @Setter @Accessors(chain = true)
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private String displayName;
-    @Getter @Setter @Accessors(chain = true)
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private NBTTagCompound entityData;
 
     public EntitySpawnProjectileData(ResourceLocation key) {
@@ -44,15 +50,15 @@ public class EntitySpawnProjectileData implements IProjectileData<Entity> {
 
     @Override
     public Entity newEntity(World world, boolean allowItemPickup) {
-        if(entityKey != null) {
+        if (entityKey != null) {
             final EntityEntry entry = ForgeRegistries.ENTITIES.getValue(entityKey);
-            if(entry != null) {
+            if (entry != null) {
                 final Entity entity = entry.newInstance(world);
-                if(entity != null) {
-                    if(displayName != null) {
+                if (entity != null) {
+                    if (displayName != null) {
                         entity.setCustomNameTag(displayName);
                     }
-                    if(entityData != null) {
+                    if (entityData != null) {
                         final NBTTagCompound entityExistingSave = entity.writeToNBT(new NBTTagCompound());
                         final UUID uuid = entity.getUniqueID();
                         entityExistingSave.merge(entityData);
@@ -73,13 +79,7 @@ public class EntitySpawnProjectileData implements IProjectileData<Entity> {
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
-       SAVE_LOGIC.load(this, nbt);
+        SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<EntitySpawnProjectileData> SAVE_LOGIC = new NbtSaveHandler<EntitySpawnProjectileData>()
-        .mainRoot()
-        /* */.nodeResourceLocation("entity_id", (e) -> e.entityKey, (e, r) -> e.entityKey = r)
-        /* */.nodeString("custom_name", EntitySpawnProjectileData::getDisplayName, EntitySpawnProjectileData::setDisplayName)
-        /* */.nodeCompoundTag("entity_data", EntitySpawnProjectileData::getEntityData, EntitySpawnProjectileData::setEntityData)
-        .base();
 }

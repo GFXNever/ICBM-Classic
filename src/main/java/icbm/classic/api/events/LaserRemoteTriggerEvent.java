@@ -15,20 +15,24 @@ import javax.annotation.Nonnull;
  * the affected launcher.
  */
 @Cancelable
-public class LaserRemoteTriggerEvent extends Event
-{
+public class LaserRemoteTriggerEvent extends Event {
+
     public final World world;
     public final EntityPlayer player;
+    /**
+     * Optional translation key to show user for why it was canceled
+     */
+    public String cancelReason;
     private Vec3d pos;
 
-    /** Optional translation key to show user for why it was canceled */
-    public String cancelReason;
-
-    public LaserRemoteTriggerEvent(World world, Vec3d pos, EntityPlayer player)
-    {
+    public LaserRemoteTriggerEvent(World world, Vec3d pos, EntityPlayer player) {
         this.world = world;
         this.pos = pos;
         this.player = player;
+    }
+
+    public Vec3d getPos() {
+        return pos;
     }
 
     /**
@@ -37,13 +41,10 @@ public class LaserRemoteTriggerEvent extends Event
      * @param pos to set, can't be null or will throw exception
      */
     public void setPos(@Nonnull Vec3d pos) {
-        if(pos == null) {
+        if (pos == null) {
             throw new IllegalArgumentException("LaserRemoteTriggerEvent: target pos can not be set to null");
         }
         this.pos = pos;
     }
 
-    public Vec3d getPos() {
-        return pos;
-    }
 }

@@ -7,28 +7,25 @@ import net.minecraft.potion.PotionEffect;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomPotionEffect extends PotionEffect
-{
+public class CustomPotionEffect extends PotionEffect {
 
-    public CustomPotionEffect(Potion potion, int duration, int amplifier)
-    {
+    public CustomPotionEffect(Potion potion, int duration, int amplifier) {
         super(potion, duration, amplifier);
     }
 
-    /** Creates a potion effect with custom curable items.
+    /**
+     * Creates a potion effect with custom curable items.
      *
-     * @param curativeItems - ItemStacks that can cure this potion effect */
-    public CustomPotionEffect(Potion potionID, int duration, int amplifier, List<ItemStack> curativeItems)
-    {
+     * @param curativeItems - ItemStacks that can cure this potion effect
+     */
+    public CustomPotionEffect(Potion potionID, int duration, int amplifier, List<ItemStack> curativeItems) {
         super(potionID, duration, amplifier);
 
-        if (curativeItems == null)
-        {
+        if (curativeItems == null) {
             this.setCurativeItems(new ArrayList<ItemStack>());
-        }
-        else
-        {
+        } else {
             this.setCurativeItems(curativeItems);
         }
     }
+
 }

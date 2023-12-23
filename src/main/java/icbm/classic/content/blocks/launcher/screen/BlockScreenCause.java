@@ -25,4 +25,5 @@ public class BlockScreenCause extends BlockCause {
     public ResourceLocation getRegistryName() {
         return REG_NAME;
     }
+
 }

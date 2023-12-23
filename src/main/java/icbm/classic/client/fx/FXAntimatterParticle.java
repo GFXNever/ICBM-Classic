@@ -7,15 +7,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class FXAntimatterParticle extends Particle
-{
-    public FXAntimatterParticle(World par1World, Pos position, double par8, double par10, double par12, double distance)
-    {
+public class FXAntimatterParticle extends Particle {
+
+    public FXAntimatterParticle(World par1World, Pos position, double par8, double par10, double par12, double distance) {
         this(par1World, position, par8, par10, par12, 1.0F, distance);
     }
 
-    public FXAntimatterParticle(World par1World, Pos position, double par8, double par10, double par12, float par14, double distance)
-    {
+    public FXAntimatterParticle(World par1World, Pos position, double par8, double par10, double par12, float par14, double distance) {
         super(par1World, position.x(), position.y(), position.z(), 0.0D, 0.0D, 0.0D);
         this.motionX *= 0.10000000149011612D;
         this.motionY *= 0.10000000149011612D;
@@ -30,22 +28,22 @@ public class FXAntimatterParticle extends Particle
         this.particleMaxAge = (int) (this.particleMaxAge * par14);
     }
 
-    public int getBrightnessForRender(float p_189214_1_)
-    {
+    public int getBrightnessForRender(float p_189214_1_) {
         return 240;
     }
 
-    /** Called to update the entity's position/logic. */
+    /**
+     * Called to update the entity's position/logic.
+     */
     @Override
-    public void onUpdate()
-    {
+    public void onUpdate() {
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
 
-        if (this.particleAge++ >= this.particleMaxAge)
-        {
+        if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();
         }
     }
+
 }

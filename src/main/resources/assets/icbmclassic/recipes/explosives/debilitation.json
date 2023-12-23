@@ -3,7 +3,7 @@
     "explosive": "icbmclassic:debilitation",
     "count": 3
   },
-    "pattern": [
+  "pattern": [
     "sss",
     "wrw",
     "sss"
@@ -19,7 +19,7 @@
       "data": 0
     },
     "r": {
-      "type" : "icbmclassic:explosive",
+      "type": "icbmclassic:explosive",
       "explosive": "icbmclassic:shrapnel"
     }
   }

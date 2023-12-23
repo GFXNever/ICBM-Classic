@@ -12,75 +12,65 @@ import javax.annotation.Nullable;
 
 /**
  * Wrapper for exposing the {@link EntityRedmatter} as a Blast
- *
+ * <p>
  * Created by Dark(DarkGuardsman, Robert) on 4/19/2020.
  */
-public class BlastRedmatterWrapper implements IBlast
-{
+public class BlastRedmatterWrapper implements IBlast {
+
     private final EntityRedmatter host;
 
-    public BlastRedmatterWrapper(EntityRedmatter host)
-    {
+    public BlastRedmatterWrapper(EntityRedmatter host) {
         this.host = host;
     }
 
     @Nonnull
     @Override
-    public BlastResponse runBlast()
-    {
+    public BlastResponse runBlast() {
         return BlastState.ALREADY_TRIGGERED.genericResponse;
     }
 
     @Override
-    public void clearBlast()
-    {
+    public void clearBlast() {
         host.setDead();
     }
 
     //<editor-fold desc="properties">
     @Override
-    public boolean isCompleted()
-    {
+    public boolean isCompleted() {
         return host.isDead;
     }
 
     @Override
     @Nullable
-    public Entity getEntity()
-    {
+    public Entity getEntity() {
         return host;
     }
 
     @Override
     @Nullable
-    public Entity getBlastSource()
-    {
+    public Entity getBlastSource() {
         return host;
     }
     //</editor-fold>
 
     //<editor-fold desc="position-data">
     @Override
-    public World world()
-    {
+    public World world() {
         return host.world;
     }
 
     @Override
-    public double z()
-    {
+    public double z() {
         return host.posZ;
     }
 
     @Override
-    public double x()
-    {
+    public double x() {
         return host.posX;
     }
 
     @Override
-    public double y()
-    {
+    public double y() {
         return host.posY;
     }
     //</editor-fold>

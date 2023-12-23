@@ -26,21 +26,18 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemBombCart extends ItemBase
-{
-    public ItemBombCart()
-    {
+public class ItemBombCart extends ItemBase {
+
+    public ItemBombCart() {
         this.setMaxStackSize(3);
         this.setHasSubtypes(true);
     }
 
     @Override
     @Nullable
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt)
-    {
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
         CapabilityExplosiveStack capabilityExplosive = new CapabilityExplosiveStack(stack);
-        if(nbt != null)
-        {
+        if (nbt != null) {
             capabilityExplosive.deserializeNBT(nbt);
         }
         return capabilityExplosive;
@@ -52,32 +49,30 @@ public class ItemBombCart extends ItemBase
      * BLOCKS
      */
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
+    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY,
+                                      float hitZ) {
         IBlockState iblockstate = worldIn.getBlockState(pos);
 
-        if (!BlockRailBase.isRailBlock(iblockstate))
-        {
+        if (!BlockRailBase.isRailBlock(iblockstate)) {
             return EnumActionResult.FAIL;
-        }
-        else
-        {
+        } else {
             ItemStack itemstack = player.getHeldItem(hand);
 
-            if (!worldIn.isRemote)
-            {
-                BlockRailBase.EnumRailDirection railBlock = iblockstate.getBlock() instanceof BlockRailBase ? ((BlockRailBase) iblockstate.getBlock()).getRailDirection(worldIn, pos, iblockstate, null) : BlockRailBase.EnumRailDirection.NORTH_SOUTH;
+            if (!worldIn.isRemote) {
+                BlockRailBase.EnumRailDirection railBlock =
+                    iblockstate.getBlock() instanceof BlockRailBase ? ((BlockRailBase) iblockstate.getBlock()).getRailDirection(worldIn, pos,
+                        iblockstate, null) : BlockRailBase.EnumRailDirection.NORTH_SOUTH;
                 double d0 = 0.0D;
 
-                if (railBlock.isAscending())
-                {
+                if (railBlock.isAscending()) {
                     d0 = 0.5D;
                 }
 
-                EntityMinecart entityminecart = new EntityBombCart(worldIn, (double) pos.getX() + 0.5D, (double) pos.getY() + 0.0625D + d0, (double) pos.getZ() + 0.5D, itemstack);
+                EntityMinecart entityminecart =
+                    new EntityBombCart(worldIn, (double) pos.getX() + 0.5D, (double) pos.getY() + 0.0625D + d0, (double) pos.getZ() + 0.5D,
+                        itemstack);
 
-                if (itemstack.hasDisplayName())
-                {
+                if (itemstack.hasDisplayName()) {
                     entityminecart.setCustomNameTag(itemstack.getDisplayName());
                 }
 
@@ -90,50 +85,42 @@ public class ItemBombCart extends ItemBase
     }
 
     @Override
-    public int getMetadata(int damage)
-    {
+    public int getMetadata(int damage) {
         return damage;
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack itemstack)
-    {
+    public String getUnlocalizedName(ItemStack itemstack) {
         final IExplosiveData data = ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosiveData(itemstack.getItemDamage());
-        if (data != null)
-        {
+        if (data != null) {
             return "bombcart." + data.getRegistryName();
         }
         return "bombcart";
     }
 
     @Override
-    public String getUnlocalizedName()
-    {
+    public String getUnlocalizedName() {
         return "bombcart";
     }
 
     @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-    {
-        if (tab == getCreativeTab() || tab == CreativeTabs.SEARCH)
-        {
-            for (int id : ICBMClassicAPI.EX_MINECART_REGISTRY.getExplosivesIDs())
-            {
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+        if (tab == getCreativeTab() || tab == CreativeTabs.SEARCH) {
+            for (int id : ICBMClassicAPI.EX_MINECART_REGISTRY.getExplosivesIDs()) {
                 items.add(new ItemStack(this, 1, id));
             }
         }
     }
 
     @Override
-    protected boolean hasDetailedInfo(ItemStack stack, EntityPlayer player)
-    {
+    protected boolean hasDetailedInfo(ItemStack stack, EntityPlayer player) {
         return true;
     }
 
     @Override
-    protected void getDetailedInfo(ItemStack stack, EntityPlayer player, List list)
-    {
+    protected void getDetailedInfo(ItemStack stack, EntityPlayer player, List list) {
         //TODO change over to a hook
         ((ItemBlockExplosive) Item.getItemFromBlock(BlockReg.blockExplosive)).getDetailedInfo(stack, player, list);
     }
+
 }

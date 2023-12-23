@@ -20,13 +20,11 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 1/15/2018.
  */
-public class BlockCruiseLauncher extends BlockICBM
-{
-    public BlockCruiseLauncher()
-    {
+public class BlockCruiseLauncher extends BlockICBM {
+
+    public BlockCruiseLauncher() {
         super("cruiseLauncher");
         this.blockHardness = 10f;
         this.blockResistance = 10f;
@@ -34,61 +32,51 @@ public class BlockCruiseLauncher extends BlockICBM
     }
 
     @Override
-    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side)
-    {
+    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, @Nullable EnumFacing side) {
         return true;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @Override
-    public boolean isFullCube(IBlockState state)
-    {
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
+    public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;
     }
 
     @Override
-    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side)
-    {
+    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side) {
         return super.canPlaceBlockOnSide(worldIn, pos, side);
     }
 
     @Override
-    public boolean canPlaceBlockAt(World worldIn, BlockPos pos)
-    {
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
         return super.canPlaceBlockAt(worldIn, pos);
     }
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta)
-    {
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new TileCruiseLauncher();
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
-        if (!world.isRemote)
-        {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX,
+                                    float hitY, float hitZ) {
+        if (!world.isRemote) {
             final TileEntity tileEntity = world.getTileEntity(pos);
-            if (tileEntity instanceof TileCruiseLauncher)
-            {
+            if (tileEntity instanceof TileCruiseLauncher) {
                 final TileCruiseLauncher launcher = (TileCruiseLauncher) tileEntity;
                 final ItemStack stack = player.getHeldItem(hand);
                 final IGPSData gpsData = ICBMClassicHelpers.getGPSData(stack);
-                if (!GPSDataHelpers.handlePlayerInteraction(gpsData, player, launcher::setTarget))
-                {
+                if (!GPSDataHelpers.handlePlayerInteraction(gpsData, player, launcher::setTarget)) {
                     player.openGui(ICBMClassic.INSTANCE, 0, world, pos.getX(), pos.getY(), pos.getZ());
                 }
             }
@@ -97,13 +85,12 @@ public class BlockCruiseLauncher extends BlockICBM
     }
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state)
-    {
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
         TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof ILauncherComponent)
-        {
+        if (tile instanceof ILauncherComponent) {
             ((ILauncherComponent) tile).getNetworkNode().onTileRemoved();
         }
         super.breakBlock(world, pos, state);
     }
+
 }

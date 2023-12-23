@@ -14,14 +14,12 @@ public class TileLauncherFrame extends TileEntity implements ILauncherComponent 
     private final LauncherNode launcherNode = new LauncherNode(this, false);
 
     @Override
-    public void onLoad()
-    {
-       launcherNode.connectToTiles();
+    public void onLoad() {
+        launcherNode.connectToTiles();
     }
 
     @Override
-    public void invalidate()
-    {
+    public void invalidate() {
         getNetworkNode().onTileRemoved();
         super.invalidate();
     }
@@ -30,23 +28,23 @@ public class TileLauncherFrame extends TileEntity implements ILauncherComponent 
     public LauncherNode getNetworkNode() {
         return launcherNode;
     }
+
     @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
-    {
-        return super.hasCapability(capability, facing) || Optional.ofNullable(getNetworkNode().getNetwork()).map(network -> network.hasCapability(capability, facing)).orElse(false);
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+        return super.hasCapability(capability, facing) || Optional.ofNullable(getNetworkNode().getNetwork())
+            .map(network -> network.hasCapability(capability, facing)).orElse(false);
     }
 
     @Override
     @Nullable
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
-    {
-        if (getNetworkNode().getNetwork() != null)
-        {
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+        if (getNetworkNode().getNetwork() != null) {
             final T cap = getNetworkNode().getNetwork().getCapability(capability, facing);
-            if(cap != null) {
+            if (cap != null) {
                 return cap;
             }
         }
         return super.getCapability(capability, facing);
     }
+
 }

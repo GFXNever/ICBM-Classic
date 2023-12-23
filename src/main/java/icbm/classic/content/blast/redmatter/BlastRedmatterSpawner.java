@@ -13,12 +13,11 @@ import javax.annotation.Nonnull;
  * <p>
  * Created by Dark(DarkGuardsman, Robert) on 4/19/2020.
  */
-public class BlastRedmatterSpawner extends BlastBase
-{
+public class BlastRedmatterSpawner extends BlastBase {
+
     @Nonnull
     @Override
-    public BlastResponse triggerBlast()
-    {
+    public BlastResponse triggerBlast() {
         //Build entity
         final EntityRedmatter entityRedmatter = new EntityRedmatter(world());
         entityRedmatter.setPosition(x(), y(), z());
@@ -26,10 +25,10 @@ public class BlastRedmatterSpawner extends BlastBase
         entityRedmatter.setBlastMaxSize(ConfigBlast.redmatter.MAX_SIZE);
 
         //Attempt to spawn
-        if (world().spawnEntity(entityRedmatter))
-        {
+        if (world().spawnEntity(entityRedmatter)) {
             return BlastState.TRIGGERED.genericResponse;
         }
         return BlastForgeResponses.ENTITY_SPAWNING.get();
     }
+
 }

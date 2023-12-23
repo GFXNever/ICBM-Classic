@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
  * Created by Robin Seifert on 4/1/2022.
  */
 @NoArgsConstructor(access = AccessLevel.NONE)
-public final class ColorHelper
-{
+public final class ColorHelper {
+
     public static float[] argbToFloats(int argb) {
         float alpha = (float) (argb >> 24 & 255) / 255.0F;
 
@@ -35,8 +35,8 @@ public final class ColorHelper
         if (saturation == 0) {
             r = g = b = (int) (brightness * 255.0f + 0.5f);
         } else {
-            float h = (hue - (float)Math.floor(hue)) * 6.0f;
-            float f = h - (float)java.lang.Math.floor(h);
+            float h = (hue - (float) Math.floor(hue)) * 6.0f;
+            float f = h - (float) java.lang.Math.floor(h);
             float p = brightness * (1.0f - saturation);
             float q = brightness * (1.0f - saturation * f);
             float t = brightness * (1.0f - (saturation * (1.0f - f)));
@@ -75,4 +75,5 @@ public final class ColorHelper
         }
         return new ColorB(r, g, b);
     }
+
 }

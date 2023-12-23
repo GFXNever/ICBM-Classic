@@ -19,19 +19,16 @@ import java.util.List;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 1/9/2017.
  */
-public class TileMachine extends TileEntity implements ITickable
-{
-    protected int ticks = -1;
+public class TileMachine extends TileEntity implements ITickable {
 
     protected final List<ITick> tickActions = new ArrayList();
+    protected int ticks = -1;
 
     @Override
-    public void update()
-    {
+    public void update() {
         //Increase tick
         ticks++;
-        if (ticks >= Integer.MAX_VALUE - 1)
-        {
+        if (ticks >= Integer.MAX_VALUE - 1) {
             ticks = 0;
         }
 
@@ -41,53 +38,45 @@ public class TileMachine extends TileEntity implements ITickable
     }
 
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate)
-    {
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
         return oldState.getBlock() != newSate.getBlock();
     }
 
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket()
-    {
+    public SPacketUpdateTileEntity getUpdatePacket() {
         return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
     }
 
     @Override
-    public NBTTagCompound getUpdateTag()
-    {
+    public NBTTagCompound getUpdateTag() {
         return writeToNBT(new NBTTagCompound());
     }
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt)
-    {
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         readFromNBT(pkt.getNbtCompound());
     }
 
-    public boolean isServer()
-    {
+    public boolean isServer() {
         return world != null && !world.isRemote;
     }
 
-    public boolean isClient()
-    {
+    public boolean isClient() {
         return world != null && world.isRemote;
     }
 
     @Deprecated
-    public EnumFacing getRotation()
-    {
+    public EnumFacing getRotation() {
         IBlockState state = getBlockState();
-        if (state.getProperties().containsKey(BlockICBM.ROTATION_PROP))
-        {
+        if (state.getProperties().containsKey(BlockICBM.ROTATION_PROP)) {
             return state.getValue(BlockICBM.ROTATION_PROP);
         }
         return EnumFacing.NORTH;
     }
 
-    public IBlockState getBlockState()
-    {
+    public IBlockState getBlockState() {
         return world.getBlockState(getPos());
     }
+
 }

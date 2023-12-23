@@ -22,11 +22,15 @@ import java.util.UUID;
 public class EntityCause extends MissileCause implements IMissileCause.IEntityCause {
 
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "entity");
-
+    private static final NbtSaveHandler<EntityCause> SAVE_LOGIC = new NbtSaveHandler<EntityCause>()
+        .mainRoot()
+        /* */.nodeString("name", EntityCause::getName, EntityCause::setName)
+        /* */.nodeUUID("uuid", EntityCause::getId, EntityCause::setId)
+        /* */.nodeBoolean("player", EntityCause::isPlayer, EntityCause::setPlayer)
+        .base();
     private String name;
     private UUID id;
     private boolean isPlayer;
-
     // runtime cache vars
     private Entity entity;
 
@@ -58,11 +62,4 @@ public class EntityCause extends MissileCause implements IMissileCause.IEntityCa
         SAVE_LOGIC.load(this, nbt);
     }
 
-
-    private static final NbtSaveHandler<EntityCause> SAVE_LOGIC = new NbtSaveHandler<EntityCause>()
-        .mainRoot()
-        /* */.nodeString("name", EntityCause::getName, EntityCause::setName)
-        /* */.nodeUUID("uuid", EntityCause::getId, EntityCause::setId)
-        /* */.nodeBoolean("player", EntityCause::isPlayer, EntityCause::setPlayer)
-        .base();
 }

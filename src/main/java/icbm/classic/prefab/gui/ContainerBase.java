@@ -7,94 +7,79 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
-public class ContainerBase<H extends Object> extends Container
-{
+public class ContainerBase<H extends Object> extends Container {
+
     protected int slotCount = 0;
 
     protected IInventory inventory;
     protected EntityPlayer player;
     protected H host;
 
-    public ContainerBase(IInventory inventory)
-    {
+    public ContainerBase(IInventory inventory) {
         this.inventory = inventory;
         this.slotCount = inventory.getSizeInventory();
     }
 
     @Deprecated
-    public ContainerBase(EntityPlayer player, IInventory inventory)
-    {
+    public ContainerBase(EntityPlayer player, IInventory inventory) {
         this(inventory);
 
         this.player = player;
-        if (inventory instanceof IPlayerUsing)
-        {
+        if (inventory instanceof IPlayerUsing) {
             ((IPlayerUsing) inventory).getPlayersUsing().add(player);
         }
     }
 
-    public ContainerBase(EntityPlayer player, H node)
-    {
-        if (node instanceof IInventory)
-        {
+    public ContainerBase(EntityPlayer player, H node) {
+        if (node instanceof IInventory) {
             inventory = (IInventory) node;
         }
 
         this.player = player;
-        if (node instanceof IPlayerUsing)
-        {
+        if (node instanceof IPlayerUsing) {
             ((IPlayerUsing) node).addPlayerToUseList(player);
         }
     }
 
     @Override
-    public void onContainerClosed(EntityPlayer entityplayer)
-    {
-        if (host instanceof IPlayerUsing && entityplayer.openContainer != this)
-        {
+    public void onContainerClosed(EntityPlayer entityplayer) {
+        if (host instanceof IPlayerUsing && entityplayer.openContainer != this) {
             ((IPlayerUsing) host).removePlayerToUseList(entityplayer);
         }
         super.onContainerClosed(entityplayer);
     }
 
-    public void addPlayerInventory(EntityPlayer player)
-    {
+    public void addPlayerInventory(EntityPlayer player) {
         addPlayerInventory(player, 8, 84);
     }
 
-    public void addPlayerInventory(EntityPlayer player, int x, int y)
-    {
-        if (this.inventory instanceof IPlayerUsing)
-        {
+    public void addPlayerInventory(EntityPlayer player, int x, int y) {
+        if (this.inventory instanceof IPlayerUsing) {
             ((IPlayerUsing) this.inventory).getPlayersUsing().add(player);
         }
 
         //Inventory
-        for (int row = 0; row < 3; ++row)
-        {
-            for (int slot = 0; slot < 9; ++slot)
-            {
+        for (int row = 0; row < 3; ++row) {
+            for (int slot = 0; slot < 9; ++slot) {
                 this.addSlotToContainer(new Slot(player.inventory, slot + row * 9 + 9, slot * 18 + x, row * 18 + y));
             }
         }
 
         //Hot bar
-        for (int slot = 0; slot < 9; ++slot)
-        {
+        for (int slot = 0; slot < 9; ++slot) {
             this.addSlotToContainer(new Slot(player.inventory, slot, slot * 18 + x, 58 + y));
         }
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer entityplayer)
-    {
-        if(this.inventory != null) {
+    public boolean canInteractWith(EntityPlayer entityplayer) {
+        if (this.inventory != null) {
             return this.inventory.isUsableByPlayer(entityplayer);
-        }
-        else if(this.host instanceof TileEntity) {
+        } else if (this.host instanceof TileEntity) {
             final BlockPos pos = ((TileEntity) this.host).getPos();
-            return entityplayer.getDistance(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ()+ 0.5) <= 4.0;
+            return entityplayer.getDistance(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= 4.0;
         }
         return true;
     }
+
 }

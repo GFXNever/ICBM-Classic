@@ -42,12 +42,11 @@ import java.util.Optional;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 6/13/2016.
  */
-public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
-{
+public class ItemRadarGun extends ItemBase implements IPacketIDReceiver {
+
     public static final double MAX_RANGE = 200; //TODO config
 
-    public ItemRadarGun()
-    {
+    public ItemRadarGun() {
         this.setMaxStackSize(1);
         this.setHasSubtypes(true);
         this.setCreativeTab(ICBMClassic.CREATIVE_TAB);
@@ -57,15 +56,14 @@ public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
 
     @Override
     @Nullable
-    public net.minecraftforge.common.capabilities.ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt)
-    {
+    public net.minecraftforge.common.capabilities.ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
         final ItemStackCapProvider provider = new ItemStackCapProvider(stack);
 
         final IGPSData data = new CapabilityGPSDataItem(stack);
         provider.add("gps_data", ICBMClassicAPI.GPS_CAPABILITY, data);
 
         // Legacy logic from before IGPSData, v5.3.x
-        if(nbt != null && nbt.hasKey("linkPos")) {
+        if (nbt != null && nbt.hasKey("linkPos")) {
             final NBTTagCompound save = nbt.getCompoundTag("linkPos");
             data.setWorld(save.getInteger("dimension"));
             data.setPosition(new Vec3d(save.getDouble("x"), save.getDouble("y"), save.getDouble("z")));
@@ -76,11 +74,10 @@ public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> lines, ITooltipFlag flagIn)
-    {
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> lines, ITooltipFlag flagIn) {
         // Stored data
         final IGPSData gpsData = ICBMClassicHelpers.getGPSData(stack);
-        if(gpsData != null && gpsData.getPosition() != null) {
+        if (gpsData != null && gpsData.getPosition() != null) {
             final Vec3d pos = gpsData.getPosition();
             final World world = gpsData.getWorld();
 
@@ -88,18 +85,16 @@ public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
             final String y = String.format("%.1f", pos.y);
             final String z = String.format("%.1f", pos.z);
 
-            if(world != null) {
+            if (world != null) {
                 final String name = Optional.of(world.getWorldInfo()).map(WorldInfo::getWorldName).orElse("--");
                 final String worldName = String.format("(%s)%s", world.provider.getDimension(), name);
                 final ITextComponent output = new TextComponentTranslation(getUnlocalizedName() + ".data.all", x, y, z, worldName);
                 LanguageUtility.outputLines(output, lines::add);
-            }
-            else {
+            } else {
                 final ITextComponent output = new TextComponentTranslation(getUnlocalizedName() + ".data.pos", x, y, z);
                 LanguageUtility.outputLines(output, lines::add);
             }
-        }
-        else {
+        } else {
             LanguageUtility.outputLines(new TextComponentTranslation(getUnlocalizedName() + ".data.empty"), lines::add);
         }
 
@@ -109,8 +104,7 @@ public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand handIn)
-    {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand handIn) {
         if (player.isSneaking()) // also clear the gps coord if the play is shift-rightclicking in the air
         {
             if (!world.isRemote) {
@@ -123,8 +117,7 @@ public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
             return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, player.getHeldItem(handIn));
         }
 
-        if (world.isRemote)
-        {
+        if (world.isRemote) {
             RayTraceResult objectMouseOver = player.rayTrace(200, 1);
             if (objectMouseOver.typeOfHit != RayTraceResult.Type.MISS) { // TODO add message saying that the gps target is out of range.
                 final TileEntity tileEntity = world.getTileEntity(objectMouseOver.getBlockPos());
@@ -137,23 +130,20 @@ public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY,
+                                      float hitZ) {
         final ItemStack stack = player.getHeldItem(hand);
-        if (world.isRemote)
-        {
+        if (world.isRemote) {
             return EnumActionResult.SUCCESS;
         }
 
-        if (player.isSneaking())
-        {
+        if (player.isSneaking()) {
             stack.setTagCompound(null);
             stack.setItemDamage(0);
             LanguageUtility.addChatToPlayer(player, "gps.cleared.name");
             player.inventoryContainer.detectAndSendChanges();
             return EnumActionResult.SUCCESS;
-        }
-        else if(onTrace(new Vec3d(pos.getX() + hitX, pos.getY() + hitX, pos.getZ() + hitZ), player, stack)) {
+        } else if (onTrace(new Vec3d(pos.getX() + hitX, pos.getY() + hitX, pos.getZ() + hitZ), player, stack)) {
             return EnumActionResult.SUCCESS;
         }
         return EnumActionResult.PASS;
@@ -164,11 +154,10 @@ public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
     }
 
     @Override
-    public boolean read(ByteBuf buf, int id, EntityPlayer player, IPacket packet)
-    {
+    public boolean read(ByteBuf buf, int id, EntityPlayer player, IPacket packet) {
         final EnumHand hand = buf.readBoolean() ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
         final Vec3d pos = new Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble());
-        if(player.world instanceof WorldServer) {
+        if (player.world instanceof WorldServer) {
             ((WorldServer) player.world).addScheduledTask(() -> {
                 onTrace(pos, player, player.getHeldItem(hand));
             });
@@ -176,19 +165,17 @@ public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
         return true;
     }
 
-    public boolean onTrace(final Vec3d posIn, EntityPlayer player, ItemStack stack)
-    {
-        if (stack.getItem() == this)
-        {
+    public boolean onTrace(final Vec3d posIn, EntityPlayer player, ItemStack stack) {
+        if (stack.getItem() == this) {
             final RadarGunTraceEvent event = new RadarGunTraceEvent(player.world, posIn, player);
 
-            if(MinecraftForge.EVENT_BUS.post(event) || event.pos == null) {
+            if (MinecraftForge.EVENT_BUS.post(event) || event.pos == null) {
                 //event was canceled
                 return false; // TODO give user feedback
             }
 
             final IGPSData gpsData = ICBMClassicHelpers.getGPSData(stack);
-            if(gpsData != null) {
+            if (gpsData != null) {
                 gpsData.setPosition(posIn);
                 gpsData.setWorld(player.world);
                 LanguageUtility.addChatToPlayer(player, "gps.pos.set.name");
@@ -197,4 +184,5 @@ public class ItemRadarGun extends ItemBase implements IPacketIDReceiver
         }
         return true;
     }
+
 }

@@ -18,14 +18,13 @@ import net.minecraftforge.common.MinecraftForge;
 /**
  * Remotely triggers missile launches on a set frequency, call back ID, and pass key. Will not funciton if any of those
  * data points is missing.
- *
- *
+ * <p>
+ * <p>
  * Created by Dark(DarkGuardsman, Robert) on 3/26/2016.
  */
-public class ItemRemoteDetonator extends ItemRadio
-{
-    public ItemRemoteDetonator()
-    {
+public class ItemRemoteDetonator extends ItemRadio {
+
+    public ItemRemoteDetonator() {
         this.setName("remoteDetonator");
         this.setCreativeTab(ICBMClassic.CREATIVE_TAB);
         this.setHasSubtypes(true);
@@ -34,12 +33,10 @@ public class ItemRemoteDetonator extends ItemRadio
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand handIn)
-    {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand handIn) {
         ItemStack stack = player.getHeldItem(handIn);
-        if (!world.isRemote)
-        {
-            if(!MinecraftForge.EVENT_BUS.post(new RemoteTriggerEvent(world, player, stack))) //event was not canceled
+        if (!world.isRemote) {
+            if (!MinecraftForge.EVENT_BUS.post(new RemoteTriggerEvent(world, player, stack))) //event was not canceled
             {
                 final String channel = getRadioChannel(stack);
                 RadioRegistry.popMessage(world, new FakeRadioSender(player, stack, null), new TriggerActionMessage(channel));
@@ -49,8 +46,8 @@ public class ItemRemoteDetonator extends ItemRadio
     }
 
     @Override
-    public boolean doesSneakBypassUse(ItemStack stack, net.minecraft.world.IBlockAccess world, BlockPos pos, EntityPlayer player)
-    {
+    public boolean doesSneakBypassUse(ItemStack stack, net.minecraft.world.IBlockAccess world, BlockPos pos, EntityPlayer player) {
         return true;
     }
+
 }

@@ -8,4 +8,5 @@ public interface IEventTrackerListener {
     default boolean consumes(EventTrackerType type) {
         return true;
     }
+
 }

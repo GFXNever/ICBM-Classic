@@ -5,16 +5,13 @@ import icbm.classic.api.missiles.projectile.IProjectileDataRegistry;
 import icbm.classic.content.missile.BuildableObjectRegistry;
 import icbm.classic.lib.projectile.vanilla.*;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.projectile.EntitySnowball;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -27,6 +24,7 @@ import java.util.function.Function;
 public class ProjectileDataRegistry extends BuildableObjectRegistry<IProjectileData> implements IProjectileDataRegistry {
 
     private final Map<Item, List<ProjectileItemConversion>> itemConversions = new HashMap();
+
     public ProjectileDataRegistry() {
         super("PROJECTILE_SPAWNING");
     }
@@ -39,7 +37,7 @@ public class ProjectileDataRegistry extends BuildableObjectRegistry<IProjectileD
     }
 
     public void registerVanillaDefaults() {
-        if(!this.isLocked()) {
+        if (!this.isLocked()) {
 
             //General Purpose
             this.register(ItemProjectileData.NAME, ItemProjectileData::new);
@@ -57,19 +55,21 @@ public class ProjectileDataRegistry extends BuildableObjectRegistry<IProjectileD
 
             // Tipped arrow
             this.register(TippedArrowProjectileData.NAME, TippedArrowProjectileData::new);
-            registerItemStackConversation(new ItemStack(Items.TIPPED_ARROW), (itemStack) -> new TippedArrowProjectileData().setArrowItem(itemStack)); //TODO cache ?
+            registerItemStackConversation(new ItemStack(Items.TIPPED_ARROW),
+                (itemStack) -> new TippedArrowProjectileData().setArrowItem(itemStack)); //TODO cache ?
 
             //Items
-            registerItemStackConversation(new ItemStack(Items.SNOWBALL), new CachedProjectileData(() -> new EntitySpawnProjectileData("minecraft:snowball")));
+            registerItemStackConversation(new ItemStack(Items.SNOWBALL),
+                new CachedProjectileData(() -> new EntitySpawnProjectileData("minecraft:snowball")));
             registerItemStackConversation(new ItemStack(Items.EGG), new CachedProjectileData(() -> new EntitySpawnProjectileData("minecraft:egg")));
 
             // Spawn eggs
             registerItemStackConversation(new ItemStack(Items.SPAWN_EGG), (itemStack) -> {
                 final EntitySpawnProjectileData projectileData = new EntitySpawnProjectileData(ItemMonsterPlacer.getNamedIdFrom(itemStack));
-                if(itemStack.hasDisplayName()) {
+                if (itemStack.hasDisplayName()) {
                     projectileData.setDisplayName(itemStack.getDisplayName());
                 }
-                if(itemStack.getTagCompound() != null && itemStack.getTagCompound().hasKey("EntityTag", 10)) {
+                if (itemStack.getTagCompound() != null && itemStack.getTagCompound().hasKey("EntityTag", 10)) {
                     projectileData.setEntityData(itemStack.getTagCompound().getCompoundTag("EntityTag"));
                 }
                 return projectileData;
@@ -81,11 +81,11 @@ public class ProjectileDataRegistry extends BuildableObjectRegistry<IProjectileD
     }
 
     public IProjectileData find(ItemStack itemStack) {
-        if(itemConversions.containsKey(itemStack.getItem())) {
+        if (itemConversions.containsKey(itemStack.getItem())) {
             final List<ProjectileItemConversion> possibleConversions = itemConversions.get(itemStack.getItem());
-            for(ProjectileItemConversion conversion : possibleConversions) {
+            for (ProjectileItemConversion conversion : possibleConversions) {
                 final IProjectileData data = conversion.getBuilder().apply(itemStack);
-                if(data != null) {
+                if (data != null) {
                     return data;
                 }
             }
@@ -112,16 +112,16 @@ public class ProjectileDataRegistry extends BuildableObjectRegistry<IProjectileD
     }
 
     @Override
-    public <E extends Entity> E  spawnProjectile(IProjectileData<E> data, World world, double x, double y, double z, Entity source,
-                                  boolean allowItemPickup, Consumer<E> preSpawnCallback) {
-        if(data != null) {
+    public <E extends Entity> E spawnProjectile(IProjectileData<E> data, World world, double x, double y, double z, Entity source,
+                                                boolean allowItemPickup, Consumer<E> preSpawnCallback) {
+        if (data != null) {
             final E entity = data.newEntity(world, allowItemPickup);
-            if(entity != null) {
+            if (entity != null) {
                 entity.setPosition(x, y, z);
-                if(preSpawnCallback != null) {
+                if (preSpawnCallback != null) {
                     preSpawnCallback.accept(entity);
                 }
-                if(world.spawnEntity(entity)) {
+                if (world.spawnEntity(entity)) {
                     data.onEntitySpawned(entity, source);
                     return entity;
                 }
@@ -129,4 +129,5 @@ public class ProjectileDataRegistry extends BuildableObjectRegistry<IProjectileD
         }
         return null;
     }
+
 }

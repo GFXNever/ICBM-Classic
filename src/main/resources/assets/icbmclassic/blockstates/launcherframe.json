@@ -8,16 +8,13 @@
       "model": "icbmclassic:frame_middle"
     },
     "type": {
-      "top" :
-      {
+      "top": {
         "model": "icbmclassic:frame_top"
       },
-      "middle" :
-      {
+      "middle": {
         "model": "icbmclassic:frame_middle"
       },
-      "bottom" :
-      {
+      "bottom": {
         "model": "icbmclassic:frame_bottom"
       }
     },

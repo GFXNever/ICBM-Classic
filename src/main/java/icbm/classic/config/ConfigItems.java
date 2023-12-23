@@ -4,13 +4,12 @@ import icbm.classic.ICBMConstants;
 import net.minecraftforge.common.config.Config;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 3/20/2018.
  */
 @Config(modid = ICBMConstants.DOMAIN, name = "icbmclassic/item")
 @Config.LangKey("config.icbmclassic:item.title")
-public class ConfigItems
-{
+public class ConfigItems {
+
     @Config.Name("enable_crafting_items")
     @Config.Comment("Enables crafting items required to make most of the content. Only disable if other mods provide the resources or custom recipes are implemented.")
     @Config.RequiresMcRestart
@@ -45,4 +44,5 @@ public class ConfigItems
     @Config.Comment("Enables finding crafting items inside of chests as loot. Use a loot table mod to change the drop rates.")
     @Config.RequiresMcRestart
     public static boolean ENABLE_LOOT_DROPS = true;
+
 }

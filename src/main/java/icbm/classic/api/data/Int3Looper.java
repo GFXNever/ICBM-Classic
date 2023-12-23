@@ -3,8 +3,8 @@ package icbm.classic.api.data;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 2020-02-16.
  */
-public interface Int3Looper
-{
+public interface Int3Looper {
+
     /**
      * Loops each xyz until told to stop
      *
@@ -14,4 +14,5 @@ public interface Int3Looper
      * @return true to keep looping, false to exit
      */
     boolean apply(int x, int y, int z);
+
 }

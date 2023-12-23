@@ -12,13 +12,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BombCartDispenseBehavior extends BehaviorDefaultDispenseItem
-{
+public class BombCartDispenseBehavior extends BehaviorDefaultDispenseItem {
+
     private final BehaviorDefaultDispenseItem behaviourDefaultDispenseItem = new BehaviorDefaultDispenseItem();
 
     @Override
-    public ItemStack dispenseStack(IBlockSource source, ItemStack stack)
-    {
+    public ItemStack dispenseStack(IBlockSource source, ItemStack stack) {
         EnumFacing enumfacing = source.getBlockState().getValue(BlockDispenser.FACING);
         World world = source.getWorld();
         double x = source.getX() + (double) enumfacing.getFrontOffsetX() * 1.125D;
@@ -27,50 +26,39 @@ public class BombCartDispenseBehavior extends BehaviorDefaultDispenseItem
         BlockPos blockpos = source.getBlockPos().offset(enumfacing);
         IBlockState iblockstate = world.getBlockState(blockpos);
         BlockRailBase.EnumRailDirection rail =
-                (iblockstate.getBlock() instanceof BlockRailBase
-                        ? ((BlockRailBase) iblockstate.getBlock()).getRailDirection(world, blockpos, iblockstate, null)
-                                : BlockRailBase.EnumRailDirection.NORTH_SOUTH);
+            (iblockstate.getBlock() instanceof BlockRailBase
+                ? ((BlockRailBase) iblockstate.getBlock()).getRailDirection(world, blockpos, iblockstate, null)
+                : BlockRailBase.EnumRailDirection.NORTH_SOUTH);
 
         double heightDelta;
 
-        if (BlockRailBase.isRailBlock(iblockstate))
-        {
-            if (rail.isAscending())
-            {
+        if (BlockRailBase.isRailBlock(iblockstate)) {
+            if (rail.isAscending()) {
                 heightDelta = 0.6D;
-            }
-            else
-            {
+            } else {
                 heightDelta = 0.1D;
             }
-        }
-        else
-        {
-            if (iblockstate.getMaterial() != Material.AIR || !BlockRailBase.isRailBlock(world.getBlockState(blockpos.down())))
-            {
+        } else {
+            if (iblockstate.getMaterial() != Material.AIR || !BlockRailBase.isRailBlock(world.getBlockState(blockpos.down()))) {
                 return this.behaviourDefaultDispenseItem.dispense(source, stack);
             }
 
             IBlockState blockB = world.getBlockState(blockpos.down());
             BlockRailBase.EnumRailDirection railB =
-                    (blockB.getBlock() instanceof BlockRailBase ?
-                            ((BlockRailBase) blockB.getBlock()).getRailDirection(world, blockpos.down(), blockB, null)
-                            : BlockRailBase.EnumRailDirection.NORTH_SOUTH);
+                (blockB.getBlock() instanceof BlockRailBase ?
+                    ((BlockRailBase) blockB.getBlock()).getRailDirection(world, blockpos.down(), blockB, null)
+                    : BlockRailBase.EnumRailDirection.NORTH_SOUTH);
 
-            if (enumfacing != EnumFacing.DOWN && railB.isAscending())
-            {
+            if (enumfacing != EnumFacing.DOWN && railB.isAscending()) {
                 heightDelta = -0.4D;
-            }
-            else
-            {
+            } else {
                 heightDelta = -0.9D;
             }
         }
 
         EntityBombCart cart = new EntityBombCart(world, x, y + heightDelta, z, stack);
 
-        if (stack.hasDisplayName())
-        {
+        if (stack.hasDisplayName()) {
             cart.setCustomNameTag(stack.getDisplayName());
         }
 
@@ -78,4 +66,5 @@ public class BombCartDispenseBehavior extends BehaviorDefaultDispenseItem
         stack.shrink(1);
         return stack;
     }
+
 }

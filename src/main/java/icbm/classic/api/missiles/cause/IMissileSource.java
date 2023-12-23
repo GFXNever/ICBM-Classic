@@ -7,17 +7,17 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 /**
  * Information about the source (starting point) of the missile.
- *
+ * <p>
  * This is for tracking purposes and should never be exposed to the player. Main purpose of this data
  * should always be for mod interaction and admin tools. Player are not meant to see this data directly as it could
  * easily provide them with the location of attackers. Instead, players should have to work for figuring out
  * attacker distance and direction.
- *
+ * <p>
  * That said ICBM team will not stop anyone from using the data. As there are valid interaction uses. Such as showing
  * missiles on an interactive map or exposing the player's own missile launch position to themselves.
  */
-public interface IMissileSource extends INBTSerializable<NBTTagCompound>
-{
+public interface IMissileSource extends INBTSerializable<NBTTagCompound> {
+
     /**
      * World the missile was launched from
      *
@@ -34,10 +34,11 @@ public interface IMissileSource extends INBTSerializable<NBTTagCompound>
 
     /**
      * Exact position source fired the missile
-     *
+     * <p>
      * If the source is a block this could be above the block.
      *
      * @retur position
      */
     Vec3d getPosition();
+
 }

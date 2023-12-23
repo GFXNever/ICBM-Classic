@@ -18,17 +18,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @since 31/05/14
  */
 @ChannelHandler.Sharable
-public class PacketInboundHandler extends SimpleChannelInboundHandler<IPacket>
-{
+public class PacketInboundHandler extends SimpleChannelInboundHandler<IPacket> {
+
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, IPacket packet) throws Exception
-    {
-        try
-        {
+    protected void channelRead0(ChannelHandlerContext ctx, IPacket packet) throws Exception {
+        try {
             INetHandler netHandler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
 
-            switch (FMLCommonHandler.instance().getEffectiveSide())
-            {
+            switch (FMLCommonHandler.instance().getEffectiveSide()) {
                 case CLIENT:
                     handleClientSide(packet);
                     break;
@@ -38,9 +35,7 @@ public class PacketInboundHandler extends SimpleChannelInboundHandler<IPacket>
                 default:
                     break;
             }
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             ICBMClassic.logger().error("Failed to handle packet " + packet, e);
         }
     }
@@ -49,4 +44,5 @@ public class PacketInboundHandler extends SimpleChannelInboundHandler<IPacket>
     private void handleClientSide(IPacket packet) {
         packet.handleClientSide(Minecraft.getMinecraft(), Minecraft.getMinecraft().player);
     }
+
 }

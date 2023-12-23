@@ -53,7 +53,8 @@ public class InventorySlot {
     }
 
     public InventorySlot withInsertCheck(Function<ItemStack, Boolean> onInsertStack) {
-        this.onInsertStack =  onInsertStack;
+        this.onInsertStack = onInsertStack;
         return this;
     }
+
 }

@@ -21,11 +21,12 @@ public class LayerChickenHelmet implements LayerRenderer<EntityChicken> {
     }
 
     @Override
-    public void doRenderLayer(EntityChicken entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-        if(entity.hasCapability(CapSpaceChicken.INSTANCE, null)) {
+    public void doRenderLayer(EntityChicken entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw,
+                              float headPitch, float scale) {
+        if (entity.hasCapability(CapSpaceChicken.INSTANCE, null)) {
 
             final CapSpaceChicken cap = entity.getCapability(CapSpaceChicken.INSTANCE, null);
-            if(cap != null && cap.isSpace()) {
+            if (cap != null && cap.isSpace()) {
 
                 renderChicken.bindTexture(texture);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -48,4 +49,5 @@ public class LayerChickenHelmet implements LayerRenderer<EntityChicken> {
     public boolean shouldCombineTextures() {
         return false;
     }
+
 }

@@ -10,8 +10,8 @@ import net.minecraft.util.ResourceLocation;
  * Created by Dark(DarkGuardsman, Robert) on 9/7/2019.
  */
 @Deprecated //Will replace at some point with settings reference from IExplosiveData or IExplosive
-public interface IExFuseEntityRegistry
-{
+public interface IExFuseEntityRegistry {
+
     /**
      * Called to set a supplier that will be used to define the fuse time
      * of the explosive.
@@ -39,18 +39,19 @@ public interface IExFuseEntityRegistry
     /**
      * Called by objects to tick the fuse for the explosive
      *
-     * @param entity       - entity that is the explosive
-     * @param explosiveData  - explosive id
-     * @param fuseTimeLeft - ticks existed
+     * @param entity        - entity that is the explosive
+     * @param explosiveData - explosive id
+     * @param fuseTimeLeft  - ticks existed
      */
     void tickFuse(Entity entity, IExplosiveData explosiveData, int fuseTimeLeft);
 
     /**
      * Gets the starting fuse time
      *
-     * @param entity      - entity that is the explosive
+     * @param entity        - entity that is the explosive
      * @param explosiveData - explosive id
      * @return ticks
      */
     int getFuseTime(Entity entity, IExplosiveData explosiveData);
+
 }

@@ -14,52 +14,44 @@ import java.util.Map;
 
 /**
  * Wrapper to store, save, and load capabilities on an ItemStack
- *
- *
+ * <p>
+ * <p>
  * Created by Dark(DarkGuardsman, Robert) on 3/21/2018.
  */
-public class ItemStackCapProvider implements ICapabilityProvider, INBTSerializable<NBTTagCompound>
-{
+public class ItemStackCapProvider implements ICapabilityProvider, INBTSerializable<NBTTagCompound> {
+
     public final ItemStack host;
     public HashMap<Capability, Object> capTypeToCap = new HashMap();
     public HashMap<String, Object> keyToCap = new HashMap();
 
-    public ItemStackCapProvider(ItemStack host)
-    {
+    public ItemStackCapProvider(ItemStack host) {
         this.host = host;
     }
 
-    public <T> void add(String key, Capability<T> capability, T cap)
-    {
+    public <T> void add(String key, Capability<T> capability, T cap) {
         capTypeToCap.put(capability, cap);
         keyToCap.put(key, cap);
     }
 
     @Override
-    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
-    {
+    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing) {
         return capTypeToCap.containsKey(capability);
     }
 
     @Nullable
     @Override
-    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
-    {
-        if (capTypeToCap.containsKey(capability))
-        {
+    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing) {
+        if (capTypeToCap.containsKey(capability)) {
             return (T) capTypeToCap.get(capability);
         }
         return null;
     }
 
     @Override
-    public NBTTagCompound serializeNBT()
-    {
+    public NBTTagCompound serializeNBT() {
         NBTTagCompound tag = new NBTTagCompound();
-        for (Map.Entry<String, Object> entry : keyToCap.entrySet())
-        {
-            if (entry.getValue() instanceof INBTSerializable)
-            {
+        for (Map.Entry<String, Object> entry : keyToCap.entrySet()) {
+            if (entry.getValue() instanceof INBTSerializable) {
                 tag.setTag(entry.getKey(), ((INBTSerializable) entry.getValue()).serializeNBT());
             }
         }
@@ -67,14 +59,12 @@ public class ItemStackCapProvider implements ICapabilityProvider, INBTSerializab
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt)
-    {
-        for (Map.Entry<String, Object> entry : keyToCap.entrySet())
-        {
-            if (entry.getValue() instanceof INBTSerializable)
-            {
+    public void deserializeNBT(NBTTagCompound nbt) {
+        for (Map.Entry<String, Object> entry : keyToCap.entrySet()) {
+            if (entry.getValue() instanceof INBTSerializable) {
                 ((INBTSerializable) entry.getValue()).deserializeNBT(nbt.getTag(entry.getKey()));
             }
         }
     }
+
 }

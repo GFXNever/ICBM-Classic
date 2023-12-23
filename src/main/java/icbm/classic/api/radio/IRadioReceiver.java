@@ -12,4 +12,5 @@ public interface IRadioReceiver extends IRadio {
      * @param packet containing the message channel and data
      */
     void onMessage(IRadioSender sender, IRadioMessage packet);
+
 }

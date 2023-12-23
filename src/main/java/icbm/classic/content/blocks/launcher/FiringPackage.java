@@ -17,15 +17,25 @@ import net.minecraftforge.common.util.INBTSerializable;
 @Data
 public class FiringPackage implements INBTSerializable<NBTTagCompound>, ITick {
 
-    /** Input: Target data */
+    private static final NbtSaveHandler<FiringPackage> SAVE_LOGIC = new NbtSaveHandler<FiringPackage>()
+        .mainRoot()
+        /* */.nodeInteger("countdown", FiringPackage::getCountDown, FiringPackage::setCountDown)
+        /* */.nodeBuildableObject("target", () -> ICBMClassicAPI.MISSILE_TARGET_DATA_REGISTRY, FiringPackage::getTargetData,
+            FiringPackage::setTargetData)
+        /* */.nodeBuildableObject("cause", () -> ICBMClassicAPI.MISSILE_CAUSE_REGISTRY, FiringPackage::getCause, FiringPackage::setCause)
+        .base();
+    /**
+     * Input: Target data
+     */
     private IMissileTarget targetData;
-
-    /** Input: Cause of firing the missile */
+    /**
+     * Input: Cause of firing the missile
+     */
     private IMissileCause cause;
-
-    /** Counter: Time to tick down before firing */
+    /**
+     * Counter: Time to tick down before firing
+     */
     private int countDown = -1;
-
     private boolean hasFired = false;
 
     public FiringPackage(IMissileTarget targetData, IMissileCause cause, int countDown) {
@@ -41,7 +51,7 @@ public class FiringPackage implements INBTSerializable<NBTTagCompound>, ITick {
 
     public void launch(IMissileLauncher missileLauncher) {
 
-        if(!hasFired) {
+        if (!hasFired) {
             hasFired = true;
 
             if (targetData instanceof IMissileTargetDelayed) {
@@ -67,20 +77,14 @@ public class FiringPackage implements INBTSerializable<NBTTagCompound>, ITick {
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<FiringPackage> SAVE_LOGIC = new NbtSaveHandler<FiringPackage>()
-        .mainRoot()
-        /* */.nodeInteger("countdown", FiringPackage::getCountDown, FiringPackage::setCountDown)
-        /* */.nodeBuildableObject("target", () -> ICBMClassicAPI.MISSILE_TARGET_DATA_REGISTRY, FiringPackage::getTargetData, FiringPackage::setTargetData)
-        /* */.nodeBuildableObject("cause", () -> ICBMClassicAPI.MISSILE_CAUSE_REGISTRY, FiringPackage::getCause, FiringPackage::setCause)
-        .base();
-
     @Override
     public void update(int tick, boolean isServer) {
-        if(isServer && !hasFired) {
+        if (isServer && !hasFired) {
             this.countDown--;
-            if(countDown <= 0) {
+            if (countDown <= 0) {
                 // TODO launch();
             }
         }
     }
+
 }

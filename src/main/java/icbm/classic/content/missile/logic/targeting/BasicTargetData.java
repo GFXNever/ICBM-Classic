@@ -57,9 +57,9 @@ public class BasicTargetData implements IMissileTarget, IMissileTargetDelayed {
     @Override
     public boolean isValid() {
         return position != null
-                && Double.isNaN(getX()) && Double.isFinite(getX())
-                && Double.isNaN(getY()) && Double.isFinite(getY())
-                && Double.isNaN(getZ()) && Double.isFinite(getZ());
+            && Double.isNaN(getX()) && Double.isFinite(getX())
+            && Double.isNaN(getY()) && Double.isFinite(getY())
+            && Double.isNaN(getZ()) && Double.isFinite(getZ());
     }
 
     @Override
@@ -78,8 +78,7 @@ public class BasicTargetData implements IMissileTarget, IMissileTargetDelayed {
     }
 
     @Override
-    public ResourceLocation getRegistryName()
-    {
+    public ResourceLocation getRegistryName() {
         return REG_NAME;
     }
 
@@ -104,9 +103,10 @@ public class BasicTargetData implements IMissileTarget, IMissileTargetDelayed {
 
     @Override
     public boolean equals(Object other) {
-        if(other instanceof BasicTargetData) {
+        if (other instanceof BasicTargetData) {
             return Objects.equals(((BasicTargetData) other).position, position);
         }
         return false;
     }
+
 }

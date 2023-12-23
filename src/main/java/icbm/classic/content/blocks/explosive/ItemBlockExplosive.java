@@ -20,19 +20,15 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemBlockExplosive extends ItemBlockAbstract
-{
-    private final String count_key = "icbm.explosive.redMatter.info.count";
-
-    private int tauntCount = 0;
-    private int redmatterRandomTranslations = -1;
-
-    private Long lastTranslationChange = 0L;
+public class ItemBlockExplosive extends ItemBlockAbstract {
 
     private static int changeOverDelay = 1000 * 60;
+    private final String count_key = "icbm.explosive.redMatter.info.count";
+    private int tauntCount = 0;
+    private int redmatterRandomTranslations = -1;
+    private Long lastTranslationChange = 0L;
 
-    public ItemBlockExplosive(Block block)
-    {
+    public ItemBlockExplosive(Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
@@ -40,36 +36,30 @@ public class ItemBlockExplosive extends ItemBlockAbstract
 
     @Override
     @Nullable
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt)
-    {
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable NBTTagCompound nbt) {
         final CapabilityExplosiveStack capabilityExplosive = new CapabilityExplosiveStack(stack);
-        if(nbt != null)
-        {
+        if (nbt != null) {
             capabilityExplosive.deserializeNBT(nbt);
         }
         return capabilityExplosive;
     }
 
     @Override
-    public void getDetailedInfo(ItemStack stack, @Nullable EntityPlayer player, List list)
-    {
+    public void getDetailedInfo(ItemStack stack, @Nullable EntityPlayer player, List list) {
         final IExplosiveData data = ICBMClassicHelpers.getExplosive(stack.getItemDamage(), true);
-        if (data != null)
-        {
+        if (data != null) {
             final EnumTier tierdata = data.getTier();
-            if(tierdata != EnumTier.NONE) // only show the tier if its not NONE. Tier NONE is currently only assinged to the Missile Module
+            if (tierdata != EnumTier.NONE) // only show the tier if its not NONE. Tier NONE is currently only assinged to the Missile Module
             {
-                list.add(TextFormatting.DARK_RED + LanguageUtility.getLocal("info.misc.tier") + ": " + tierdata.getTooltipColor() + tierdata.getLocalizedName());
+                list.add(TextFormatting.DARK_RED + LanguageUtility.getLocal(
+                    "info.misc.tier") + ": " + tierdata.getTooltipColor() + tierdata.getLocalizedName());
             }
-        }
-        else if (stack.getItemDamage() == ICBMExplosives.REDMATTER.getRegistryID()) //TODO add hook for any explosive via content reg
+        } else if (stack.getItemDamage() == ICBMExplosives.REDMATTER.getRegistryID()) //TODO add hook for any explosive via content reg
         {
             ///Shhh!!! tell no one this exists, tis a surprise
             boolean taunt = shouldTauntPlayer(player);
-            if (taunt)
-            {
-                switch (tauntCount)
-                {
+            if (taunt) {
+                switch (tauntCount) {
                     case 0:
                         list.add("Place me, you know you want to :)");
                         //$FALL-THROUGH$
@@ -97,91 +87,70 @@ public class ItemBlockExplosive extends ItemBlockAbstract
                     case 7:
                         list.add("I'm back for you");
                 }
-            }
-            else
-            {
+            } else {
                 normalDetailedInfo(list);
             }
 
             //Cycle next message
-            if (player != null && System.currentTimeMillis() - lastTranslationChange > changeOverDelay)
-            {
+            if (player != null && System.currentTimeMillis() - lastTranslationChange > changeOverDelay) {
                 lastTranslationChange = System.currentTimeMillis();
-                if (taunt)
-                {
+                if (taunt) {
                     tauntCount = player.world.rand.nextInt(7);
-                }
-                else if (redmatterRandomTranslations > 0)
-                {
+                } else if (redmatterRandomTranslations > 0) {
                     tauntCount = player.world.rand.nextInt(redmatterRandomTranslations);
                 }
             }
-        }
-        else
-        {
+        } else {
             super.getDetailedInfo(stack, player, list);
         }
     }
 
-    protected boolean shouldTauntPlayer(@Nullable EntityPlayer player)
-    {
+    protected boolean shouldTauntPlayer(@Nullable EntityPlayer player) {
         return player != null && player.getName() != null
-                && (player.getName().toLowerCase().startsWith("sips_") || player.getName().toLowerCase().startsWith("sjin"));
+            && (player.getName().toLowerCase().startsWith("sips_") || player.getName().toLowerCase().startsWith("sjin"));
     }
 
-    protected void normalDetailedInfo(List list)
-    {
-        if (redmatterRandomTranslations == -1)
-        {
-            try
-            {
+    protected void normalDetailedInfo(List list) {
+        if (redmatterRandomTranslations == -1) {
+            try {
                 redmatterRandomTranslations = Integer.parseInt(LanguageUtility.getLocal(count_key));
-            }
-            catch (NumberFormatException e)
-            {
+            } catch (NumberFormatException e) {
                 redmatterRandomTranslations = 0;
             }
         }
         String translationKey = "icbm.explosive.redMatter.info." + tauntCount;
         String translation = LanguageUtility.getLocal(translationKey);
-        if (!translation.isEmpty() && !translation.equals(translationKey))
-        {
+        if (!translation.isEmpty() && !translation.equals(translationKey)) {
             list.addAll(LanguageUtility.splitByLine(translation));
         }
     }
 
     @Override
-    public int getMetadata(int damage)
-    {
+    public int getMetadata(int damage) {
         return damage;
     }
 
     @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items)
-    {
-        if (tab == getCreativeTab() || tab == CreativeTabs.SEARCH)
-        {
-            for (int id : ICBMClassicAPI.EX_BLOCK_REGISTRY.getExplosivesIDs())
-            {
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
+        if (tab == getCreativeTab() || tab == CreativeTabs.SEARCH) {
+            for (int id : ICBMClassicAPI.EX_BLOCK_REGISTRY.getExplosivesIDs()) {
                 items.add(new ItemStack(this, 1, id));
             }
         }
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack itemstack)
-    {
+    public String getUnlocalizedName(ItemStack itemstack) {
         final IExplosiveData data = ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosiveData(itemstack.getItemDamage());
-        if (data != null)
-        {
+        if (data != null) {
             return "explosive." + data.getRegistryName();
         }
         return "explosive";
     }
 
     @Override
-    public String getUnlocalizedName()
-    {
+    public String getUnlocalizedName() {
         return "explosive";
     }
+
 }

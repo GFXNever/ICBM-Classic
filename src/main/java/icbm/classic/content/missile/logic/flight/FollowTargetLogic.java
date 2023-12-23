@@ -1,24 +1,19 @@
 package icbm.classic.content.missile.logic.flight;
 
-import icbm.classic.ICBMClassic;
 import icbm.classic.ICBMConstants;
-import icbm.classic.api.events.MissileEvent;
 import icbm.classic.api.missiles.IMissile;
-import icbm.classic.api.missiles.parts.IMissileTarget;
 import icbm.classic.config.missile.ConfigMissile;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraftforge.common.MinecraftForge;
 
 /**
  * Follows the location of the target data
- *
+ * <p>
  * Created by Robin Seifert on 10/8/2022.
  */
-public class FollowTargetLogic extends DeadFlightLogic
-{
+public class FollowTargetLogic extends DeadFlightLogic {
+
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "direct.follow");
 
     private boolean mHadLock;
@@ -48,8 +43,7 @@ public class FollowTargetLogic extends DeadFlightLogic
     }
 
     @Override
-    public void onEntityTick(Entity entity, IMissile missile, int ticksInAir)
-    {
+    public void onEntityTick(Entity entity, IMissile missile, int ticksInAir) {
         super.onEntityTick(entity, missile, ticksInAir);
 
         if (entity.world.isRemote) {
@@ -88,8 +82,8 @@ public class FollowTargetLogic extends DeadFlightLogic
     }
 
     @Override
-    public ResourceLocation getRegistryName()
-    {
+    public ResourceLocation getRegistryName() {
         return REG_NAME;
     }
+
 }

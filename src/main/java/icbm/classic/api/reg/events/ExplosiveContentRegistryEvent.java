@@ -10,13 +10,11 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  * <p>
  * Created by Dark(DarkGuardsman, Robert) on 1/4/19.
  */
-public class ExplosiveContentRegistryEvent extends Event
-{
+public class ExplosiveContentRegistryEvent extends Event {
 
     public final IExplosiveRegistry registry;
 
-    public ExplosiveContentRegistryEvent(IExplosiveRegistry registry)
-    {
+    public ExplosiveContentRegistryEvent(IExplosiveRegistry registry) {
         this.registry = registry;
     }
 
@@ -26,8 +24,8 @@ public class ExplosiveContentRegistryEvent extends Event
      * @param id              - unique name of the content type
      * @param contentRegistry - content type
      */
-    public void register(ResourceLocation id, IExplosiveContentRegistry contentRegistry)
-    {
+    public void register(ResourceLocation id, IExplosiveContentRegistry contentRegistry) {
         registry.registerContentRegistry(id, contentRegistry);
     }
+
 }

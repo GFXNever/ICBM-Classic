@@ -18,7 +18,10 @@ import net.minecraft.world.World;
 public class RedstoneCause extends BlockCause {
 
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "block.redstone");
-
+    private static final NbtSaveHandler<RedstoneCause> SAVE_LOGIC = new NbtSaveHandler<RedstoneCause>()
+        .mainRoot()
+        /* */.nodeFacing("side", RedstoneCause::getSide, RedstoneCause::setSide)
+        .base();
     private EnumFacing side;
 
     public RedstoneCause(World world, BlockPos pos, IBlockState state, EnumFacing side) {
@@ -42,8 +45,4 @@ public class RedstoneCause extends BlockCause {
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<RedstoneCause> SAVE_LOGIC = new NbtSaveHandler<RedstoneCause>()
-        .mainRoot()
-        /* */.nodeFacing("side", RedstoneCause::getSide, RedstoneCause::setSide)
-        .base();
 }

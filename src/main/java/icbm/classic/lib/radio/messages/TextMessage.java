@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 @Data
 @AllArgsConstructor
 public class TextMessage implements ITextMessage {
+
     private final String channel;
     private final String message;
     @Accessors(fluent = true)
@@ -27,4 +28,5 @@ public class TextMessage implements ITextMessage {
         this.shouldTranslate = true;
         this.translationInputs = data;
     }
+
 }

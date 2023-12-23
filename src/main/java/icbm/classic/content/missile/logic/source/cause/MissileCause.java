@@ -9,28 +9,6 @@ import net.minecraft.util.ResourceLocation;
 
 public abstract class MissileCause implements IMissileCause {
 
-    private IMissileCause parent;
-
-    public IMissileCause setPreviousCause(IMissileCause parent) {
-        this.parent = parent;
-        return this;
-    }
-
-    @Override
-    public IMissileCause getPreviousCause() {
-        return parent;
-    }
-
-    @Override
-    public NBTTagCompound serializeNBT() {
-        return SAVE_LOGIC.save(this, new NBTTagCompound());
-    }
-
-    @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
-        SAVE_LOGIC.load(this, nbt);
-    }
-
     public static final NbtSaveNode<MissileCause, NBTTagCompound> CAUSE_SAVE = new NbtSaveNode<MissileCause, NBTTagCompound>("parent",
         (cause) -> { //TODO convert to class to make cleaner and provide better testing surface
             final NBTTagCompound save = new NBTTagCompound();
@@ -55,9 +33,30 @@ public abstract class MissileCause implements IMissileCause {
             }
         }
     );
-
     private static final NbtSaveHandler<MissileCause> SAVE_LOGIC = new NbtSaveHandler<MissileCause>()
         .mainRoot()
         /* */.node(CAUSE_SAVE)
         .base();
+    private IMissileCause parent;
+
+    public IMissileCause setPreviousCause(IMissileCause parent) {
+        this.parent = parent;
+        return this;
+    }
+
+    @Override
+    public IMissileCause getPreviousCause() {
+        return parent;
+    }
+
+    @Override
+    public NBTTagCompound serializeNBT() {
+        return SAVE_LOGIC.save(this, new NBTTagCompound());
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt) {
+        SAVE_LOGIC.load(this, nbt);
+    }
+
 }

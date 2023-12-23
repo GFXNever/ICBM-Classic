@@ -14,14 +14,13 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public abstract class BlockICBM extends BlockContainer
-{
+public abstract class BlockICBM extends BlockContainer {
+
     public static final PropertyDirection ROTATION_PROP = PropertyDirection.create("rotation");
 
     protected boolean dropInventory = false;
 
-    public BlockICBM(String name, Material mat)
-    {
+    public BlockICBM(String name, Material mat) {
         super(mat);
         blockHardness = 10f;
         blockResistance = 10f;
@@ -30,41 +29,37 @@ public abstract class BlockICBM extends BlockContainer
         setCreativeTab(ICBMClassic.CREATIVE_TAB);
     }
 
-    public BlockICBM(String name)
-    {
+    public BlockICBM(String name) {
         this(name, Material.IRON);
     }
 
     @Override
-    protected BlockStateContainer createBlockState()
-    {
+    protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, ROTATION_PROP);
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta)
-    {
+    public IBlockState getStateFromMeta(int meta) {
         return getDefaultState().withProperty(ROTATION_PROP, EnumFacing.getFront(meta));
     }
 
     @Override
-    public int getMetaFromState(IBlockState state)
-    {
+    public int getMetaFromState(IBlockState state) {
         return state.getValue(ROTATION_PROP).ordinal();
     }
 
     @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand)
-    {
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta,
+                                            EntityLivingBase placer, EnumHand hand) {
         return getDefaultState().withProperty(ROTATION_PROP, placer.getHorizontalFacing());
     }
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state)
-    {
-        if(dropInventory) {
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        if (dropInventory) {
             InventoryUtility.dropInventory(world, pos);
         }
         super.breakBlock(world, pos, state);
     }
+
 }

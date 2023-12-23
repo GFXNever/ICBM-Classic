@@ -16,28 +16,25 @@ import javax.annotation.Nullable;
  * <p>
  * Created by Dark(DarkGuardsman, Robert) on 4/19/2020. Original logic by GHXX
  */
-public class CapRedmatterPull implements IBlastVelocity
-{
+public class CapRedmatterPull implements IBlastVelocity {
+
     private final EntityRedmatter redmatter;
 
-    public CapRedmatterPull(EntityRedmatter redmatter)
-    {
+    public CapRedmatterPull(EntityRedmatter redmatter) {
         this.redmatter = redmatter;
     }
 
     @Override
-    public boolean onBlastApplyMotion(@Nullable Entity source, IBlast blast, double xDifference, double yDifference, double zDifference, double distance)
-    {
-        if (source instanceof EntityRedmatter)
-        {
+    public boolean onBlastApplyMotion(@Nullable Entity source, IBlast blast, double xDifference, double yDifference, double zDifference,
+                                      double distance) {
+        if (source instanceof EntityRedmatter) {
             handlePull((EntityRedmatter) source, xDifference, yDifference, zDifference, distance);
             return true;
         }
         return false;
     }
 
-    private void handlePull(EntityRedmatter otherRedmatter, double xDifference, double yDifference, double zDifference, double distance)
-    {
+    private void handlePull(EntityRedmatter otherRedmatter, double xDifference, double yDifference, double zDifference, double distance) {
         final double sizeScale = calculatePullPower(otherRedmatter);
 
         //Normalize vector (creates direction of pull)
@@ -54,8 +51,7 @@ public class CapRedmatterPull implements IBlastVelocity
         redmatter.addVelocity(motionX, motionY, motionZ);
     }
 
-    private double calculatePullPower(EntityRedmatter otherRedmatter)
-    {
+    private double calculatePullPower(EntityRedmatter otherRedmatter) {
         //Get the cubic size of each redmatter
         final double otherSize = Math.max(1, Math.pow(otherRedmatter.getBlastSize(), 3));
         final double thisSize = Math.max(1, Math.pow(redmatter.getBlastSize(), 3));
@@ -64,4 +60,5 @@ public class CapRedmatterPull implements IBlastVelocity
         final double combinedSize = otherSize + thisSize;
         return thisSize / combinedSize;
     }
+
 }

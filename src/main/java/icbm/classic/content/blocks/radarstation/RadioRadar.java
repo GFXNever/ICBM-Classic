@@ -15,4 +15,5 @@ public class RadioRadar extends RadioTile<TileRadarStation> implements IRadioSen
     public void onMessageCallback(IRadioReceiver receiver, IRadioMessage response) {
 
     }
+
 }

@@ -15,7 +15,7 @@
       "data": 32767
     },
     "r": {
-      "type" : "icbmclassic:explosive",
+      "type": "icbmclassic:explosive",
       "explosive": "icbmclassic:repulsive"
     }
   }

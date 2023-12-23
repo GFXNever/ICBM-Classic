@@ -12,10 +12,9 @@ import net.minecraft.world.World;
  * @Deprecated for removal, leaving as placeholder to set new blocks in position
  */
 @Deprecated
-public class BlockMultiblock extends BlockContainer
-{
-    public BlockMultiblock()
-    {
+public class BlockMultiblock extends BlockContainer {
+
+    public BlockMultiblock() {
         super(Material.ROCK);
         this.setRegistryName(ICBMConstants.DOMAIN, "multiblock");
         this.setUnlocalizedName(ICBMConstants.PREFIX + "multiblock");
@@ -24,8 +23,8 @@ public class BlockMultiblock extends BlockContainer
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
+    public TileEntity createNewTileEntity(World world, int meta) {
         return new TileMulti();
     }
+
 }

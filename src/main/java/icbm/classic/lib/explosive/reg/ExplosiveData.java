@@ -12,92 +12,78 @@ import java.util.Set;
 
 /**
  * Handles storing data about an explosive in the {@link ExplosiveRegistry}
- *
- *
+ * <p>
+ * <p>
  * Created by Dark(DarkGuardsman, Robert) on 1/4/19.
  */
-@ToString(of={"regName", "id"})
-public class ExplosiveData implements IExplosiveData
-{
+@ToString(of = {"regName", "id"})
+public class ExplosiveData implements IExplosiveData {
+
     public final ResourceLocation regName;
     public final int id;
     public final EnumTier tier;
-
-    public IBlastFactory blastCreationFactory;
-
     public final Set<ResourceLocation> enabledContent = new HashSet();
-
+    public IBlastFactory blastCreationFactory;
     public boolean enabled = true;
 
-    public ExplosiveData(ResourceLocation regName, int id, EnumTier tier)
-    {
+    public ExplosiveData(ResourceLocation regName, int id, EnumTier tier) {
         this.regName = regName;
         this.id = id;
         this.tier = tier;
     }
 
-    public ExplosiveData blastFactory(IBlastFactory factory)
-    {
+    public ExplosiveData blastFactory(IBlastFactory factory) {
         blastCreationFactory = factory;
         return this;
     }
 
     @Override
-    public ResourceLocation getRegistryName()
-    {
+    public ResourceLocation getRegistryName() {
         return regName;
     }
 
     @Override
-    public int getRegistryID()
-    {
+    public int getRegistryID() {
         return id;
     }
 
     @Override
-    public IBlastFactory getBlastFactory()
-    {
+    public IBlastFactory getBlastFactory() {
         return blastCreationFactory;
     }
 
     @Override
-    public EnumTier getTier()
-    {
+    public EnumTier getTier() {
         return tier;
     }
 
     @Override
-    public boolean isEnabled()
-    {
+    public boolean isEnabled() {
         return enabled;
     }
 
     @Override
-    public void setEnabled(boolean b)
-    {
+    public void setEnabled(boolean b) {
         this.enabled = b;
     }
 
     @Override
-    public boolean onEnableContent(ResourceLocation contentID, IExplosiveContentRegistry registry)
-    {
+    public boolean onEnableContent(ResourceLocation contentID, IExplosiveContentRegistry registry) {
         enabledContent.add(contentID);
         return true;
     }
 
     @Override
-    public boolean equals(Object object)
-    {
-        if(object instanceof ExplosiveData)
-        {
+    public boolean equals(Object object) {
+        if (object instanceof ExplosiveData) {
             return ((ExplosiveData) object).id == id;
         }
         return false;
     }
 
     @Override
-    public int compareTo(IExplosiveData o)
-    {
+    public int compareTo(IExplosiveData o) {
         return Integer.compare(getRegistryID(), o.getRegistryID());
     }
+
 }

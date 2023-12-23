@@ -19,4 +19,5 @@ public interface IToolTip {
      * @return tooltip or null to ignore
      */
     ITextComponent getTooltip();
+
 }

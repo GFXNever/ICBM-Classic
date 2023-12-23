@@ -8,6 +8,8 @@ import java.util.function.Function;
 
 @Data
 public class ProjectileItemConversion {
+
     private final ItemStack sortStack;
     private final Function<ItemStack, IProjectileData> builder;
+
 }

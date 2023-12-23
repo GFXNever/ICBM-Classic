@@ -8,15 +8,13 @@
       "model": "icbmclassic:launcher_connector"
     },
     "up": {
-      "true" :
-      {
+      "true": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "up": "icbmclassic:blocks/silo_connector/connected"
         }
       },
-      "false" :
-      {
+      "false": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "up": "icbmclassic:blocks/silo_connector/disconnected"
@@ -24,15 +22,13 @@
       }
     },
     "down": {
-      "true" :
-      {
+      "true": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "down": "icbmclassic:blocks/silo_connector/connected"
         }
       },
-      "false" :
-      {
+      "false": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "down": "icbmclassic:blocks/silo_connector/disconnected"
@@ -40,15 +36,13 @@
       }
     },
     "north": {
-      "true" :
-      {
+      "true": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "north": "icbmclassic:blocks/silo_connector/connected"
         }
       },
-      "false" :
-      {
+      "false": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "north": "icbmclassic:blocks/silo_connector/disconnected"
@@ -56,15 +50,13 @@
       }
     },
     "east": {
-      "true" :
-      {
+      "true": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "east": "icbmclassic:blocks/silo_connector/connected"
         }
       },
-      "false" :
-      {
+      "false": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "east": "icbmclassic:blocks/silo_connector/disconnected"
@@ -72,15 +64,13 @@
       }
     },
     "south": {
-      "true" :
-      {
+      "true": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "south": "icbmclassic:blocks/silo_connector/connected"
         }
       },
-      "false" :
-      {
+      "false": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "south": "icbmclassic:blocks/silo_connector/disconnected"
@@ -88,15 +78,13 @@
       }
     },
     "west": {
-      "true" :
-      {
+      "true": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "west": "icbmclassic:blocks/silo_connector/connected"
         }
       },
-      "false" :
-      {
+      "false": {
         "model": "icbmclassic:launcher_connector",
         "textures": {
           "west": "icbmclassic:blocks/silo_connector/disconnected"

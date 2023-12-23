@@ -4,13 +4,12 @@ import icbm.classic.ICBMConstants;
 import net.minecraftforge.common.config.Config;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 3/12/2018.
  */
 @Config(modid = ICBMConstants.DOMAIN, name = "icbmclassic/emp")
 @Config.LangKey("config.icbmclassic:emp.title")
-public class ConfigEMP
-{
+public class ConfigEMP {
+
     @Config.Name("allow_creeper_charging")
     @Config.Comment("Should a lighting effect be applied to the creeper to super charge it due to EMP effect?")
     public static boolean ALLOW_LIGHTING_CREEPER = true;
@@ -58,4 +57,5 @@ public class ConfigEMP
     @Config.Name("allow_tiles")
     @Config.Comment("Should EMP effect run on blocks and tiles?")
     public static boolean ALLOW_TILES = true;
+
 }

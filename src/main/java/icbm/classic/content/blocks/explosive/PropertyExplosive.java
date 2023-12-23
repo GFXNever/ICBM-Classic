@@ -11,35 +11,31 @@ import java.util.Collection;
 /**
  * Created by Dark(DarkGuardsman, Robert) on 1/6/2019.
  */
-public class PropertyExplosive implements IProperty<IExplosiveData>
-{
+public class PropertyExplosive implements IProperty<IExplosiveData> {
+
     @Override
-    public String getName()
-    {
+    public String getName() {
         return "explosive";
     }
 
     @Override
-    public Collection<IExplosiveData> getAllowedValues()
-    {
+    public Collection<IExplosiveData> getAllowedValues() {
         return ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosives();
     }
 
     @Override
-    public Class<IExplosiveData> getValueClass()
-    {
+    public Class<IExplosiveData> getValueClass() {
         return IExplosiveData.class;
     }
 
     @Override
-    public Optional<IExplosiveData> parseValue(String value)
-    {
+    public Optional<IExplosiveData> parseValue(String value) {
         return Optional.fromNullable(ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosiveData(new ResourceLocation(value.replace("_", ":"))));
     }
 
     @Override
-    public String getName(IExplosiveData value)
-    {
+    public String getName(IExplosiveData value) {
         return value.getRegistryName().toString().replaceAll(":", "_");
     }
+
 }

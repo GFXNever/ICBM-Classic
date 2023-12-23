@@ -4,11 +4,11 @@ import icbm.classic.ICBMConstants;
 import lombok.NoArgsConstructor;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 @NoArgsConstructor
 public class BallisticTargetingData extends BasicTargetData {
+
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "ballistic");
 
     public static final String NBT_IMPACT_HEIGHT = "impact_height";
@@ -23,8 +23,7 @@ public class BallisticTargetingData extends BasicTargetData {
     }
 
     @Override
-    public ResourceLocation getRegistryName()
-    {
+    public ResourceLocation getRegistryName() {
         return REG_NAME;
     }
 
@@ -44,4 +43,5 @@ public class BallisticTargetingData extends BasicTargetData {
         super.deserializeNBT(nbt);
         impactHeightOffset = nbt.getDouble(NBT_IMPACT_HEIGHT);
     }
+
 }

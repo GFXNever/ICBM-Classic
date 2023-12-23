@@ -8,18 +8,17 @@ import icbm.classic.content.entity.EntitySmoke;
 
 import javax.annotation.Nonnull;
 
-public class BlastSmoke extends BlastBase
-{
+public class BlastSmoke extends BlastBase {
+
     @Nonnull
     @Override
-    public BlastResponse triggerBlast()
-    {
+    public BlastResponse triggerBlast() {
         final EntitySmoke smoke = new EntitySmoke(world());
         smoke.setPosition(x(), y(), z());
-        if(world().spawnEntity(smoke))
-        {
+        if (world().spawnEntity(smoke)) {
             return BlastState.TRIGGERED.genericResponse;
         }
         return BlastForgeResponses.ENTITY_SPAWNING.get();
     }
+
 }

@@ -11,9 +11,8 @@ import java.util.function.Supplier;
 
 public class GuiButtonBase<B extends GuiButtonBase> extends GuiButton implements IGuiComponent, IToolTip {
 
-    private ActionTrigger action;
-
     private final Rectangle bounds;
+    private ActionTrigger action;
     private Supplier<ITextComponent> tooltip;
 
     private GuiContainerBase container;
@@ -33,13 +32,8 @@ public class GuiButtonBase<B extends GuiButtonBase> extends GuiButton implements
         return (B) this;
     }
 
-    public B setTooltip(Supplier<ITextComponent> tooltip) {
-        this.tooltip = tooltip;
-        return (B) this;
-    }
-
     public void triggerAction() {
-        if(action != null) {
+        if (action != null) {
             action.trigger();
         }
     }
@@ -51,15 +45,22 @@ public class GuiButtonBase<B extends GuiButtonBase> extends GuiButton implements
 
     @Override
     public ITextComponent getTooltip() {
-        if(tooltip != null) {
+        if (tooltip != null) {
             return tooltip.get();
         }
         return null;
+    }
+
+    public B setTooltip(Supplier<ITextComponent> tooltip) {
+        this.tooltip = tooltip;
+        return (B) this;
     }
 
     @FunctionalInterface
     public static interface ActionTrigger {
 
         void trigger();
+
     }
+
 }

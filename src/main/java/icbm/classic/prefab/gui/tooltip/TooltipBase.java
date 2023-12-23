@@ -75,4 +75,5 @@ public abstract class TooltipBase implements IToolTip, IGuiComponent {
     }
 
     protected abstract ITextComponent getActualTooltip();
+
 }

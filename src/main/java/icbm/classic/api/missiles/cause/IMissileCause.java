@@ -10,7 +10,7 @@ import net.minecraft.world.World;
  * Cause of a missile launch event. Stored as part of {@link IMissileSource}
  * used to track who or what fired the missile. Can be stored as a chain of
  * causes allowing detailed information to be tracked.
- *
+ * <p>
  * Example: player -> remote -> screen -> silo -> cluster missile -> missile
  */
 public interface IMissileCause extends IBuildableObject {
@@ -22,7 +22,7 @@ public interface IMissileCause extends IBuildableObject {
      */
     default IMissileCause getRootCause() {
         final IMissileCause cause = getPreviousCause();
-        if(cause != null) { //TODO add logic to prevent infinite loop
+        if (cause != null) { //TODO add logic to prevent infinite loop
             return cause.getPreviousCause();
         }
         return null;
@@ -37,6 +37,7 @@ public interface IMissileCause extends IBuildableObject {
 
     /**
      * Sets the missile cause
+     *
      * @param parent to use
      * @return self
      */
@@ -46,15 +47,22 @@ public interface IMissileCause extends IBuildableObject {
      * Cause containing entity information
      */
     interface IEntityCause extends IMissileCause {
+
         Entity getEntity();
+
     }
 
     /**
      * Cause containing block information
      */
     interface IBlockCause extends IMissileCause {
+
         World getWorld();
+
         BlockPos getBlockPos();
+
         IBlockState getBlockState();
+
     }
+
 }

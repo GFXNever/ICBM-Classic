@@ -24,7 +24,9 @@ public class FaceRotationButton extends GuiButtonBase<FaceRotationButton> implem
     private final Supplier<EnumFacing> currentRotationGetter;
     private final Supplier<EnumFacing> blockFaceGetter;
     private EnumFacing prevSide;
-    public FaceRotationButton(int buttonId, int x, int y, Supplier<EnumFacing> blockFaceGetter, Supplier<EnumFacing> currentRotationGetter, Consumer<EnumFacing> setter, Runnable networkCall) {
+
+    public FaceRotationButton(int buttonId, int x, int y, Supplier<EnumFacing> blockFaceGetter, Supplier<EnumFacing> currentRotationGetter,
+                              Consumer<EnumFacing> setter, Runnable networkCall) {
         super(buttonId, x, y, WIDTH, HEIGHT, "-");
         this.blockFaceGetter = blockFaceGetter;
         this.currentRotationGetter = currentRotationGetter;
@@ -38,7 +40,7 @@ public class FaceRotationButton extends GuiButtonBase<FaceRotationButton> implem
     protected EnumFacing rotate() {
         final EnumFacing currentRotation = currentRotationGetter.get();
         final EnumFacing blockFace = blockFaceGetter.get();
-        if(GuiContainer.isShiftKeyDown()) {
+        if (GuiContainer.isShiftKeyDown()) {
             return FaceRotations.rotateLeft(blockFace, currentRotation);
         }
         return FaceRotations.rotateRight(blockFace, currentRotation);
@@ -49,7 +51,7 @@ public class FaceRotationButton extends GuiButtonBase<FaceRotationButton> implem
         super.onUpdate();
 
         final EnumFacing side = currentRotationGetter.get();
-        if(prevSide != side) {
+        if (prevSide != side) {
             prevSide = side;
             //displayString = (side.getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE ? "-" : "") + side.getAxis().getName().toUpperCase();
             displayString = side.name().toUpperCase().substring(0, 1);
@@ -57,8 +59,8 @@ public class FaceRotationButton extends GuiButtonBase<FaceRotationButton> implem
     }
 
     @Override
-    public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
-    {
+    public boolean mousePressed(Minecraft mc, int mouseX, int mouseY) {
         return super.mousePressed(mc, mouseX, mouseY) && (GuiContainer.isAltKeyDown() || GuiContainer.isShiftKeyDown());
     }
+
 }

@@ -7,8 +7,8 @@ import net.minecraft.entity.Entity;
  * Created by Dark(DarkGuardsman, Robert) on 1/7/19.
  */
 @FunctionalInterface
-public interface WorldEntityIntSupplier
-{
+public interface WorldEntityIntSupplier {
+
     /**
      * Calculates or retrieves an int based on the entity
      *
@@ -16,4 +16,5 @@ public interface WorldEntityIntSupplier
      * @return
      */
     int get(Entity entity);
+
 }

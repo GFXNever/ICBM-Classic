@@ -5,8 +5,8 @@ import net.minecraftforge.common.config.Config;
 /**
  * Config for Surface to Air missiles
  */
-public class ConfigSAMMissile
-{
+public class ConfigSAMMissile {
+
     @Config.Name("speed")
     @Config.Comment("Speed (meters per tick) limiter of the missile")
     @Config.RangeDouble(min = 0.0001, max = 10)
@@ -21,4 +21,5 @@ public class ConfigSAMMissile
     @Config.Comment("Damage (hearts) to apply to the target when impacting")
     @Config.RangeInt(min = 0)
     public float ATTACK_DAMAGE = 100;
+
 }

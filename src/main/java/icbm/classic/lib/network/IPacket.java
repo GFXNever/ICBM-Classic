@@ -22,8 +22,7 @@ import java.util.function.Consumer;
  * @author tgame14, DarkCow
  * @since 26/05/14
  */
-public interface IPacket<P extends IPacket>
-{
+public interface IPacket<P extends IPacket> {
 
     /**
      * Encode the packet data into the ByteBuf stream. Complex data sets may need specific data handlers
@@ -43,8 +42,7 @@ public interface IPacket<P extends IPacket>
     void decodeInto(ChannelHandlerContext ctx, ByteBuf buffer);
 
     @Deprecated
-    default P addData(Object... objects)
-    {
+    default P addData(Object... objects) {
         return (P) this;
     }
 
@@ -54,8 +52,7 @@ public interface IPacket<P extends IPacket>
     }
 
     @SideOnly(Side.CLIENT)
-    default void handleClientSide(final Minecraft minecraft, final EntityPlayer player)
-    {
+    default void handleClientSide(final Minecraft minecraft, final EntityPlayer player) {
         throw new UnsupportedOperationException("Unsupported operation for Packet: " + getClass().getSimpleName());
     }
 
@@ -64,8 +61,8 @@ public interface IPacket<P extends IPacket>
      *
      * @param player the player reference
      */
-    default void handleServerSide(EntityPlayer player)
-    {
+    default void handleServerSide(EntityPlayer player) {
         throw new UnsupportedOperationException("Unsupported operation for Packet: " + getClass().getSimpleName());
     }
+
 }

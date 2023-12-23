@@ -12,16 +12,16 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  * or cancel the event to not set any position.
  */
 @Cancelable
-public class LauncherSetTargetEvent extends Event
-{
+public class LauncherSetTargetEvent extends Event {
+
     public final World world;
     public final BlockPos pos;
     public Vec3d target;
 
-    public LauncherSetTargetEvent(World world, BlockPos pos, Vec3d target)
-    {
+    public LauncherSetTargetEvent(World world, BlockPos pos, Vec3d target) {
         this.world = world;
         this.pos = pos;
         this.target = target;
     }
+
 }

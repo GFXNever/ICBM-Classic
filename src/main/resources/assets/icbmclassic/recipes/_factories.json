@@ -5,7 +5,7 @@
   "ingredients": {
     "explosive": "icbm.classic.lib.recipe.ExIngredientFactory"
   },
-  "recipes" : {
-    "explosive" : "icbm.classic.lib.recipe.ExRecipeFactory"
+  "recipes": {
+    "explosive": "icbm.classic.lib.recipe.ExRecipeFactory"
   }
 }

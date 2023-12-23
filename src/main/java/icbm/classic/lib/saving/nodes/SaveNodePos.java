@@ -8,14 +8,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 @Deprecated
-public class SaveNodePos<E> extends NbtSaveNode<E, NBTTagCompound>
-{
+public class SaveNodePos<E> extends NbtSaveNode<E, NBTTagCompound> {
+
     public SaveNodePos(final String name, Function<E, Pos> save, BiConsumer<E, Pos> load) {
         super(name,
             (obj) -> {
                 final Pos pos = save.apply(obj);
-                if (pos != null)
-                {
+                if (pos != null) {
                     final NBTTagCompound compound = new NBTTagCompound();
                     compound.setDouble("x", pos.getX());
                     compound.setDouble("y", pos.getY());
@@ -34,4 +33,5 @@ public class SaveNodePos<E> extends NbtSaveNode<E, NBTTagCompound>
             }
         );
     }
+
 }

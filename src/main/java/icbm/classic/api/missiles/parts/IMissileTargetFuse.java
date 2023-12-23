@@ -11,4 +11,5 @@ public interface IMissileTargetFuse extends IMissileTarget {
      * @return delay in ticks
      */
     int getImpactDelay(); //TODO implement
+
 }

@@ -17,9 +17,8 @@ import javax.annotation.Nullable;
 
 public class ParachuteProjectileData implements IProjectileData<EntityParachute> {
 
-    private final static ProjectileType[] TYPE = new ProjectileType[] {ProjectileType.TYPE_ENTITY, ProjectileType.TYPE_HOLDER};
     public final static ResourceLocation NAME = new ResourceLocation(ICBMConstants.DOMAIN, "holder.parachute");
-
+    private final static ProjectileType[] TYPE = new ProjectileType[]{ProjectileType.TYPE_ENTITY, ProjectileType.TYPE_HOLDER};
     @Getter
     @Setter
     @Accessors(chain = true)
@@ -42,7 +41,7 @@ public class ParachuteProjectileData implements IProjectileData<EntityParachute>
 
     @Override
     public void onEntitySpawned(@Nonnull EntityParachute entity, @Nullable Entity source) {
-        if(!passengerItemStack.isEmpty()) {
+        if (!passengerItemStack.isEmpty()) {
 
         }
     }
@@ -56,4 +55,5 @@ public class ParachuteProjectileData implements IProjectileData<EntityParachute>
     public void deserializeNBT(NBTTagCompound nbt) {
 
     }
+
 }

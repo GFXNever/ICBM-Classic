@@ -31,102 +31,98 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 
-public class BlockExplosive extends BlockICBM
-{
+public class BlockExplosive extends BlockICBM {
+
     public static final PropertyExplosive EX_PROP = new PropertyExplosive();
 
-    public BlockExplosive()
-    {
+    public BlockExplosive() {
         super("explosives", Material.TNT);
         setHardness(2);
         setSoundType(SoundType.CLOTH);
     }
 
+    public static void triggerExplosive(World world, BlockPos pos, boolean setFire) {
+        if (!world.isRemote) {
+            TileEntity tileEntity = world.getTileEntity(pos);
+
+            if (tileEntity instanceof TileEntityExplosive) {
+                ((TileEntityExplosive) tileEntity).trigger(setFire);
+            }
+        }
+    }
+
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player)
-    {
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
         return getItem(world, pos, getActualState(state, world, pos));
     }
 
     @Override
-    public int damageDropped(IBlockState state)
-    {
+    public int damageDropped(IBlockState state) {
         return state.getValue(EX_PROP).getRegistryID();
     }
 
     @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-    {
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
         IExplosiveData explosiveData = null;
         TileEntity tile = worldIn.getTileEntity(pos);
-        if (tile instanceof TileEntityExplosive && ((TileEntityExplosive) tile).capabilityExplosive != null)
-        {
+        if (tile instanceof TileEntityExplosive && ((TileEntityExplosive) tile).capabilityExplosive != null) {
             explosiveData = ((TileEntityExplosive) tile).capabilityExplosive.getExplosiveData();
         }
 
-        if (explosiveData != null)
-        {
+        if (explosiveData != null) {
             return state.withProperty(EX_PROP, explosiveData);
         }
         return state;
     }
 
     @Override
-    public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos)
-    {
+    public boolean isNormalCube(IBlockState state, IBlockAccess world, BlockPos pos) {
         return true;
     }
 
     @Override
-    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
-    {
+    public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side) {
         return isNormalCube(base_state, world, pos);
     }
 
     @Override
-    public boolean isTopSolid(IBlockState state)
-    {
+    public boolean isTopSolid(IBlockState state) {
         return true;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    public boolean isOpaqueCube(IBlockState state) {
         return true;
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
+    public EnumBlockRenderType getRenderType(IBlockState state) {
         return EnumBlockRenderType.MODEL;
     }
 
     @Override
-    protected BlockStateContainer createBlockState()
-    {
+    protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, ROTATION_PROP, EX_PROP);
     }
 
     @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand)
-    {
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta,
+                                            EntityLivingBase placer, EnumHand hand) {
         ItemStack stack = placer.getHeldItem(hand);
         IBlockState state = getDefaultState().withProperty(ROTATION_PROP, facing);
         IExplosiveData prop = ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosiveData(stack.getItemDamage());
-        if(prop != null) {
+        if (prop != null) {
             return state.withProperty(EX_PROP, prop);
-        }
-        else { // if the explosives id doesnt exist, then fallback to the one with the id 0
+        } else { // if the explosives id doesnt exist, then fallback to the one with the id 0
             prop = ICBMClassicAPI.EXPLOSIVE_REGISTRY.getExplosiveData(0);
-            ICBMClassic.logger().log(Level.ERROR, "Unable to get explosives kind, choosing "+prop.getRegistryName().toString()+" as a fallback.");
+            ICBMClassic.logger().log(Level.ERROR, "Unable to get explosives kind, choosing " + prop.getRegistryName().toString() + " as a fallback.");
             stack.setItemDamage(0);
             return state.withProperty(EX_PROP, prop);
         }
     }
 
     @Override
-    public void onBlockAdded(World world, BlockPos pos, IBlockState state)
-    {
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         // Can't be implemented as we lack blockState for explosive at this point
         //super.onBlockAdded(world, pos, state);
 
@@ -140,52 +136,33 @@ public class BlockExplosive extends BlockICBM
      * Called when the block is placed in the world.
      */
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entityLiving, ItemStack itemStack)
-    {
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase entityLiving, ItemStack itemStack) {
         final TileEntity tile = world.getTileEntity(pos);
-        if (tile instanceof TileEntityExplosive)
-        {
+        if (tile instanceof TileEntityExplosive) {
             TileEntityExplosive explosive = (TileEntityExplosive) tile;
             explosive.capabilityExplosive = new CapabilityExplosiveStack(itemStack.copy());
 
-            if (world.isBlockPowered(pos))
-            {
+            if (world.isBlockPowered(pos)) {
                 BlockExplosive.triggerExplosive(world, pos, false);
             }
 
             // Check to see if there is fire nearby.
             // If so, then detonate.
-            for (EnumFacing rotation : EnumFacing.HORIZONTALS)
-            {
+            for (EnumFacing rotation : EnumFacing.HORIZONTALS) {
                 Pos position = new Pos(pos).add(rotation);
                 Block blockId = position.getBlock(world);
 
-                if (blockId == Blocks.FIRE || blockId == Blocks.FLOWING_LAVA || blockId == Blocks.LAVA)
-                {
+                if (blockId == Blocks.FIRE || blockId == Blocks.FLOWING_LAVA || blockId == Blocks.LAVA) {
                     BlockExplosive.triggerExplosive(world, pos, true);
                     break;
                 }
             }
 
-            if (entityLiving != null)
-            {
+            if (entityLiving != null) {
                 //TODO turn into event and logger
                 ICBMClassic.logger().info("ICBMClassic>>BlockExplosive#onBlockPlacedBy: " + entityLiving.getName()
-                        + " placed " + explosive.capabilityExplosive.getExplosiveData().getRegistryName() + " in: " + pos);
+                    + " placed " + explosive.capabilityExplosive.getExplosiveData().getRegistryName() + " in: " + pos);
             }
-        }
-    }
-
-    /**
-     * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed
-     * (coordinates passed are their own) Args: x, y, z, neighbor block
-     */
-    @Override
-    public void neighborChanged(IBlockState thisBlock, World world, BlockPos pos, Block blockIn, BlockPos fromPos)
-    {
-        if (world.isBlockPowered(pos))
-        {
-            BlockExplosive.triggerExplosive(world, pos, false);
         }
     }
 
@@ -194,16 +171,14 @@ public class BlockExplosive extends BlockICBM
      * 1, exploded, 2 burned)
      */
 
-    public static void triggerExplosive(World world, BlockPos pos, boolean setFire)
-    {
-        if (!world.isRemote)
-        {
-            TileEntity tileEntity = world.getTileEntity(pos);
-
-            if (tileEntity instanceof TileEntityExplosive)
-            {
-                ((TileEntityExplosive) tileEntity).trigger(setFire);
-            }
+    /**
+     * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed
+     * (coordinates passed are their own) Args: x, y, z, neighbor block
+     */
+    @Override
+    public void neighborChanged(IBlockState thisBlock, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        if (world.isBlockPowered(pos)) {
+            BlockExplosive.triggerExplosive(world, pos, false);
         }
     }
 
@@ -211,15 +186,13 @@ public class BlockExplosive extends BlockICBM
      * Called upon the block being destroyed by an explosion
      */
     @Override
-    public void onBlockExploded(World world, BlockPos pos, Explosion explosion)
-    {
+    public void onBlockExploded(World world, BlockPos pos, Explosion explosion) {
         BlockExplosive.triggerExplosive(world, pos, false);
         super.onBlockExploded(world, pos, explosion);
     }
 
     @Override
-    public boolean canDropFromExplosion(Explosion explosionIn)
-    {
+    public boolean canDropFromExplosion(Explosion explosionIn) {
         return false;
     }
 
@@ -228,60 +201,48 @@ public class BlockExplosive extends BlockICBM
      * represent x,y,z of the block.
      */
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-    {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX,
+                                    float hitY, float hitZ) {
         ItemStack itemstack = player.getHeldItem(hand);
 
-        if (!itemstack.isEmpty() && (itemstack.getItem() == Items.FLINT_AND_STEEL || itemstack.getItem() == Items.FIRE_CHARGE))
-        {
+        if (!itemstack.isEmpty() && (itemstack.getItem() == Items.FLINT_AND_STEEL || itemstack.getItem() == Items.FIRE_CHARGE)) {
             BlockExplosive.triggerExplosive(world, pos, false);
 
-            if (itemstack.getItem() == Items.FLINT_AND_STEEL)
-            {
+            if (itemstack.getItem() == Items.FLINT_AND_STEEL) {
                 itemstack.damageItem(1, player);
-            }
-            else if (!player.capabilities.isCreativeMode)
-            {
+            } else if (!player.capabilities.isCreativeMode) {
                 itemstack.shrink(1);
             }
 
             return true;
-        }
-        else
-        {
+        } else {
             return super.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
         }
     }
 
     @Override
-    public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entityIn)
-    {
-        if (!world.isRemote && entityIn instanceof EntityArrow)
-        {
-            EntityArrow entityarrow = (EntityArrow)entityIn;
+    public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entityIn) {
+        if (!world.isRemote && entityIn instanceof EntityArrow) {
+            EntityArrow entityarrow = (EntityArrow) entityIn;
 
-            if (entityarrow.isBurning())
-            {
+            if (entityarrow.isBurning()) {
                 BlockExplosive.triggerExplosive(world, pos, false);
             }
         }
     }
 
     @Override
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items)
-    {
-        if (tab == this.getCreativeTabToDisplayOn())
-        {
-            for (int id : ICBMClassicAPI.EX_BLOCK_REGISTRY.getExplosivesIDs())
-            {
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
+        if (tab == this.getCreativeTabToDisplayOn()) {
+            for (int id : ICBMClassicAPI.EX_BLOCK_REGISTRY.getExplosivesIDs()) {
                 items.add(new ItemStack(this, 1, id));
             }
         }
     }
 
     @Override
-    public TileEntity createNewTileEntity(World world, int meta)
-    {
+    public TileEntity createNewTileEntity(World world, int meta) {
         return new TileEntityExplosive();
     }
+
 }

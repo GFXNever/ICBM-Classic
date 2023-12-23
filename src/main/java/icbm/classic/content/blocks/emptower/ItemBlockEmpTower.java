@@ -14,19 +14,19 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemBlockEmpTower extends ItemBlockSubTypes {
+
     public ItemBlockEmpTower(Block block) {
         super(block);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World world, List list, ITooltipFlag flag)
-    {
-        if(stack.getMetadata() == 1){
+    public void addInformation(ItemStack stack, @Nullable World world, List list, ITooltipFlag flag) {
+        if (stack.getMetadata() == 1) {
             list.add(LanguageUtility.getLocal(getUnlocalizedName(stack) + ".info").replace("%1$s", Integer.toString(ConfigEmpTower.BONUS_RADIUS)));
-        }
-        else {
+        } else {
             list.add(LanguageUtility.getLocal(getUnlocalizedName(stack) + ".info"));
         }
     }
+
 }

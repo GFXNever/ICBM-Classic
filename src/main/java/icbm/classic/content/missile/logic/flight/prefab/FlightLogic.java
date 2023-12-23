@@ -15,19 +15,26 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.function.Consumer;
 
-public abstract class FlightLogic  implements IMissileFlightLogic, IMissileFlightLogicStep {
+public abstract class FlightLogic implements IMissileFlightLogic, IMissileFlightLogicStep {
 
-    @Getter @Setter @Accessors(chain = true)
+    private static final NbtSaveHandler<FlightLogic> SAVE_LOGIC = new NbtSaveHandler<FlightLogic>()
+        .mainRoot()
+        /* */.nodeBuildableObject("next", () -> ICBMClassicAPI.MISSILE_FLIGHT_LOGIC_REGISTRY, FlightLogic::getNextStep, FlightLogic::setNextStep)
+        .base();
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private IMissileFlightLogic nextStep;
 
     @Override
     public void start(Entity entity, IMissile missile) {
-        if(!isValid()) {
-            ICBMClassic.logger().error(this + ": was not setup correctly. Setting flight logic to next step or null to avoid problems. Issue is likely due to custom properties set into the missile.");
+        if (!isValid()) {
+            ICBMClassic.logger().error(
+                this + ": was not setup correctly. Setting flight logic to next step or null to avoid problems. Issue is likely due to custom properties set into the missile.");
             missile.switchFlightLogic(getNextStep());
         }
 
-        if(ConfigDebug.DEBUG_MISSILE_LOGIC) {
+        if (ConfigDebug.DEBUG_MISSILE_LOGIC) {
             dumpInformation((str) -> ICBMClassic.logger().info(str));
         }
     }
@@ -38,9 +45,8 @@ public abstract class FlightLogic  implements IMissileFlightLogic, IMissileFligh
     }
 
     @Override
-    public void onEntityTick(Entity entity, IMissile missile, int ticksInAir)
-    {
-        if(isDone() && !entity.world.isRemote) {
+    public void onEntityTick(Entity entity, IMissile missile, int ticksInAir) {
+        if (isDone() && !entity.world.isRemote) {
             missile.switchFlightLogic(getNextStep());
         }
     }
@@ -81,8 +87,4 @@ public abstract class FlightLogic  implements IMissileFlightLogic, IMissileFligh
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<FlightLogic> SAVE_LOGIC = new NbtSaveHandler<FlightLogic>()
-        .mainRoot()
-        /* */.nodeBuildableObject("next", () -> ICBMClassicAPI.MISSILE_FLIGHT_LOGIC_REGISTRY, FlightLogic::getNextStep, FlightLogic::setNextStep)
-        .base();
 }

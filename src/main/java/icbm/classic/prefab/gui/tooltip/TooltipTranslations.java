@@ -7,6 +7,7 @@ import net.minecraft.util.text.ITextComponent;
  * Simple tooltip component for showing users additional information
  */
 public class TooltipTranslations extends TooltipBase {
+
     private ITextComponent normalTooltip;
     private ITextComponent shiftTooltip;
 
@@ -22,9 +23,10 @@ public class TooltipTranslations extends TooltipBase {
 
     @Override
     protected ITextComponent getActualTooltip() {
-        if(GuiScreen.isShiftKeyDown()) {
+        if (GuiScreen.isShiftKeyDown()) {
             return shiftTooltip;
         }
         return normalTooltip;
     }
+
 }

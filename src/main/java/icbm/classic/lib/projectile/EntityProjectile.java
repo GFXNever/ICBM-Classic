@@ -33,7 +33,25 @@ import java.util.UUID;
  *
  * @author Darkguardsman
  */
-public abstract class EntityProjectile<E extends EntityProjectile<E>> extends EntityICBM implements IProjectile, IMissileAiming, IEntityAdditionalSpawnData {
+public abstract class EntityProjectile<E extends EntityProjectile<E>> extends EntityICBM
+    implements IProjectile, IMissileAiming, IEntityAdditionalSpawnData {
+
+    private static final NbtSaveHandler<EntityProjectile> SAVE_LOGIC = new NbtSaveHandler<EntityProjectile>()
+        //Stuck in ground data
+        .addRoot("ground")
+        /* */.nodeBlockPos("pos", (projectile) -> projectile.tilePos, (projectile, pos) -> projectile.tilePos = pos)
+        /* */.nodeFacing("side", (projectile) -> projectile.sideTile, (projectile, side) -> projectile.sideTile = side)
+        /* */.nodeBlockState("state", (projectile) -> projectile.blockInside, (projectile, blockState) -> projectile.blockInside = blockState)
+        .base()
+        //Flags
+        .addRoot("flags")
+        /* */.nodeBoolean("ground", (projectile) -> projectile.inGround, (projectile, flag) -> projectile.inGround = flag)
+        .base()
+        //Ticks
+        .addRoot("ticks")
+        /* */.nodeInteger("air", (projectile) -> projectile.ticksInAir, (projectile, flag) -> projectile.ticksInAir = flag)
+        /* */.nodeInteger("ground", (projectile) -> projectile.ticksInGround, (projectile, flag) -> projectile.ticksInGround = flag)
+        .base();
     /**
      * The entity who shot this projectile and can be used for damage calculations
      * As well useful for causing argo on the shooter
@@ -50,17 +68,6 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
      * location. Think of it like moving towards the sound of the weapon.
      */
     public Pos sourceOfProjectile;
-
-    //Settings
-    protected int inGroundKillTime = 1200;
-    protected int inAirKillTime = 1200;
-    /**
-     * Damage source to do on impact
-     */
-    //TODO replace with method allowing more complex calculations
-    protected DamageSource impact_damageSource = DamageSource.ANVIL;
-
-    //In ground data
     /**
      * Block position projectile is stuck inside
      */
@@ -69,6 +76,8 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
      * Face of tile we are stuck inside
      */
     public EnumFacing sideTile = EnumFacing.UP;
+
+    //In ground data
     /**
      * Block state we are stuck inside
      */
@@ -81,12 +90,18 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
      * Entity is being teleported, causes it to ignore block impacts
      */
     public boolean changingDimensions = false;
-
     //Timers
     public int ticksInGround;
     public int ticksInAir;
-
     public boolean freezeMotion = false;
+    //Settings
+    protected int inGroundKillTime = 1200;
+    protected int inAirKillTime = 1200;
+    /**
+     * Damage source to do on impact
+     */
+    //TODO replace with method allowing more complex calculations
+    protected DamageSource impact_damageSource = DamageSource.ANVIL;
 
     public EntityProjectile(World world) {
         super(world);
@@ -151,8 +166,10 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
         this.posZ -= (double) (MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F * distanceScale);
         this.setPosition(this.posX, this.posY, this.posZ);
 
-        this.motionX = (double) (-MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
-        this.motionZ = (double) (MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
+        this.motionX =
+            (double) (-MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
+        this.motionZ =
+            (double) (MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
         this.motionY = (double) (-MathHelper.sin(this.rotationPitch / 180.0F * (float) Math.PI));
         this.shoot(this.motionX, this.motionY, this.motionZ, multiplier, 0);
 
@@ -246,7 +263,8 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
 
             //Handle entity collision boxes
             Entity entity = null;
-            List list = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().offset(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+            List list = this.world.getEntitiesWithinAABBExcludingEntity(this,
+                this.getEntityBoundingBox().offset(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
             double distanceToHit = 0.0D;
             float hitBoxSizeScale;
 
@@ -255,7 +273,8 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
 
                 if (shouldCollideWith(checkEntity) && (checkEntity != this.shootingEntity || this.ticksInAir >= 5)) {
                     hitBoxSizeScale = 0.3F;
-                    AxisAlignedBB hitBox = checkEntity.getEntityBoundingBox().expand((double) hitBoxSizeScale, (double) hitBoxSizeScale, (double) hitBoxSizeScale);
+                    AxisAlignedBB hitBox =
+                        checkEntity.getEntityBoundingBox().expand((double) hitBoxSizeScale, (double) hitBoxSizeScale, (double) hitBoxSizeScale);
                     RayTraceResult entityRayHit = hitBox.calculateIntercept(rayStart, rayEnd);
 
                     if (entityRayHit != null) {
@@ -402,7 +421,6 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
         onImpactEntity(entityHit, (float) getVelocity().magnitude(), hit);
     }
 
-
     protected void onImpactEntity(Entity entityHit, float velocity, RayTraceResult hit) {
         if (!world.isRemote) {
             int damage = MathHelper.ceil((double) velocity * 2);
@@ -412,7 +430,8 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
                 if (entityHit instanceof EntityLivingBase) {
                     float vel_horizontal = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
                     if (vel_horizontal > 0.0F) {
-                        entityHit.addVelocity(this.motionX * 0.6000000238418579D / (double) vel_horizontal, 0.1D, this.motionZ * 0.6000000238418579D / (double) vel_horizontal);
+                        entityHit.addVelocity(this.motionX * 0.6000000238418579D / (double) vel_horizontal, 0.1D,
+                            this.motionZ * 0.6000000238418579D / (double) vel_horizontal);
                     }
                 }
 
@@ -461,7 +480,8 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
     public void rotateTowardsMotion(float delta) {
         //Get rotation from motion
         float speed = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-        this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI); //TODO update to catch atan for better performance on repeat calls
+        this.rotationYaw =
+            (float) (Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI); //TODO update to catch atan for better performance on repeat calls
         this.rotationPitch = (float) (Math.atan2(this.motionY, (double) speed) * 180.0D / Math.PI);
 
         //-------------------------------------
@@ -568,23 +588,6 @@ public abstract class EntityProjectile<E extends EntityProjectile<E>> extends En
         super.readEntityFromNBT(nbt);
         SAVE_LOGIC.load(this, nbt);
     }
-
-    private static final NbtSaveHandler<EntityProjectile> SAVE_LOGIC = new NbtSaveHandler<EntityProjectile>()
-        //Stuck in ground data
-        .addRoot("ground")
-        /* */.nodeBlockPos("pos", (projectile) -> projectile.tilePos, (projectile, pos) -> projectile.tilePos = pos)
-        /* */.nodeFacing("side", (projectile) -> projectile.sideTile, (projectile, side) -> projectile.sideTile = side)
-        /* */.nodeBlockState("state", (projectile) -> projectile.blockInside, (projectile, blockState) -> projectile.blockInside = blockState)
-        .base()
-        //Flags
-        .addRoot("flags")
-        /* */.nodeBoolean("ground", (projectile) -> projectile.inGround, (projectile, flag) -> projectile.inGround = flag)
-        .base()
-        //Ticks
-        .addRoot("ticks")
-        /* */.nodeInteger("air", (projectile) -> projectile.ticksInAir, (projectile, flag) -> projectile.ticksInAir = flag)
-        /* */.nodeInteger("ground", (projectile) -> projectile.ticksInGround, (projectile, flag) -> projectile.ticksInGround = flag)
-        .base();
     //Project source, if needed implement in each projectile directly. or add a boolean toggle to .addRoot. As missile doesn't need source nor shooter due to missile.targetData
         /*
         .addRoot("source")

@@ -11,6 +11,7 @@ import net.minecraftforge.common.config.Config;
 @Config(modid = ICBMConstants.DOMAIN, name = "icbmclassic/emp_tower")
 @Config.LangKey("config.icbmclassic:emp_tower.title")
 public class ConfigEmpTower {
+
     @Config.Name("extender_range_bonus")
     @Config.Comment("Bonus max range (meters) given for each extender added above the base")
     public static int BONUS_RADIUS = 20;
@@ -38,4 +39,5 @@ public class ConfigEmpTower {
     @Config.Name("base_max_range")
     @Config.Comment("Max user configurable range of base emp tower (meters)")
     public static int MAX_BASE_RANGE = 150;
+
 }

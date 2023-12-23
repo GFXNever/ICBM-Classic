@@ -6,7 +6,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.*;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class FlyingBlock {
@@ -29,7 +29,7 @@ public class FlyingBlock {
      * @return true if allowed
      */
     public static boolean isAllowed(IBlockState state) {
-        if(!ConfigFlyingBlocks.ENABLED) {
+        if (!ConfigFlyingBlocks.ENABLED) {
             return false;
         }
 
@@ -39,7 +39,7 @@ public class FlyingBlock {
         }
 
         // Allow List
-        return  banAllowList.contains(state);
+        return banAllowList.contains(state);
     }
 
     /**
@@ -107,4 +107,5 @@ public class FlyingBlock {
         banAllowList.reload();
         //TODO load replacements, ensure we store as block -> handler
     }
+
 }

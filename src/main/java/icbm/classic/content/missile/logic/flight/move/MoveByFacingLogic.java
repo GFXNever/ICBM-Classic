@@ -18,14 +18,25 @@ import java.util.function.Consumer;
  * Flight logic to move in a direction matching {@link EnumFacing} until a set distance is meet
  */
 public class MoveByFacingLogic extends AccelerateByFacingLogic {
+
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "engine.move.facing");
-
-    /** Distance to cover */
-    @Getter @Setter @Accessors(chain = true)
+    private static final NbtSaveHandler<MoveByFacingLogic> SAVE_LOGIC = new NbtSaveHandler<MoveByFacingLogic>()
+        .mainRoot()
+        /* */.nodeDouble("distance", MoveByFacingLogic::getDistance, MoveByFacingLogic::setDistance)
+        .base();
+    /**
+     * Distance to cover
+     */
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private double distance;
-
-    /** When set to true it will track distance relative to the acceleration and not actual amount moved */
-    @Getter @Setter @Accessors(chain = true)
+    /**
+     * When set to true it will track distance relative to the acceleration and not actual amount moved
+     */
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private boolean relative = false;
 
     @Override
@@ -45,12 +56,11 @@ public class MoveByFacingLogic extends AccelerateByFacingLogic {
         super.onEntityTick(entity, missile, ticksInAir);
 
         // Movement ignoring outside forces
-        if(relative) {
+        if (relative) {
             distance -= getVelocityAdded();
         }
         // Measured movement in direction, technically can run forever if something stops movement
-        else
-        {
+        else {
             distance -= getDirection().getFrontOffsetX() * entity.motionX;
             distance -= getDirection().getFrontOffsetY() * entity.motionY;
             distance -= getDirection().getFrontOffsetZ() * entity.motionZ;
@@ -78,8 +88,4 @@ public class MoveByFacingLogic extends AccelerateByFacingLogic {
         SAVE_LOGIC.load(this, nbt);
     }
 
-    private static final NbtSaveHandler<MoveByFacingLogic> SAVE_LOGIC = new NbtSaveHandler<MoveByFacingLogic>()
-        .mainRoot()
-        /* */.nodeDouble("distance", MoveByFacingLogic::getDistance, MoveByFacingLogic::setDistance)
-        .base();
 }

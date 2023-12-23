@@ -1,6 +1,5 @@
 package icbm.classic.lib.radar;
 
-import com.google.common.collect.Lists;
 import icbm.classic.ICBMClassic;
 import icbm.classic.lib.transform.region.Cube;
 import net.minecraft.entity.Entity;
@@ -23,6 +22,7 @@ import java.util.List;
  * Created by Dark(DarkGuardsman, Robert) on 3/5/2016.
  */
 public final class RadarRegistry {
+
     /**
      * Used only for event calls
      */
@@ -82,7 +82,8 @@ public final class RadarRegistry {
         if (world == null || world.provider == null) {
             //Only throw an error in dev mode, ignore in normal runtime
             if (ICBMClassic.runningAsDev) {
-                ICBMClassic.logger().error("RadarRegistry: World can not be null or have a null provider when requesting a radar map", new RuntimeException());
+                ICBMClassic.logger()
+                    .error("RadarRegistry: World can not be null or have a null provider when requesting a radar map", new RuntimeException());
             }
 
             return null;
@@ -124,7 +125,8 @@ public final class RadarRegistry {
      * @return list, never null
      */
     public static List<Entity> getAllLivingObjectsWithin(World world, double x, double y, double z, double distance) {
-        return getAllLivingObjectsWithin(world, new Cube(x - distance, Math.max(0, y - distance), z - distance, x + distance, y + distance, z + distance));
+        return getAllLivingObjectsWithin(world,
+            new Cube(x - distance, Math.max(0, y - distance), z - distance, x + distance, y + distance, z + distance));
     }
 
     /**

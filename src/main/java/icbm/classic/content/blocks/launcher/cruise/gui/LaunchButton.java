@@ -24,7 +24,7 @@ public class LaunchButton extends GuiButtonBase<LaunchButton> {
     @Override
     public void onUpdate() {
         super.onUpdate();
-        if(enabledCheck != null) {
+        if (enabledCheck != null) {
             this.enabled = enabledCheck.get();
         }
     }
@@ -43,7 +43,7 @@ public class LaunchButton extends GuiButtonBase<LaunchButton> {
             final int UV_WIDTH = 182;
 
             // Disabled state
-            if(!this.enabled) {
+            if (!this.enabled) {
                 this.drawTexturedModalRect(this.x, this.y, UV_WIDTH, 111, this.width, this.height);
             }
             // Pressed state
@@ -60,7 +60,7 @@ public class LaunchButton extends GuiButtonBase<LaunchButton> {
             }
 
             // Draw button cover
-            if(!enabled && doDrawGlass) {
+            if (!enabled && doDrawGlass) {
                 this.drawTexturedModalRect(this.x - 4, this.y - 4, 220, 5, 36, 36);
             }
 
@@ -87,4 +87,5 @@ public class LaunchButton extends GuiButtonBase<LaunchButton> {
         }
         return false;
     }
+
 }

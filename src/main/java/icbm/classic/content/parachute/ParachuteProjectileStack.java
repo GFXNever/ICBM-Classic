@@ -14,7 +14,9 @@ public class ParachuteProjectileStack implements IProjectileStack<EntityParachut
     /**
      * ItemStack to use to spawn as a passenger of this parachute
      */
-    @Getter @Setter @Accessors(chain = true)
+    @Getter
+    @Setter
+    @Accessors(chain = true)
     private ItemStack passengerItemStack = ItemStack.EMPTY;
 
     @Override
@@ -26,7 +28,7 @@ public class ParachuteProjectileStack implements IProjectileStack<EntityParachut
 
     @Override
     public void deserializeNBT(NBTTagCompound save) {
-        if(save.hasKey("passengerItemStack", 10)) {
+        if (save.hasKey("passengerItemStack", 10)) {
             passengerItemStack = new ItemStack(save.getCompoundTag("passengerItemStack"));
         }
     }
@@ -35,4 +37,5 @@ public class ParachuteProjectileStack implements IProjectileStack<EntityParachut
     public IProjectileData<EntityParachute> getProjectileData() {
         return new ParachuteProjectileData().setPassengerItemStack(passengerItemStack);
     }
+
 }

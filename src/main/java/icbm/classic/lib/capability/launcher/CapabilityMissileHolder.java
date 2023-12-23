@@ -12,27 +12,40 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nullable;
 
-public class CapabilityMissileHolder implements IMissileHolder
-{
+public class CapabilityMissileHolder implements IMissileHolder {
+
     private final IItemHandlerModifiable inventory;
     private final int slot;
 
-    public CapabilityMissileHolder(IItemHandlerModifiable inventory, int slot)
-    {
+    public CapabilityMissileHolder(IItemHandlerModifiable inventory, int slot) {
         this.inventory = inventory;
         this.slot = slot;
     }
 
+    public static void register() {
+        CapabilityManager.INSTANCE.register(IMissileHolder.class, new Capability.IStorage<IMissileHolder>() {
+                @Nullable
+                @Override
+                public NBTBase writeNBT(Capability<IMissileHolder> capability, IMissileHolder instance, EnumFacing side) {
+                    return null;
+                }
+
+                @Override
+                public void readNBT(Capability<IMissileHolder> capability, IMissileHolder instance, EnumFacing side, NBTBase nbt) {
+
+                }
+            },
+            () -> new CapabilityMissileHolder(null, 0));
+    }
+
     @Override
-    public ItemStack getMissileStack()
-    {
+    public ItemStack getMissileStack() {
         return inventory.getStackInSlot(slot);
     }
 
     @Override
-    public ItemStack insertMissileStack(ItemStack stack, boolean simulate)
-    {
-        if(canSupportMissile(stack)) {
+    public ItemStack insertMissileStack(ItemStack stack, boolean simulate) {
+        if (canSupportMissile(stack)) {
             return inventory.insertItem(slot, stack, simulate);
         }
         return null;
@@ -40,9 +53,9 @@ public class CapabilityMissileHolder implements IMissileHolder
 
     @Override
     public boolean consumeMissile() {
-        if(hasMissile()) {
+        if (hasMissile()) {
             final ICapabilityMissileStack missileStack = getMissileStack().getCapability(ICBMClassicAPI.MISSILE_STACK_CAPABILITY, null);
-            if(missileStack != null) {
+            if (missileStack != null) {
                 inventory.setStackInSlot(slot, missileStack.consumeMissile());
                 return true;
             }
@@ -51,28 +64,8 @@ public class CapabilityMissileHolder implements IMissileHolder
     }
 
     @Override
-    public boolean canSupportMissile(ItemStack stack)
-    {
+    public boolean canSupportMissile(ItemStack stack) {
         return inventory.isItemValid(slot, stack);
     }
 
-    public static void register()
-    {
-        CapabilityManager.INSTANCE.register(IMissileHolder.class, new Capability.IStorage<IMissileHolder>()
-            {
-                @Nullable
-                @Override
-                public NBTBase writeNBT(Capability<IMissileHolder> capability, IMissileHolder instance, EnumFacing side)
-                {
-                    return null;
-                }
-
-                @Override
-                public void readNBT(Capability<IMissileHolder> capability, IMissileHolder instance, EnumFacing side, NBTBase nbt)
-                {
-
-                }
-            },
-            () -> new CapabilityMissileHolder(null, 0));
-    }
 }

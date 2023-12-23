@@ -20,6 +20,26 @@ public class RadarRenderData {
         this.host = host;
     }
 
+    public static List<RadarRenderDot> decodeDots(ByteBuf buf) {
+
+        final List<RadarRenderDot> dots = new LinkedList();
+
+        int dotCount = buf.readInt();
+        for (int i = 0; i < dotCount; i++) {
+            dots.add(new RadarRenderDot(buf.readInt(), buf.readInt(), RadarDotType.get(buf.readByte())));
+        }
+        return dots;
+    }
+
+    public static void encodeDots(ByteBuf buf, List<RadarRenderDot> dots) {
+        buf.writeInt(dots.size());
+        dots.forEach(dot -> {
+            buf.writeInt(dot.getX());
+            buf.writeInt(dot.getY());
+            buf.writeByte(dot.getType().ordinal());
+        });
+    }
+
     public void update() {
 
 
@@ -37,8 +57,8 @@ public class RadarRenderData {
         addDot(this.host.getPos().getX() + 0.5, this.host.getPos().getZ() + 0.5 + this.host.getTriggerRange(), RadarDotType.MARKER);
         addDot(this.host.getPos().getX() + 0.5, this.host.getPos().getZ() + 0.5 - this.host.getTriggerRange(), RadarDotType.MARKER);
 
-        this.host.getDetectedThreats().forEach((entity) ->  addDot(entity.posX, entity.posZ, RadarDotType.HOSTILE));
-        this.host.getIncomingThreats().forEach((entity) ->  addDot(entity.x(), entity.z(), RadarDotType.INCOMING));
+        this.host.getDetectedThreats().forEach((entity) -> addDot(entity.posX, entity.posZ, RadarDotType.HOSTILE));
+        this.host.getIncomingThreats().forEach((entity) -> addDot(entity.x(), entity.z(), RadarDotType.INCOMING));
     }
 
     public void addDot(double ex, double ez, RadarDotType type) {
@@ -48,8 +68,8 @@ public class RadarRenderData {
         final double vecX = deltaX / this.host.getDetectionRange();
         final double vecZ = deltaZ / this.host.getDetectionRange();
 
-        final int x = (int)Math.floor(vecX * (UV_SIZE / 2f));
-        final int z = (int)Math.floor(vecZ * (UV_SIZE / 2f));
+        final int x = (int) Math.floor(vecX * (UV_SIZE / 2f));
+        final int z = (int) Math.floor(vecZ * (UV_SIZE / 2f));
 
         dots.add(new RadarRenderDot(x, z, type));
     }
@@ -63,23 +83,4 @@ public class RadarRenderData {
         this.dots.addAll(dots);
     }
 
-    public static List<RadarRenderDot> decodeDots(ByteBuf buf) {
-
-        final List<RadarRenderDot> dots = new LinkedList();
-
-        int dotCount = buf.readInt();
-        for(int i = 0; i < dotCount; i++) {
-            dots.add(new RadarRenderDot(buf.readInt(), buf.readInt(), RadarDotType.get(buf.readByte())));
-        }
-        return dots;
-    }
-
-    public static void encodeDots(ByteBuf buf, List<RadarRenderDot> dots) {
-        buf.writeInt(dots.size());
-        dots.forEach(dot -> {
-            buf.writeInt(dot.getX());
-            buf.writeInt(dot.getY());
-            buf.writeByte(dot.getType().ordinal());
-        });
-    }
 }

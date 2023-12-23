@@ -10,11 +10,9 @@ import net.minecraft.util.ResourceLocation;
 import java.util.function.Consumer;
 
 /**
- *
  * Created by Dark(DarkGuardsman, Robert) on 1/4/19.
  */
-public interface IExMissileRegistry extends IExplosiveContentRegistry
-{
+public interface IExMissileRegistry extends IExplosiveContentRegistry {
 
     /**
      * Adds a simple callback for when a missile launches
@@ -46,7 +44,7 @@ public interface IExMissileRegistry extends IExplosiveContentRegistry
      * Do not use this in place of normal events, this is designed to add logic for
      * specific missile types.
      *
-     * @param exName        - id of the explosive/missile
+     * @param exName   - id of the explosive/missile
      * @param function - function to call
      */
     void setInteractionListener(ResourceLocation exName, EntityInteractionFunction function);
@@ -59,4 +57,5 @@ public interface IExMissileRegistry extends IExplosiveContentRegistry
     void triggerFlightUpdate(IMissile missile);
 
     boolean onInteraction(Entity entity, EntityPlayer player, EnumHand hand);
+
 }
