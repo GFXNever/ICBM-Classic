@@ -67,7 +67,7 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
 {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "cruiseLauncher");
 
-    private static final int REDSTONE_CHECK_RATE = 40;
+    private static final int REDSTONE_CHECK_RATE = 1;
     private static final double ROTATION_SPEED = 10.0;
 
     public static final double MISSILE__HOLDER_Y = 2.0;
