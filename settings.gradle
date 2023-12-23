@@ -8,7 +8,7 @@ pluginManagement {
         };
         maven {
             name 'Garden of Fancy'
-            url 'https://gitlab.com/api/v4/projects/26758973/packages/maven'
+            url 'https://maven.gofancy.wtf/releases'
         };
     }
 }
