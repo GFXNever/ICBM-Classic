@@ -117,6 +117,7 @@ public class ICBMClassic
     public static CommonProxy proxy;
 
     public static final int MAP_HEIGHT = 255;
+    public static final int RADAR_MAP_HEIGHT = 1000;
 
     @Deprecated
     private static final Logger logger = LogManager.getLogger(ICBMConstants.DOMAIN);
