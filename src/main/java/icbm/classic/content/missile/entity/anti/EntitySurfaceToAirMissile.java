@@ -1,9 +1,15 @@
 package icbm.classic.content.missile.entity.anti;
 
+import icbm.classic.ICBMClassic;
+import icbm.classic.client.ICBMSounds;
+import icbm.classic.client.fx.ParticleSmokeICBM;
 import icbm.classic.config.missile.ConfigMissile;
 import icbm.classic.content.missile.entity.EntityMissile;
 import icbm.classic.content.missile.logic.flight.FollowTargetLogic;
 import icbm.classic.content.reg.ItemReg;
+import icbm.classic.lib.transform.vector.Pos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntityDamageSource;
@@ -73,6 +79,13 @@ public class EntitySurfaceToAirMissile extends EntityMissile<EntitySurfaceToAirM
 
         //Normal update logic
         super.onUpdate();
+    }
+
+    @Override
+    public void setDead() {
+        ICBMClassic.proxy.spawnInterceptionParticles(world, posX, posY, posZ);
+        ICBMSounds.EXPLOSION.play(this, 3.0F, (1.0F + (this.world().rand.nextFloat() - this.world().rand.nextFloat()) * 0.2F) * 0.7F, true);
+        super.setDead();
     }
 
     @Override

@@ -9,6 +9,7 @@ import icbm.classic.client.render.entity.layer.LayerChickenHelmet;
 import icbm.classic.config.ConfigClient;
 import icbm.classic.lib.transform.vector.Pos;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderChicken;
 import net.minecraft.entity.Entity;
@@ -153,5 +154,51 @@ public class ClientProxy extends CommonProxy
                 Minecraft.getMinecraft().effectRenderer.addEffect(particleAirParticleICBM);
             }
         }
+    }
+
+    @Override
+    public void spawnInterceptionParticles(World world, double posX, double posY, double posZ) {
+        Random rand = world.rand;
+        ParticleManager particleManager = Minecraft.getMinecraft().effectRenderer;
+
+        for (int i = 0 ; i < 10 ; i++) {
+            float scale = 10 + 8 * rand.nextFloat();
+
+            double randX = 0.1 * normalizedRandom(rand);
+            double randY = 0.1 * normalizedRandom(rand);
+            double randZ = 0.1 * normalizedRandom(rand);
+
+            double particleX = posX + randX;
+            double particleY = posY + randY;
+            double particleZ = posZ + randZ;
+
+            //Get delta from center of blast so particles move out
+            double particleMX = particleX - posX;
+            double particleMY = (particleY - posY) * 0.05;
+            double particleMZ = particleZ - posZ;
+
+            //Normalize motion vector
+            final double speed = MathHelper.sqrt(particleMX * particleMX + particleMY * particleMY + particleMZ * particleMZ);
+            particleMX /= speed;
+            particleMY /= speed;
+            particleMZ /= speed;
+
+            //Give motion vector a randomized multiplier based on blast size
+            double multiplier = speed / scale + 0.1D;
+            multiplier *= (world.rand.nextFloat() * world.rand.nextFloat() + 0.3F);
+            particleMX *= multiplier;
+            particleMY *= multiplier;
+            particleMZ *= multiplier;
+
+            ParticleSmokeICBM particle = new ParticleSmokeICBM(world, new Pos(particleX, particleY, particleZ), particleMX, particleMY, particleMZ, scale);
+            particle.setColor(0.3f, 0.3f, 0.3f, true);
+            particle.setAge(20*40);
+
+            particleManager.addEffect(particle);
+        }
+    }
+
+    private double normalizedRandom(Random random) {
+        return (random.nextFloat() - 0.5) * 2;
     }
 }

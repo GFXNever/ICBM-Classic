@@ -22,8 +22,8 @@ public class SAMTargetData implements IMissileTarget {
     public static final ResourceLocation REG_NAME = new ResourceLocation(ICBMConstants.DOMAIN, "anti.missile");
 
     private static final int MAX_TARGETS = 5;
-    private static final int SCAN_DELAY = 10;
-    private static final int MAX_RANGE = 30;
+    private static final int SCAN_DELAY = 5;
+    private static final int MAX_RANGE = 100;
 
     private final Queue<Entity> targets = new LinkedList();
 
