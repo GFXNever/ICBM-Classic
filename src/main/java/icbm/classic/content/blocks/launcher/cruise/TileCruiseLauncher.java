@@ -221,12 +221,9 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
             currentAim.moveTowards(aim, ROTATION_SPEED, deltaTime).clampTo360();
 
             // Check redstone
-            if (this.ticks % REDSTONE_CHECK_RATE == 0) {
-                for (EnumFacing side : EnumFacing.VALUES) {
-                    final int power = world.getRedstonePower(getPos().offset(side), side);
-                    if (power > 1) {
-                        firingPackage = new FiringPackage(new BasicTargetData(getTarget()), new RedstoneCause(getWorld(), getPos(), getBlockState(), side), 0);
-                    }
+            if (this.ticks % REDSTONE_CHECK_RATE == 0) { // TODO fix to check on block update instead of every tick
+                if (this.world.isBlockPowered(this.pos)) {
+                    firingPackage = new FiringPackage(new BasicTargetData(getTarget()), new RedstoneCause(getWorld(), getPos(), getBlockState(), null), 0);
                 }
             }
 
