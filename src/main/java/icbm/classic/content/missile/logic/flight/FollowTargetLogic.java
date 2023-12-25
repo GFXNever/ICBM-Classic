@@ -70,15 +70,19 @@ public class FollowTargetLogic extends DeadFlightLogic {
         motionY /= velocity;
         motionZ /= velocity;
 
-        //Set motion
-        entity.motionX = motionX * ConfigMissile.SAM_MISSILE.FLIGHT_SPEED;
-        entity.motionY = motionY * ConfigMissile.SAM_MISSILE.FLIGHT_SPEED;
-        entity.motionZ = motionZ * ConfigMissile.SAM_MISSILE.FLIGHT_SPEED;
-
-        //Update rotation
         float f3 = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
-        entity.prevRotationYaw = entity.rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
-        entity.prevRotationPitch = entity.rotationPitch = (float) (Math.atan2(motionY, (double) f3) * 180.0D / Math.PI);
+        float yawDiff = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
+        float pitchDiff = (float) (Math.atan2(motionY, f3) * 180.0D / Math.PI);
+
+        // This lowers the motion of the missile the less it's aimed towards the target
+        // allowing a smooth acceleration
+        entity.motionX = motionX * ConfigMissile.SAM_MISSILE.FLIGHT_SPEED * (1 - Math.abs(Math.atan2(motionX, motionZ) % 1) / 10);
+        entity.motionY = motionY * ConfigMissile.SAM_MISSILE.FLIGHT_SPEED * (1 - Math.abs(Math.atan2(motionY, f3) % 1) / 10);
+        entity.motionZ = motionZ * ConfigMissile.SAM_MISSILE.FLIGHT_SPEED * (1 - Math.abs(Math.atan2(motionZ, motionX) % 1) / 10);
+
+        // Update rotation
+        entity.prevRotationYaw = entity.rotationYaw = yawDiff;
+        entity.prevRotationPitch = entity.rotationPitch = pitchDiff;
     }
 
     @Override
