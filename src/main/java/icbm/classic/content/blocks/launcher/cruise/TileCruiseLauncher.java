@@ -277,7 +277,7 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
     }
 
     public boolean isAimed() {
-        return currentAim.isWithin(aim, 0.01);
+        return currentAim.isWithin(aim, 30);
     }
 
     protected void updateAimAngle() {
