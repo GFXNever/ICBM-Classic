@@ -23,6 +23,7 @@ import icbm.classic.lib.network.lambda.tile.PacketCodexTile;
 import icbm.classic.lib.radar.RadarRegistry;
 import icbm.classic.lib.radio.RadioRegistry;
 import icbm.classic.lib.radio.imp.Radio;
+import icbm.classic.lib.radio.messages.DetectedMissileMessage;
 import icbm.classic.lib.radio.messages.IncomingMissileMessage;
 import icbm.classic.lib.saving.NbtSaveHandler;
 import icbm.classic.lib.tile.TickAction;
@@ -124,7 +125,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
      * All detected threats in our radar range
      */
     @Getter
-    private final List<Entity> detectedThreats = new ArrayList<Entity>();
+    private final List<IMissile> detectedThreats = new ArrayList<>();
     /**
      * Threats that will cause harm to our protection area
      */
@@ -222,11 +223,13 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
                 }
 
                 //Check for incoming and launch anti-missiles if
-                if (this.ticks % 20 == 0 && !radio.getChannel()
-                    .equals(RadioRegistry.EMPTY_HZ) && this.incomingThreats.size() > 0) //TODO track if a anti-missile is already in air to hit target
-                {
-                    RadioRegistry.popMessage(world, radio,
-                        new IncomingMissileMessage(radio.getChannel(), this.incomingThreats.get(0))); //TODO use static var for event name
+                if (this.ticks % 5 == 0 && !radio.getChannel().equals(RadioRegistry.EMPTY_HZ)) {
+                    for (IMissile detectedMissile : this.detectedThreats) {
+                        RadioRegistry.popMessage(world, radio, new DetectedMissileMessage(radio.getChannel(), detectedMissile));
+                    }
+                    for (IMissile incomingMissile : this.incomingThreats) {
+                        RadioRegistry.popMessage(world, radio, new IncomingMissileMessage(radio.getChannel(), incomingMissile));
+                    }
                 }
             }
             // No power, reset state
@@ -286,39 +289,42 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
                 continue;
             }
 
-            final IMissile newMissile = ICBMClassicHelpers.getMissile(entity);
-            if (newMissile == null || newMissile.getTicksInAir() <= 1) {
+            final IMissile missile = ICBMClassicHelpers.getMissile(entity);
+            if (missile == null || missile.getTicksInAir() <= 1) {
                 continue;
             }
 
-            if (this.isMissileGoingToHit(newMissile)) {
-                if (!this.incomingThreats.isEmpty()) {
-                    // Sort in order of distance
-                    double dist = new Pos((TileEntity) this).distance(newMissile);
-
-                    for (int i = 0; i < this.incomingThreats.size(); i++) //TODO switch to priority list
-                    {
-                        IMissile missile = this.incomingThreats.get(i);
-
-                        if (dist < new Pos((TileEntity) this).distance(missile)) {
-                            this.incomingThreats.add(i, missile);
-                            break;
-                        } else if (i == this.incomingThreats.size() - 1) {
-                            this.incomingThreats.add(missile);
-                            break;
-                        }
-                    }
-                } else {
-                    this.incomingThreats.add(newMissile);
-                }
+            double distance = missile.getVec3d().distanceTo(new Vec3d(this.pos.getX(), this.pos.getY(), this.pos.getZ()));
+            if (distance <= this.triggerRange) {
+                addIncomingMissile(missile);
             } else {
-                this.detectedThreats.add(entity);
+                this.detectedThreats.add(missile);
             }
         }
 
         // Only update render data if we have players viewing the UI
         if (this.getPlayersUsing().size() > 0) {
             radarRenderData.update();
+        }
+    }
+
+    private void addIncomingMissile(IMissile missile) {
+        if (!this.incomingThreats.isEmpty()) {
+            // Sort in order of distance
+            double dist = new Pos(this).distance(missile);
+            for (int i = 0; i < this.incomingThreats.size(); i++) //TODO switch to priority list
+            {
+                IMissile existingMissile = this.incomingThreats.get(i);
+                if (dist < new Pos(this).distance(existingMissile)) {
+                    this.incomingThreats.add(i, existingMissile);
+                    break;
+                } else if (i == this.incomingThreats.size() - 1) {
+                    this.incomingThreats.add(existingMissile);
+                    break;
+                }
+            }
+        } else {
+            this.incomingThreats.add(missile);
         }
     }
 

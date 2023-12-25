@@ -126,7 +126,7 @@ public final class RadarRegistry {
      */
     public static List<Entity> getAllLivingObjectsWithin(World world, double x, double y, double z, double distance) {
         return getAllLivingObjectsWithin(world,
-            new Cube(x - distance, Math.max(0, y - distance), z - distance, x + distance, y + distance, z + distance));
+            new Cube(x - distance, Math.max(0, y - distance), z - distance, x + distance, y + distance * 3, z + distance));
     }
 
     /**
