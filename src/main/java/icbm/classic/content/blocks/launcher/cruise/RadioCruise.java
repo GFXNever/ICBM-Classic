@@ -45,6 +45,7 @@ public class RadioCruise extends RadioTile<TileCruiseLauncher> implements IRadio
             TargetDesignationMessage message = (TargetDesignationMessage) packet;
             if (message.getLauncherId() == host.getLauncherId()) {
                 host.setTarget(message.getTrackedEntity().getPositionVector());
+                host.setFiringPackage(new FiringPackage(new BasicTargetData(host.getTarget()), null, 0));
             }
             return;
         }
