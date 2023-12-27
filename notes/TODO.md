@@ -1,5 +1,13 @@
 # TODO
 
+## Omer and Tzofi
+- Add launcher cooldown between launches
+- Make models 3d
+- Make SAMs launch with follow target logic
+- Simple IFF system 
+
+
+
 ## Missiles/Launcher Work Left
 
 - Engine smoke position
