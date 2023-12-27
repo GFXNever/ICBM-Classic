@@ -11,6 +11,7 @@ import icbm.classic.content.blocks.radarstation.data.RadarRenderData;
 import icbm.classic.content.blocks.radarstation.gui.ContainerRadarStation;
 import icbm.classic.content.blocks.radarstation.gui.GuiRadarStation;
 import icbm.classic.content.missile.entity.anti.EntitySurfaceToAirMissile;
+import icbm.classic.content.radar.MissileDetectionStateMachine;
 import icbm.classic.content.reg.BlockReg;
 import icbm.classic.lib.NBTConstants;
 import icbm.classic.lib.data.IMachineInfo;
@@ -23,7 +24,6 @@ import icbm.classic.lib.network.lambda.tile.PacketCodexTile;
 import icbm.classic.lib.radar.RadarRegistry;
 import icbm.classic.lib.radio.RadioRegistry;
 import icbm.classic.lib.radio.imp.Radio;
-import icbm.classic.lib.radio.messages.IncomingMissileMessage;
 import icbm.classic.lib.saving.NbtSaveHandler;
 import icbm.classic.lib.tile.TickAction;
 import icbm.classic.lib.tile.TickDoOnce;
@@ -39,7 +39,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -52,7 +51,10 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.function.BiConsumer;
 
 public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiTile, IPlayerUsing {
@@ -194,6 +196,22 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        if (isServer()) {
+            RadioRegistry.add(radio);
+        }
+    }
+
+    @Override
+    public void invalidate() {
+        if (isServer()) {
+            RadioRegistry.remove(radio);
+        }
+        super.invalidate();
+    }
+
+    @Override
     public void markDirty() {
         super.markDirty();
         if (isServer()) {
@@ -214,29 +232,27 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
 
         if (isServer()) {
             final boolean hasPower = energyStorage.consumePower(getEnergyCost(), false);
-
-            //If we have energy
-            if (hasPower) {
-                energyStorage.consumePower(getEnergyCost(), true);
-
-                // Do a radar scan
-                if (ticks % 3 == 0) //TODO make config to control scan rate to reduce lag
-                {
-                    this.doScan(); //TODO consider rewriting to not cache targets
-                }
-
-                //Check for incoming and launch anti-missiles if
-                if (this.ticks % 20 == 0 && !radio.getChannel()
-                    .equals(RadioRegistry.EMPTY_HZ) && this.incomingThreats.size() > 0) //TODO track if a anti-missile is already in air to hit target
-                {
-                    RadioRegistry.popMessage(world, radio,
-                        new IncomingMissileMessage(radio.getChannel(), this.incomingThreats.get(0))); //TODO use static var for event name
-                }
-            }
-            // No power, reset state
-            else {
-                incomingThreats.clear();
+            if (!hasPower) {
+                // No power, reset state
+                mIncomingThreats.clear();
                 detectedThreats.clear();
+
+                setEmitRedstoneOutput(false);
+                return;
+            }
+
+            // Do a radar scan
+            if (ticks % 3 == 0) //TODO make config to control scan rate to reduce lag
+            {
+                this.doScan(); //TODO consider rewriting to not cache targets
+            }
+
+            //Check for incoming and launch anti-missiles if
+            if (this.ticks % 20 == 0 && !radio.getChannel()
+                .equals(RadioRegistry.EMPTY_HZ) && hasIncomingMissiles()) //TODO track if a anti-missile is already in air to hit target
+            {
+                IMissile threat = mIncomingThreats.remove();
+                new MissileDetectionStateMachine(this).start(threat);
             }
 
             //Update redstone state
