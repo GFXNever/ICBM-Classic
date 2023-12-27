@@ -311,7 +311,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
             }
 
             final IMissile newMissile = ICBMClassicHelpers.getMissile(entity);
-            if (newMissile == null || newMissile.getTicksInAir() <= 1) {
+            if (newMissile == null || newMissile.getTicksInAir() <= 1 || entity instanceof EntitySurfaceToAirMissile) {
                 continue;
             }
 
