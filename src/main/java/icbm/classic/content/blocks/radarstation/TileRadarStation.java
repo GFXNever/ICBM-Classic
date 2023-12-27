@@ -52,9 +52,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiTile, IPlayerUsing {
@@ -128,8 +126,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     /**
      * Threats that will cause harm to our protection area
      */
-    @Getter
-    private final List<IMissile> incomingThreats = new ArrayList(); //TODO decouple from missile so we can track other entities
+    private final Queue<IMissile> mIncomingThreats; //TODO decouple from missile so we can track other entities
     @Getter
     private final RadarRenderData radarRenderData = new RadarRenderData(this);
     @Getter
@@ -142,7 +139,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         .withChangeCallback((s, i) -> markDirty())
         .withSlot(new InventorySlot(0, EnergySystem::isEnergyItem).withTick(this.energyStorage::dischargeItem));
     @Getter
-    private final List<EntityPlayer> playersUsing = new LinkedList<>();
+    private final List<EntityPlayer> playersUsing = new ArrayList<>();
     /**
      * Range to detect any radar contracts
      */
@@ -171,6 +168,13 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
             playersUsing.removeIf((player) -> !(player.openContainer instanceof ContainerRadarStation));
         }));
         tickActions.add(inventory);
+
+        mIncomingThreats = new PriorityQueue<>(this::compareThreats);
+    }
+
+    private int compareThreats(IMissile first, IMissile second) {
+        Pos selfPosition = new Pos(this);
+        return (int) (selfPosition.distance(first) - selfPosition.distance(second));
     }
 
     public static boolean isThreat(Entity entity) {
@@ -236,12 +240,11 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
             }
 
             //Update redstone state
-            final boolean shouldBeOn = hasPower && hasIncomingMissiles();
-            if (world.getBlockState(getPos()).getValue(BlockRadarStation.REDSTONE_PROPERTY) != shouldBeOn) {
+            final boolean redstoneValue = hasIncomingMissiles();
+            if (world.getBlockState(getPos()).getValue(BlockRadarStation.REDSTONE_PROPERTY) != redstoneValue) {
                 final BlockPos selfPos = getPos();
 
-                ICBMClassic.logger().info("Updating redstone state " + shouldBeOn);
-                world.setBlockState(selfPos, getBlockState().withProperty(BlockRadarStation.REDSTONE_PROPERTY, shouldBeOn), 3);
+                setEmitRedstoneOutput(redstoneValue);
                 for (EnumFacing facing : EnumFacing.values()) {
                     final BlockPos targetPos = selfPos.offset(facing);
                     world.neighborChanged(targetPos, getBlockType(), getPos());
@@ -264,6 +267,11 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         }
     }
 
+    private void setEmitRedstoneOutput(boolean value) {
+        ICBMClassic.logger().info("Updating redstone state " + value);
+        world.setBlockState(getPos(), getBlockState().withProperty(BlockRadarStation.REDSTONE_PROPERTY, value), 3);
+    }
+
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState) {
         return !(oldState.getBlock() == BlockReg.blockRadarStation && newState.getBlock() == BlockReg.blockRadarStation); //Don't kill tile if the radar station is still there
@@ -271,7 +279,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
 
     private void doScan() //TODO document and thread
     {
-        this.incomingThreats.clear();
+        mIncomingThreats.clear();
         this.detectedThreats.clear();
         this.descriptionPacketSender.doNext();
         this.radarRenderData.clear();
@@ -292,27 +300,9 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
             }
 
             if (this.isMissileGoingToHit(newMissile)) {
-                if (!this.incomingThreats.isEmpty()) {
-                    // Sort in order of distance
-                    double dist = new Pos(this).distance(newMissile);
-
-                    for (int i = 0; i < this.incomingThreats.size(); i++) //TODO switch to priority list
-                    {
-                        IMissile missile = this.incomingThreats.get(i);
-
-                        if (dist < new Pos(this).distance(missile)) {
-                            this.incomingThreats.add(i, missile);
-                            break;
-                        } else if (i == this.incomingThreats.size() - 1) {
-                            this.incomingThreats.add(missile);
-                            break;
-                        }
-                    }
-                } else {
-                    this.incomingThreats.add(newMissile);
-                }
+                mIncomingThreats.add(newMissile);
             } else {
-                this.detectedThreats.add(entity);
+                detectedThreats.add(entity);
             }
         }
 
@@ -345,6 +335,10 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         return nextDistance < currentDistance;   // we assume that the missile hits if the distance decreases (the missile is coming closer)
     }
 
+    public Queue<IMissile> getIncomingThreats() {
+        return mIncomingThreats;
+    }
+
     public EnumRadarState getRadarState() {
 
         if (isClient()) {
@@ -353,18 +347,18 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
 
         if (!this.energyStorage.consumePower(getEnergyCost(), false)) {
             return EnumRadarState.OFF;
-        } else if (this.incomingThreats.size() > 0) {
+        } else if (hasIncomingMissiles()) {
             return EnumRadarState.DANGER;
-        } else if (this.detectedThreats.size() > 0) {
+        } else if (!this.detectedThreats.isEmpty()) {
             return EnumRadarState.WARNING;
         }
         return EnumRadarState.ON;
     }
 
     public int getStrongRedstonePower(EnumFacing side) {
-        if (this.outputRedstone && incomingThreats.size() > 0) //TODO add UI customization to pick side of redstone output and minimal number of missiles to trigger
+        if (this.outputRedstone && hasIncomingMissiles()) //TODO add UI customization to pick side of redstone output and minimal number of missiles to trigger
         {
-            return Math.min(15, incomingThreats.size());
+            return Math.min(15, mIncomingThreats.size());
         }
         return 0;
     }
@@ -374,7 +368,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
     }
 
     public boolean hasIncomingMissiles() {
-        return incomingThreats.size() > 0;
+        return !mIncomingThreats.isEmpty();
     }
 
     @Override
@@ -420,5 +414,4 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         SAVE_LOGIC.save(this, nbt);
         return super.writeToNBT(nbt);
     }
-
 }
