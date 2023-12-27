@@ -100,9 +100,7 @@ public class RadarComponent implements IGuiComponent {
 
         // Target data
 
-        for (int i = 0; i < tile.getRadarRenderData().getDots().size(); i++) {
-            final RadarRenderDot dot = tile.getRadarRenderData().getDots().get(i);
-
+        for (RadarRenderDot dot : tile.getRadarRenderData().getDots()) {
             final int x = gx + dot.getX();
             final int y = gy + dot.getY();
             if (dot.getType() == RadarDotType.MARKER) {
