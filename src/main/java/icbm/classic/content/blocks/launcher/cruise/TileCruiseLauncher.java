@@ -7,6 +7,7 @@ import icbm.classic.api.events.LauncherSetTargetEvent;
 import icbm.classic.config.ConfigMain;
 import icbm.classic.config.machines.ConfigLauncher;
 import icbm.classic.content.blocks.launcher.FiringPackage;
+import icbm.classic.content.blocks.launcher.LauncherId;
 import icbm.classic.content.blocks.launcher.LauncherLangs;
 import icbm.classic.content.blocks.launcher.cruise.gui.ContainerCruiseLauncher;
 import icbm.classic.content.blocks.launcher.cruise.gui.GuiCruiseLauncher;
@@ -61,6 +62,7 @@ import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 
 public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILauncherComponent, IMachineInfo, IPlayerUsing {
@@ -92,7 +94,7 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
             .fromClient()
             .nodeVec3d(TileCruiseLauncher::getTarget, TileCruiseLauncher::setTarget)
             .onFinished((r, t, p) -> r.markDirty());
-        //TODO change UI to only have yaw and pitch, drop xyz but still allow tools to auto fill from xyz
+    //TODO change UI to only have yaw and pitch, drop xyz but still allow tools to auto fill from xyz
     public static final PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher> PACKET_GUI =
         (PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>) new PacketCodexTile<TileCruiseLauncher, TileCruiseLauncher>(REGISTRY_NAME, "gui")
             .fromClient()
@@ -163,6 +165,9 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
      */
     private Vec3d _targetPos = Vec3d.ZERO;
 
+    @Getter
+    private final LauncherId launcherId;
+
     public TileCruiseLauncher() {
         tickActions.add(descriptionPacketSender);
         tickActions.add(new TickAction(3, true, (t) -> PACKET_GUI.sendPacketToGuiUsers(this, playersUsing)));
@@ -170,6 +175,8 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
             playersUsing.removeIf((player) -> !(player.openContainer instanceof ContainerCruiseLauncher));
         }));
         tickActions.add(inventory);
+
+        launcherId = new LauncherId(UUID.randomUUID());
     }
 
     public static void register() {
@@ -254,7 +261,6 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
 
 
         if (isServer()) {
-
             // Update current aim
             currentAim.moveTowards(aim, ROTATION_SPEED, deltaTime).clampTo360();
 
@@ -411,7 +417,6 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
             updateAimAngle();
         }
     }
-    ;
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
