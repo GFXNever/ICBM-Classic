@@ -88,7 +88,7 @@ public final class RadioRegistry {
      * @param sender posting message
      * @param packet containing message
      */
-    public static void popMessage(World world, IRadioSender sender, IRadioMessage packet) {
+    public static void broadcastMessage(World world, IRadioSender sender, IRadioMessage packet) {
         if (world == null || world.provider == null || world.isRemote) {
             ICBMClassic.logger().error("RadarRegistry: Invalid world : " + world, new RuntimeException());
             return;

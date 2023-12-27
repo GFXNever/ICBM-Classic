@@ -294,13 +294,13 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
             if (this.isMissileGoingToHit(newMissile)) {
                 if (!this.incomingThreats.isEmpty()) {
                     // Sort in order of distance
-                    double dist = new Pos((TileEntity) this).distance(newMissile);
+                    double dist = new Pos(this).distance(newMissile);
 
                     for (int i = 0; i < this.incomingThreats.size(); i++) //TODO switch to priority list
                     {
                         IMissile missile = this.incomingThreats.get(i);
 
-                        if (dist < new Pos((TileEntity) this).distance(missile)) {
+                        if (dist < new Pos(this).distance(missile)) {
                             this.incomingThreats.add(i, missile);
                             break;
                         } else if (i == this.incomingThreats.size() - 1) {
@@ -317,7 +317,7 @@ public class TileRadarStation extends TileMachine implements IMachineInfo, IGuiT
         }
 
         // Only update render data if we have players viewing the UI
-        if (this.getPlayersUsing().size() > 0) {
+        if (!getPlayersUsing().isEmpty()) {
             radarRenderData.update();
         }
     }

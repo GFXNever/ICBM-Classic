@@ -5,7 +5,7 @@ import icbm.classic.api.radio.IRadioReceiver;
 import icbm.classic.api.radio.IRadioSender;
 import icbm.classic.lib.radio.imp.RadioTile;
 
-public class RadioRadar extends RadioTile<TileRadarStation> implements IRadioSender {
+public class RadioRadar extends RadioTile<TileRadarStation> implements IRadioSender, IRadioReceiver {
 
     public RadioRadar(TileRadarStation host) {
         super(host);
@@ -16,4 +16,8 @@ public class RadioRadar extends RadioTile<TileRadarStation> implements IRadioSen
 
     }
 
+    @Override
+    public void onMessage(IRadioSender sender, IRadioMessage packet) {
+
+    }
 }

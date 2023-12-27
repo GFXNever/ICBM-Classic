@@ -168,8 +168,8 @@ public abstract class BlastGasBase extends Blast implements IBlastTickable {
 
         //Init path data
         if (affectedBlocks.isEmpty()) {
-            affectedBlocks.add(getPos());
-            edgeBlocks.add(getPos());
+            affectedBlocks.add(getBlockPosition());
+            edgeBlocks.add(getBlockPosition());
         }
 
         if (edgeBlocks.isEmpty()) {

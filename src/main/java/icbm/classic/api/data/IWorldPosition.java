@@ -27,11 +27,11 @@ public interface IWorldPosition extends IPos3D {
         return world() != null;
     }
 
-    default BlockPos getPos() {
+    default BlockPos getBlockPosition() {
         return new BlockPos(xi(), yi(), zi());
     }
 
-    default Vec3d getVec3d() {
+    default Vec3d getVectorPosition() {
         return new Vec3d(x(), y(), z());
     }
 

@@ -15,7 +15,7 @@ public class IncomingMissileMessage implements IIncomingMissileMessage {
 
     @Override
     public Vec3d getTarget() {
-        return Optional.ofNullable(missile).map(IMissile::getVec3d).orElse(null);
+        return Optional.ofNullable(missile).map(IMissile::getVectorPosition).orElse(null);
     }
 
 }

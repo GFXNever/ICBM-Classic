@@ -170,7 +170,7 @@ public class CommandBlastSpreadTest
         do
         {
             final FakeBlast blast = blastsCreated.poll();
-            final BlockPos pos = blast.getPos();
+            final BlockPos pos = blast.getBlockPosition();
 
             //Check that we match position, then remove to catch duplicate spawns
             Assertions.assertTrue(positions.contains(pos));

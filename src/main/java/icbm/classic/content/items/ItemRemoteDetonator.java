@@ -39,7 +39,7 @@ public class ItemRemoteDetonator extends ItemRadio {
             if (!MinecraftForge.EVENT_BUS.post(new RemoteTriggerEvent(world, player, stack))) //event was not canceled
             {
                 final String channel = getRadioChannel(stack);
-                RadioRegistry.popMessage(world, new FakeRadioSender(player, stack, null), new TriggerActionMessage(channel));
+                RadioRegistry.broadcastMessage(world, new FakeRadioSender(player, stack, null), new TriggerActionMessage(channel));
             }
         }
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);

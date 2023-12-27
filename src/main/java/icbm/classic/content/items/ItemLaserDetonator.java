@@ -104,7 +104,7 @@ public class ItemLaserDetonator extends ItemRadio implements IPacketIDReceiver {
                         formatNumber(event.getPos().z)
                     ), false);
 
-                    RadioRegistry.popMessage(player.world, new FakeRadioSender(player, stack, null),
+                    RadioRegistry.broadcastMessage(player.world, new FakeRadioSender(player, stack, null),
                         new TriggerActionTargetMessage(getRadioChannel(stack), event.getPos()));
                 } else if (event.cancelReason != null) {
                     player.sendStatusMessage(new TextComponentTranslation(event.cancelReason), true);
