@@ -123,6 +123,7 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
         /* */.nodeInteger("energy", tile -> tile.energyStorage.getEnergyStored(), (tile, i) -> tile.energyStorage.setEnergyStored(i))
         /* */.nodeINBTSerializable("launcher", launcher -> launcher.launcher)
         .base();
+    public static final int AVAILABLE_COOLDOWN = 100;
     public final RadioCruise radio = new RadioCruise(this);
     /**
      * Desired aim angle, updated every tick if target != null
@@ -168,6 +169,8 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
     @Getter
     private final LauncherId launcherId;
 
+    private int nextAvailableTicks;
+
     public TileCruiseLauncher() {
         tickActions.add(descriptionPacketSender);
         tickActions.add(new TickAction(3, true, (t) -> PACKET_GUI.sendPacketToGuiUsers(this, playersUsing)));
@@ -177,6 +180,7 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
         tickActions.add(inventory);
 
         launcherId = new LauncherId(UUID.randomUUID());
+        nextAvailableTicks = 0;
     }
 
     public static void register() {
@@ -272,14 +276,19 @@ public class TileCruiseLauncher extends TileMachine implements IGuiTile, ILaunch
                 }
             }
 
-            if (firingPackage != null && isAimed()) {
+            if (firingPackage != null && isAimed() && isAvailable()) {
                 firingPackage.setCountDown(firingPackage.getCountDown() - 1);
                 if (firingPackage.getCountDown() <= 0) {
                     firingPackage.launch(launcher);
                     firingPackage = null;
+                    nextAvailableTicks = ticks + AVAILABLE_COOLDOWN;
                 }
             }
         }
+    }
+
+    public boolean isAvailable() {
+        return ticks >= nextAvailableTicks;
     }
 
     public boolean isAimed() {

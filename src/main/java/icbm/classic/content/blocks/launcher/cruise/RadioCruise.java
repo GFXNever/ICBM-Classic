@@ -28,7 +28,9 @@ public class RadioCruise extends RadioTile<TileCruiseLauncher> implements IRadio
         }
 
         if (packet instanceof IRequestAvailableLauncherMessage) {
-            // TODO: Add ready check (for cooldown and missile check)
+            if (!host.isAvailable()) {
+                return;
+            }
             sender.onMessageCallback(this, new LauncherReadyMessage(host.getLauncherId(), getChannel()));
             return;
         }
